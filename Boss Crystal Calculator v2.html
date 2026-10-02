@@ -1,0 +1,3776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSEA Boss Crystal Calculator</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #0f1117;
+        color: #f1f3f5;
+    }
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
+
+    .container {
+        width: min(1400px, calc(100% - 30px));
+        margin: 0 auto;
+        padding: 24px 0 50px;
+    }
+
+    header {
+        margin-bottom: 24px;
+    }
+
+    header h1 {
+        margin: 0 0 6px;
+        font-size: 30px;
+    }
+
+    header p {
+        margin: 0;
+        color: #9aa1ad;
+        font-size: 14px;
+    }
+
+    /* =========================
+       DASHBOARD
+    ========================= */
+
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .card {
+        background: #171a22;
+        border: 1px solid #292e3a;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .card-label {
+        color: #9aa1ad;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .card-value {
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .card-sub {
+        color: #777f8d;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .progress-wrap {
+        margin-top: 10px;
+    }
+
+    .progress {
+        height: 7px;
+        background: #272c36;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: #7c5cff;
+        transition: width 0.2s ease;
+    }
+
+    /* =========================
+       SECTIONS
+    ========================= */
+
+    .section {
+        background: #171a22;
+        border: 1px solid #292e3a;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid #292e3a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .section-subtitle {
+        color: #777f8d;
+        font-size: 12px;
+    }
+
+    /* =========================
+       ACCOUNT
+    ========================= */
+
+    .account-section {
+        margin-bottom: 16px;
+    }
+
+    .account-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    .account-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+
+    .account-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .account-tab {
+        background: #171a22;
+        color: #aeb5c2;
+        border: 1px solid #292e3a;
+        border-radius: 9px;
+        padding: 9px 12px;
+        cursor: pointer;
+        transition: 0.15s;
+    }
+
+    .account-tab:hover {
+        border-color: #464d5c;
+        color: #fff;
+    }
+
+    .account-tab.active {
+        background: #242033;
+        border-color: #7c5cff;
+        color: #fff;
+    }
+
+    .account-tab-name {
+        font-weight: 700;
+    }
+
+    .account-tab-count {
+        margin-left: 5px;
+        color: #858c99;
+        font-size: 12px;
+    }
+
+    /* =========================
+       CHARACTER
+    ========================= */
+
+    .character-section {
+        margin-bottom: 16px;
+    }
+
+    .character-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .character-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+
+    .character-actions-top {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .character-tab {
+        background: #171a22;
+        color: #aeb5c2;
+        border: 1px solid #292e3a;
+        border-radius: 9px;
+        padding: 9px 12px;
+        cursor: pointer;
+        transition: 0.15s;
+    }
+
+    .character-tab:hover {
+        border-color: #464d5c;
+        color: #fff;
+    }
+
+    .character-tab.active {
+        background: #242033;
+        border-color: #7c5cff;
+        color: #fff;
+    }
+
+    .character-tab-name {
+        font-weight: 700;
+    }
+
+    .character-tab-count {
+        margin-left: 5px;
+        color: #858c99;
+        font-size: 12px;
+    }
+
+    /* =========================
+       TOOLBAR
+    ========================= */
+
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        background: #14171e;
+        border-bottom: 1px solid #292e3a;
+    }
+
+    .search {
+        flex: 1;
+        min-width: 220px;
+    }
+
+    .input,
+    .search input {
+        width: 100%;
+        background: #0f1117;
+        border: 1px solid #303642;
+        color: #fff;
+        border-radius: 8px;
+        padding: 10px 12px;
+        outline: none;
+    }
+
+    .input:focus,
+    .search input:focus {
+        border-color: #7c5cff;
+    }
+
+    .btn {
+        background: #242934;
+        color: #fff;
+        border: 1px solid #373e4c;
+        border-radius: 8px;
+        padding: 9px 12px;
+        cursor: pointer;
+        transition: 0.15s;
+    }
+
+    .btn:hover {
+        background: #2c3240;
+    }
+
+    .btn.primary {
+        background: #6650d9;
+        border-color: #7c5cff;
+    }
+
+    .btn.primary:hover {
+        background: #7560e8;
+    }
+
+    .btn.danger {
+        color: #ff9d9d;
+    }
+
+    /* =========================
+       BOSS LIST
+    ========================= */
+
+    .boss-list {
+        padding: 8px 16px 16px;
+    }
+
+    .boss-row {
+        display: grid;
+        grid-template-columns:
+            minmax(150px, 1fr)
+            minmax(260px, 2fr)
+            120px
+            160px;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 0;
+        border-bottom: 1px solid #242934;
+    }
+
+    .boss-row:last-child {
+        border-bottom: none;
+    }
+
+    .boss-name {
+        font-weight: 700;
+    }
+
+    .boss-type {
+        display: inline-block;
+        margin-left: 7px;
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-size: 10px;
+        color: #9da4b1;
+        background: #242934;
+        vertical-align: middle;
+    }
+
+    .difficulty-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    .difficulty-option {
+        position: relative;
+    }
+
+    .difficulty-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .difficulty-option label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-width: 42px;
+        text-align: center;
+        padding: 7px 9px;
+        background: #11141a;
+        border: 1px solid #303642;
+        color: #aeb5c2;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 700;
+        user-select: none;
+        transition: 0.15s;
+    }
+
+    .difficulty-option label:hover {
+        border-color: #596174;
+        color: #fff;
+    }
+
+    .difficulty-option input:checked + label {
+        background: #332a5d;
+        border-color: #7c5cff;
+        color: #fff;
+    }
+
+    .difficulty-option input:disabled + label {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .difficulty-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
+        border-radius: 999px;
+        background: #7c5cff;
+        color: #fff;
+        font-size: 10px;
+        line-height: 1;
+    }
+
+    .party-select {
+        width: 58px;
+        background: #11141a;
+        color: #fff;
+        border: 1px solid #303642;
+        border-radius: 7px;
+        padding: 7px 5px;
+        outline: none;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .party-select:focus {
+        border-color: #7c5cff;
+    }
+
+    .meso {
+        text-align: right;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .meso small {
+        display: block;
+        color: #777f8d;
+        font-weight: 400;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .empty {
+        padding: 35px 15px;
+        text-align: center;
+        color: #777f8d;
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+
+    .toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        background: #242934;
+        border: 1px solid #424958;
+        color: #fff;
+        padding: 12px 15px;
+        border-radius: 9px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        transition: 0.2s;
+        z-index: 1000;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* =========================
+       MODAL
+    ========================= */
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+    .modal {
+        width: min(420px, calc(100% - 30px));
+        background: #171a22;
+        border: 1px solid #303642;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .modal h3 {
+        margin: 0 0 12px;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 950px) {
+
+        .dashboard {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .boss-row {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .meso {
+            text-align: left;
+        }
+
+        .party-select {
+            max-width: 180px;
+        }
+
+    }
+
+    @media (max-width: 650px) {
+
+        .container {
+            width: min(100% - 20px, 1400px);
+            padding-top: 15px;
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        .dashboard {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .account-top,
+        .character-top {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .account-actions,
+        .character-actions-top {
+            width: 100%;
+        }
+
+        .account-actions .btn,
+        .character-actions-top .btn {
+            flex: 1;
+        }
+
+        .toolbar {
+            flex-direction: column;
+        }
+
+        .search {
+            min-width: 0;
+        }
+
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>MSEA Boss Crystal Calculator</h1>
+        <p>
+            Track weekly Boss Crystals, party splits, and meso earnings.
+            Supports multiple accounts and multiple characters.
+        </p>
+    </header>
+
+
+    <!-- =========================
+         DASHBOARD
+    ========================= -->
+
+    <section class="dashboard">
+
+        <div class="card">
+            <div class="card-label">
+                Character Crystals
+            </div>
+
+            <div class="card-value"
+                 id="characterCrystals">
+                0
+            </div>
+
+            <div class="card-sub">
+                Maximum 12 clears
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-label">
+                Character Remaining
+            </div>
+
+            <div class="card-value"
+                 id="characterRemaining">
+                12
+            </div>
+
+            <div class="card-sub">
+                Boss Crystal slots
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-label">
+                Character Total
+            </div>
+
+            <div class="card-value"
+                 id="characterTotal">
+                0
+            </div>
+
+            <div class="card-sub">
+                Meso per person
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-label">
+                Account Total
+            </div>
+
+            <div class="card-value"
+                 id="accountTotal">
+                0
+            </div>
+
+            <div class="card-sub">
+                <span id="accountCrystalText">
+                    0 / 90 Boss Crystals
+                </span>
+            </div>
+
+            <div class="progress-wrap">
+                <div class="progress">
+                    <div
+                        class="progress-bar"
+                        id="accountProgress">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         ACCOUNTS
+    ========================= -->
+
+    <section class="account-section">
+
+        <div class="account-top">
+
+            <div
+                class="account-tabs"
+                id="accountTabs">
+            </div>
+
+
+            <div class="account-actions">
+
+                <button
+                    class="btn primary"
+                    onclick="addAccount()">
+                    + Add Account
+                </button>
+
+                <button
+                    class="btn"
+                    onclick="renameAccount()">
+                    Rename Account
+                </button>
+
+                <button
+                    class="btn danger"
+                    onclick="deleteAccount()">
+                    Delete Account
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         CHARACTERS
+    ========================= -->
+
+    <section class="character-section">
+
+        <div class="character-top">
+
+            <div
+                class="character-tabs"
+                id="characterTabs">
+            </div>
+
+
+            <div class="character-actions-top">
+
+                <button
+                    class="btn"
+                    onclick="renameCharacter()">
+                    Rename Character
+                </button>
+
+                <button
+                    class="btn danger"
+                    onclick="deleteCharacter()">
+                    Delete Character
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         TOOLBAR
+    ========================= -->
+
+    <section class="section">
+
+        <div class="toolbar">
+
+            <div class="search">
+
+                <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search boss..."
+                    oninput="renderBosses()">
+
+            </div>
+
+
+            <button
+                class="btn primary"
+                onclick="addCharacter()">
+                + Add Character
+            </button>
+
+
+            <button
+                class="btn"
+                onclick="loadExampleData()">
+                Example Data
+            </button>
+
+
+            <button
+                class="btn"
+                onclick="clearSelected()">
+                Clear Selected
+            </button>
+
+
+            <button
+                class="btn danger"
+                onclick="resetAll()">
+                Reset All
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         WEEKLY BOSSES
+    ========================= -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-title">
+                    Weekly Bosses
+                </div>
+
+                <div class="section-subtitle">
+                    Maximum 12 Boss Crystals per character
+                    · Each boss can be cleared up to 2 times
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="boss-list"
+            id="weeklyBosses">
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- =========================
+     TOAST
+========================= -->
+
+<div
+    class="toast"
+    id="toast">
+</div>
+
+
+<!-- =========================
+     MODAL
+========================= -->
+
+<div
+    class="modal-overlay"
+    id="modalOverlay">
+
+    <div class="modal">
+
+        <h3 id="modalTitle">
+            Rename
+        </h3>
+
+        <input
+            class="input"
+            id="modalInput"
+            type="text"
+            maxlength="30"
+            autocomplete="off">
+
+
+        <div class="modal-actions">
+
+            <button
+                class="btn"
+                onclick="closeModal()">
+                Cancel
+            </button>
+
+
+            <button
+                class="btn primary"
+                onclick="confirmModal()">
+                Confirm
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+const MAX_BOSSES_PER_CHARACTER = 12;
+
+const MAX_ACCOUNT_CRYSTALS = 90;
+
+const MAX_CLEARS_PER_BOSS = 2;
+
+const STORAGE_KEY =
+    "msea_boss_crystal_calculator_v11";
+
+
+/* =========================================================
+   BOSS DATA
+========================================================= */
+
+const defaultBosses = [
+
+    {
+        id: "lotus",
+        name: "Lotus",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 21.87 },
+            { name: "H", value: 71 },
+            { name: "EX", value: 588 }
+        ]
+    },
+
+    {
+        id: "damien",
+        name: "Damien",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 22.86 },
+            { name: "H", value: 67.5 }
+        ]
+    },
+
+    {
+        id: "slime",
+        name: "Slime",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 29.6 },
+            { name: "C", value: 99.9 }
+        ]
+    },
+
+    {
+        id: "lucid",
+        name: "Lucid",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 35.6 },
+            { name: "N", value: 43.2 },
+            { name: "H", value: 85 }
+        ]
+    },
+
+    {
+        id: "will",
+        name: "Will",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 38.7 },
+            { name: "N", value: 50.4 },
+            { name: "H", value: 104.4 }
+        ]
+    },
+
+    {
+        id: "dusk",
+        name: "Dusk",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 54 },
+            { name: "H", value: 94.5 }
+        ]
+    },
+
+    {
+        id: "heretic",
+        name: "Heretic",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 96.3 },
+            { name: "H", value: 139.7 }
+        ]
+    },
+
+    {
+        id: "djunkel",
+        name: "Djunkel",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 58.5 },
+            { name: "H", value: 124.2 }
+        ]
+    },
+
+    {
+        id: "seren",
+        name: "Seren",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 289.8 },
+            { name: "H", value: 423 },
+            { name: "EX", value: 2280 }
+        ]
+    },
+
+    {
+        id: "kalos",
+        name: "Kalos",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 338.8 },
+            { name: "N", value: 495 },
+            { name: "C", value: 1056 },
+            { name: "EX", value: 2565 }
+        ]
+    },
+
+    {
+        id: "adversary",
+        name: "Adversary",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 361 },
+            { name: "N", value: 530 },
+            { name: "H", value: 1260 },
+            { name: "EX", value: 2920 }
+        ]
+    },
+
+    {
+        id: "radiant",
+        name: "Radiant",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 594 },
+            { name: "H", value: 2256 }
+        ]
+    },
+
+    {
+        id: "carling",
+        name: "Carling",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 368.2 },
+            { name: "N", value: 577.5 },
+            { name: "H", value: 1232 },
+            { name: "EX", value: 3040 }
+        ]
+    },
+
+    {
+        id: "bellona",
+        name: "Bellona",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: null },
+            { name: "N", value: null },
+            { name: "H", value: null }
+        ]
+    },
+
+    {
+        id: "limbo",
+        name: "Limbo",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 900 },
+            { name: "H", value: 1930 }
+        ]
+    },
+
+    {
+        id: "baldrix",
+        name: "Baldrix",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 1200 },
+            { name: "H", value: 2160 }
+        ]
+    },
+
+    {
+        id: "jupiter",
+        name: "Jupiter",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 1360 },
+            { name: "H", value: 3000 }
+        ]
+    }
+
+];
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+/*
+    New structure:
+
+    state = {
+        accounts: [
+            {
+                id,
+                name,
+                characters: [
+                    {
+                        id,
+                        name,
+                        selected: {}
+                    }
+                ]
+            }
+        ],
+
+        activeAccountId,
+        activeCharacterId,
+
+        partySizes: {}
+    }
+
+*/
+
+let state = {
+
+    accounts: [],
+
+    activeAccountId: null,
+
+    activeCharacterId: null,
+
+    partySizes: {}
+
+};
+
+let modalAction = null;
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+function init() {
+
+    loadState();
+
+    migrateState();
+
+    if (!state.accounts.length) {
+
+        createInitialAccount();
+
+    }
+
+    ensureActiveAccount();
+
+    ensureActiveCharacter();
+
+    saveState();
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   ID
+========================================================= */
+
+function generateId() {
+
+    return (
+        Date.now().toString(36) +
+        Math.random()
+            .toString(36)
+            .slice(2)
+    );
+
+}
+
+
+/* =========================================================
+   ACCOUNT HELPERS
+========================================================= */
+
+function getActiveAccount() {
+
+    return state.accounts.find(
+        account =>
+            account.id ===
+            state.activeAccountId
+    );
+
+}
+
+
+function getActiveCharacter() {
+
+    const account =
+        getActiveAccount();
+
+    if (!account) {
+        return null;
+    }
+
+    return account.characters.find(
+        character =>
+            character.id ===
+            state.activeCharacterId
+    );
+
+}
+
+
+function createInitialAccount() {
+
+    const account = {
+
+        id: generateId(),
+
+        name: "Account 1",
+
+        characters: []
+
+    };
+
+
+    const character = {
+
+        id: generateId(),
+
+        name: "Character 1",
+
+        selected: {}
+
+    };
+
+
+    account.characters.push(
+        character
+    );
+
+
+    state.accounts.push(
+        account
+    );
+
+
+    state.activeAccountId =
+        account.id;
+
+    state.activeCharacterId =
+        character.id;
+
+}
+
+
+/* =========================================================
+   STATE MIGRATION
+========================================================= */
+
+/*
+    This allows your previous version
+    to continue working.
+
+    Old structure:
+
+        characters: []
+        activeCharacterId
+        partySizes
+
+    becomes:
+
+        Account 1
+            └── old characters
+*/
+
+function migrateState() {
+
+    /*
+        Already new format
+    */
+
+    if (
+        Array.isArray(
+            state.accounts
+        )
+    ) {
+
+        state.accounts.forEach(
+            account => {
+
+                if (
+                    !Array.isArray(
+                        account.characters
+                    )
+                ) {
+
+                    account.characters = [];
+
+                }
+
+                account.characters.forEach(
+                    character => {
+
+                        if (
+                            !character.selected
+                        ) {
+
+                            character.selected = {};
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+        migrateOldSelections();
+
+        return;
+
+    }
+
+
+    /*
+        This branch is mostly for safety.
+    */
+
+    state.accounts = [];
+
+    state.activeAccountId = null;
+
+    state.activeCharacterId = null;
+
+}
+
+
+/* =========================================================
+   LOAD STATE
+========================================================= */
+
+function loadState() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+
+        /*
+            Try new storage first.
+        */
+
+        if (saved) {
+
+            const parsed =
+                JSON.parse(saved);
+
+            if (
+                parsed &&
+                Array.isArray(
+                    parsed.accounts
+                )
+            ) {
+
+                state = {
+
+                    accounts:
+                        parsed.accounts,
+
+                    activeAccountId:
+                        parsed.activeAccountId ||
+                        null,
+
+                    activeCharacterId:
+                        parsed.activeCharacterId ||
+                        null,
+
+                    partySizes:
+                        parsed.partySizes &&
+                        typeof parsed.partySizes === "object"
+                            ? parsed.partySizes
+                            : {}
+
+                };
+
+                return;
+
+            }
+
+        }
+
+
+        /*
+            Check old v10 storage.
+
+            This is important because you already
+            have data in the previous calculator.
+        */
+
+        const oldStorage =
+            localStorage.getItem(
+                "msea_boss_crystal_calculator_v10"
+            );
+
+
+        if (oldStorage) {
+
+            const parsedOld =
+                JSON.parse(
+                    oldStorage
+                );
+
+
+            const account = {
+
+                id: generateId(),
+
+                name: "Account 1",
+
+                characters:
+                    Array.isArray(
+                        parsedOld.characters
+                    )
+                        ? parsedOld.characters
+                        : []
+
+            };
+
+
+            state = {
+
+                accounts: [
+                    account
+                ],
+
+                activeAccountId:
+                    account.id,
+
+                activeCharacterId:
+                    parsedOld.activeCharacterId ||
+                    (
+                        account.characters[0]
+                            ? account.characters[0].id
+                            : null
+                    ),
+
+                partySizes:
+                    parsedOld.partySizes &&
+                    typeof parsedOld.partySizes === "object"
+                        ? parsedOld.partySizes
+                        : {}
+
+            };
+
+
+            migrateOldSelections();
+
+            return;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load saved data:",
+            error
+        );
+
+    }
+
+
+    state = {
+
+        accounts: [],
+
+        activeAccountId: null,
+
+        activeCharacterId: null,
+
+        partySizes: {}
+
+    };
+
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+function saveState() {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(state)
+    );
+
+}
+
+
+/* =========================================================
+   OLD SELECTION MIGRATION
+========================================================= */
+
+function migrateOldSelections() {
+
+    state.accounts.forEach(
+        account => {
+
+            if (
+                !Array.isArray(
+                    account.characters
+                )
+            ) {
+                account.characters = [];
+            }
+
+
+            account.characters.forEach(
+                character => {
+
+                    if (
+                        !character.selected
+                    ) {
+
+                        character.selected = {};
+
+                        return;
+
+                    }
+
+
+                    Object.keys(
+                        character.selected
+                    ).forEach(
+                        bossId => {
+
+                            const value =
+                                character.selected[
+                                    bossId
+                                ];
+
+
+                            if (
+                                typeof value ===
+                                "string"
+                            ) {
+
+                                character.selected[
+                                    bossId
+                                ] = [
+                                    value
+                                ];
+
+                            }
+
+                            else if (
+                                Array.isArray(
+                                    value
+                                )
+                            ) {
+
+                                character.selected[
+                                    bossId
+                                ] =
+                                    value.slice(
+                                        0,
+                                        MAX_CLEARS_PER_BOSS
+                                    );
+
+                            }
+
+                            else {
+
+                                delete character.selected[
+                                    bossId
+                                ];
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ACTIVE STATE
+========================================================= */
+
+function ensureActiveAccount() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+
+        state.activeAccountId =
+            state.accounts[0].id;
+
+    }
+
+}
+
+
+function ensureActiveCharacter() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return;
+    }
+
+
+    const character =
+        account.characters.find(
+            item =>
+                item.id ===
+                state.activeCharacterId
+        );
+
+
+    if (!character) {
+
+        if (
+            account.characters.length === 0
+        ) {
+
+            const newCharacter = {
+
+                id: generateId(),
+
+                name: "Character 1",
+
+                selected: {}
+
+            };
+
+
+            account.characters.push(
+                newCharacter
+            );
+
+
+            state.activeCharacterId =
+                newCharacter.id;
+
+        }
+
+        else {
+
+            state.activeCharacterId =
+                account.characters[0].id;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   BOSS HELPERS
+========================================================= */
+
+function getBoss(bossId) {
+
+    return defaultBosses.find(
+        boss =>
+            boss.id === bossId
+    );
+
+}
+
+
+function isMonthlyBoss(boss) {
+
+    return (
+        boss &&
+        boss.type === "Monthly"
+    );
+
+}
+
+
+function getDifficulty(
+    bossId,
+    difficultyName
+) {
+
+    const boss =
+        getBoss(bossId);
+
+
+    if (!boss) {
+        return null;
+    }
+
+
+    return boss.difficulties.find(
+        difficulty =>
+            difficulty.name ===
+            difficultyName
+    );
+
+}
+
+
+function getBossSelections(
+    character,
+    bossId
+) {
+
+    if (
+        !character ||
+        !character.selected
+    ) {
+
+        return [];
+
+    }
+
+
+    const value =
+        character.selected[bossId];
+
+
+    if (
+        Array.isArray(value)
+    ) {
+
+        return value;
+
+    }
+
+
+    if (
+        typeof value === "string"
+    ) {
+
+        return [
+            value
+        ];
+
+    }
+
+
+    return [];
+
+}
+
+
+/* =========================================================
+   CRYSTAL COUNTS
+========================================================= */
+
+function getCharacterCrystalCount(
+    character
+) {
+
+    if (
+        !character ||
+        !character.selected
+    ) {
+
+        return 0;
+
+    }
+
+
+    let total = 0;
+
+
+    Object.keys(
+        character.selected
+    ).forEach(
+        bossId => {
+
+            const boss =
+                getBoss(bossId);
+
+
+            if (
+                !boss ||
+                boss.type !== "Weekly"
+            ) {
+
+                return;
+
+            }
+
+
+            total +=
+                getBossSelections(
+                    character,
+                    bossId
+                ).length;
+
+        }
+    );
+
+
+    return total;
+
+}
+
+
+function getAccountCharacters() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return [];
+    }
+
+
+    return account.characters;
+
+}
+
+
+function getAccountCrystalCount() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return 0;
+    }
+
+
+    let total = 0;
+
+
+    account.characters.forEach(
+        character => {
+
+            total +=
+                getCharacterCrystalCount(
+                    character
+                );
+
+        }
+    );
+
+
+    return total;
+
+}
+
+
+/* =========================================================
+   MESO
+========================================================= */
+
+function formatMeso(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "—";
+
+    }
+
+
+    if (
+        value >= 1000
+    ) {
+
+        return (
+            value / 1000
+        ).toFixed(
+            value % 1000 === 0
+                ? 0
+                : 2
+        ) + "b";
+
+    }
+
+
+    return value.toFixed(
+        Number.isInteger(value)
+            ? 0
+            : 2
+    ) + "m";
+
+}
+
+
+function getPartySize(
+    bossId,
+    characterId,
+    difficulty
+) {
+
+    const key =
+        characterId +
+        ":" +
+        bossId +
+        ":" +
+        difficulty;
+
+
+    if (
+        Object.prototype.hasOwnProperty.call(
+            state.partySizes,
+            key
+        )
+    ) {
+
+        return (
+            Number(
+                state.partySizes[key]
+            ) || 1
+        );
+
+    }
+
+
+    /*
+        Old format fallback
+    */
+
+    const oldKey =
+        characterId +
+        ":" +
+        bossId;
+
+
+    return (
+        Number(
+            state.partySizes[oldKey]
+        ) || 1
+    );
+
+}
+
+
+function setPartySize(
+    bossId,
+    characterId,
+    difficulty,
+    value
+) {
+
+    const key =
+        characterId +
+        ":" +
+        bossId +
+        ":" +
+        difficulty;
+
+
+    state.partySizes[key] =
+        Number(value);
+
+
+    saveState();
+
+    renderAll();
+
+}
+
+
+function getCharacterTotal(
+    character
+) {
+
+    if (
+        !character ||
+        !character.selected
+    ) {
+
+        return 0;
+
+    }
+
+
+    let total = 0;
+
+
+    Object.keys(
+        character.selected
+    ).forEach(
+        bossId => {
+
+            const selections =
+                getBossSelections(
+                    character,
+                    bossId
+                );
+
+
+            selections.forEach(
+                difficultyName => {
+
+                    const difficulty =
+                        getDifficulty(
+                            bossId,
+                            difficultyName
+                        );
+
+
+                    if (
+                        !difficulty ||
+                        difficulty.value === null
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const partySize =
+                        getPartySize(
+                            bossId,
+                            character.id,
+                            difficultyName
+                        );
+
+
+                    total +=
+                        difficulty.value /
+                        partySize;
+
+                }
+            );
+
+        }
+    );
+
+
+    return total;
+
+}
+
+
+function getAccountTotal() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return 0;
+    }
+
+
+    return account.characters.reduce(
+        (
+            total,
+            character
+        ) =>
+            total +
+            getCharacterTotal(
+                character
+            ),
+        0
+    );
+
+}
+
+
+/* =========================================================
+   DIFFICULTY SELECTION
+========================================================= */
+
+function selectDifficulty(
+    bossId,
+    difficulty
+) {
+
+    const character =
+        getActiveCharacter();
+
+
+    if (!character) {
+        return;
+    }
+
+
+    if (!character.selected) {
+
+        character.selected = {};
+
+    }
+
+
+    const boss =
+        getBoss(bossId);
+
+
+    if (!boss) {
+        return;
+    }
+
+
+    let selections =
+        getBossSelections(
+            character,
+            bossId
+        ).slice();
+
+
+    const difficultyCount =
+        selections.filter(
+            item =>
+                item === difficulty
+        ).length;
+
+
+    const currentBossClears =
+        selections.length;
+
+
+    /*
+        x2 -> remove both
+    */
+
+    if (
+        difficultyCount === 2
+    ) {
+
+        selections =
+            selections.filter(
+                item =>
+                    item !== difficulty
+            );
+
+    }
+
+    /*
+        x1 -> x2 normally.
+
+        But if character/account is full,
+        x1 becomes deselect.
+    */
+
+    else if (
+        difficultyCount === 1
+    ) {
+
+        const characterCount =
+            getCharacterCrystalCount(
+                character
+            );
+
+
+        const accountCount =
+            getAccountCrystalCount();
+
+
+        const characterFull =
+            !isMonthlyBoss(boss) &&
+            characterCount >=
+                MAX_BOSSES_PER_CHARACTER;
+
+
+        const accountFull =
+            accountCount >=
+            MAX_ACCOUNT_CRYSTALS;
+
+
+        if (
+            characterFull ||
+            accountFull
+        ) {
+
+            selections =
+                selections.filter(
+                    item =>
+                        item !== difficulty
+                );
+
+        }
+
+        else {
+
+            selections.push(
+                difficulty
+            );
+
+        }
+
+    }
+
+    /*
+        x0 -> x1
+    */
+
+    else {
+
+        const characterCount =
+            getCharacterCrystalCount(
+                character
+            );
+
+
+        const accountCount =
+            getAccountCrystalCount();
+
+
+        if (
+            !isMonthlyBoss(boss) &&
+            characterCount >=
+                MAX_BOSSES_PER_CHARACTER
+        ) {
+
+            showToast(
+                `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
+            );
+
+            return;
+
+        }
+
+
+        if (
+            accountCount >=
+            MAX_ACCOUNT_CRYSTALS
+        ) {
+
+            showToast(
+                `Account limit reached: ${MAX_ACCOUNT_CRYSTALS} Boss Crystals.`
+            );
+
+            return;
+
+        }
+
+
+        if (
+            currentBossClears >=
+            MAX_CLEARS_PER_BOSS
+        ) {
+
+            showToast(
+                "This boss can only be cleared 2 times."
+            );
+
+            return;
+
+        }
+
+
+        selections.push(
+            difficulty
+        );
+
+    }
+
+
+    if (
+        !selections.length
+    ) {
+
+        delete character.selected[
+            bossId
+        ];
+
+    }
+
+    else {
+
+        character.selected[
+            bossId
+        ] = selections;
+
+    }
+
+
+    saveState();
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   RENDER ALL
+========================================================= */
+
+function renderAll() {
+
+    renderAccounts();
+
+    renderCharacters();
+
+    renderDashboard();
+
+    renderBosses();
+
+}
+
+
+/* =========================================================
+   ACCOUNT RENDER
+========================================================= */
+
+function renderAccounts() {
+
+    const container =
+        document.getElementById(
+            "accountTabs"
+        );
+
+
+    container.innerHTML = "";
+
+
+    state.accounts.forEach(
+        account => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "account-tab" +
+                (
+                    account.id ===
+                    state.activeAccountId
+                        ? " active"
+                        : ""
+                );
+
+
+            const crystalCount =
+                account.characters.reduce(
+                    (
+                        total,
+                        character
+                    ) =>
+                        total +
+                        getCharacterCrystalCount(
+                            character
+                        ),
+                    0
+                );
+
+
+            button.innerHTML = `
+
+                <span class="account-tab-name">
+                    ${escapeHtml(
+                        account.name
+                    )}
+                </span>
+
+                <span class="account-tab-count">
+                    ${crystalCount}/${MAX_ACCOUNT_CRYSTALS}
+                </span>
+
+            `;
+
+
+            button.onclick = () => {
+
+                state.activeAccountId =
+                    account.id;
+
+
+                state.activeCharacterId =
+                    account.characters.length
+                        ? account.characters[0].id
+                        : null;
+
+
+                ensureActiveCharacter();
+
+                saveState();
+
+                renderAll();
+
+            };
+
+
+            container.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CHARACTER RENDER
+========================================================= */
+
+function renderCharacters() {
+
+    const container =
+        document.getElementById(
+            "characterTabs"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return;
+    }
+
+
+    account.characters.forEach(
+        character => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "character-tab" +
+                (
+                    character.id ===
+                    state.activeCharacterId
+                        ? " active"
+                        : ""
+                );
+
+
+            const count =
+                getCharacterCrystalCount(
+                    character
+                );
+
+
+            button.innerHTML = `
+
+                <span class="character-tab-name">
+                    ${escapeHtml(
+                        character.name
+                    )}
+                </span>
+
+                <span class="character-tab-count">
+                    ${count}/${MAX_BOSSES_PER_CHARACTER}
+                </span>
+
+            `;
+
+
+            button.onclick = () => {
+
+                state.activeCharacterId =
+                    character.id;
+
+
+                saveState();
+
+                renderAll();
+
+            };
+
+
+            container.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard() {
+
+    const character =
+        getActiveCharacter();
+
+
+    const characterCrystals =
+        getCharacterCrystalCount(
+            character
+        );
+
+
+    const characterRemaining =
+        Math.max(
+            0,
+            MAX_BOSSES_PER_CHARACTER -
+            characterCrystals
+        );
+
+
+    const characterTotal =
+        getCharacterTotal(
+            character
+        );
+
+
+    const accountTotal =
+        getAccountTotal();
+
+
+    const accountCrystals =
+        getAccountCrystalCount();
+
+
+    document.getElementById(
+        "characterCrystals"
+    ).textContent =
+        characterCrystals;
+
+
+    document.getElementById(
+        "characterRemaining"
+    ).textContent =
+        characterRemaining;
+
+
+    document.getElementById(
+        "characterTotal"
+    ).textContent =
+        formatMeso(
+            characterTotal
+        );
+
+
+    document.getElementById(
+        "accountTotal"
+    ).textContent =
+        formatMeso(
+            accountTotal
+        );
+
+
+    document.getElementById(
+        "accountCrystalText"
+    ).textContent =
+        `${accountCrystals} / ${MAX_ACCOUNT_CRYSTALS} Boss Crystals`;
+
+
+    const percentage =
+        Math.min(
+            100,
+            (
+                accountCrystals /
+                MAX_ACCOUNT_CRYSTALS
+            ) * 100
+        );
+
+
+    document.getElementById(
+        "accountProgress"
+    ).style.width =
+        percentage + "%";
+
+}
+
+
+/* =========================================================
+   BOSS LIST
+========================================================= */
+
+function renderBosses() {
+
+    const container =
+        document.getElementById(
+            "weeklyBosses"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const search =
+        document.getElementById(
+            "searchInput"
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const character =
+        getActiveCharacter();
+
+
+    if (!character) {
+        return;
+    }
+
+
+    const characterCount =
+        getCharacterCrystalCount(
+            character
+        );
+
+
+    const accountCount =
+        getAccountCrystalCount();
+
+
+    defaultBosses.forEach(
+        boss => {
+
+            if (
+                search &&
+                !boss.name
+                    .toLowerCase()
+                    .includes(search)
+            ) {
+
+                return;
+
+            }
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "boss-row";
+
+
+            const selections =
+                getBossSelections(
+                    character,
+                    boss.id
+                );
+
+
+            const difficultyCounts = {};
+
+
+            selections.forEach(
+                difficultyName => {
+
+                    difficultyCounts[
+                        difficultyName
+                    ] =
+                        (
+                            difficultyCounts[
+                                difficultyName
+                            ] || 0
+                        ) + 1;
+
+                }
+            );
+
+
+            const bossClearCount =
+                selections.length;
+
+
+            const characterLimitReached =
+                !isMonthlyBoss(boss) &&
+                characterCount >=
+                MAX_BOSSES_PER_CHARACTER;
+
+
+            const accountLimitReached =
+                accountCount >=
+                MAX_ACCOUNT_CRYSTALS;
+
+
+            let difficultyHtml = "";
+
+
+            boss.difficulties.forEach(
+                difficulty => {
+
+                    const count =
+                        difficultyCounts[
+                            difficulty.name
+                        ] || 0;
+
+
+                    /*
+                        IMPORTANT:
+
+                        Existing selections are NEVER
+                        disabled.
+
+                        This means when 12/12 or 90/90,
+                        you can still click an existing
+                        difficulty to remove it.
+                    */
+
+                    const disabled =
+                        count === 0 &&
+                        (
+                            characterLimitReached ||
+                            accountLimitReached ||
+                            bossClearCount >=
+                            MAX_CLEARS_PER_BOSS
+                        );
+
+
+                    const inputId =
+                        `difficulty-${character.id}-${boss.id}-${difficulty.name}`;
+
+
+                    let labelContent =
+                        difficulty.name;
+
+
+                    if (
+                        count > 0
+                    ) {
+
+                        labelContent += `
+
+                            <span class="difficulty-count">
+                                ${count}
+                            </span>
+
+                        `;
+
+                    }
+
+
+                    const partySize =
+                        getPartySize(
+                            boss.id,
+                            character.id,
+                            difficulty.name
+                        );
+
+
+                    difficultyHtml += `
+
+                        <div
+                            class="difficulty-option"
+                            style="
+                                display:flex;
+                                align-items:center;
+                                gap:6px;
+                            "
+                        >
+
+                            <input
+                                type="checkbox"
+                                id="${inputId}"
+                                ${count > 0 ? "checked" : ""}
+                                ${disabled ? "disabled" : ""}
+                            >
+
+
+                            <label
+                                for="${inputId}"
+                                onclick="
+                                    handleDifficultyClick(
+                                        event,
+                                        '${boss.id}',
+                                        '${difficulty.name}'
+                                    )
+                                "
+                            >
+                                ${labelContent}
+                            </label>
+
+
+                            <select
+                                class="party-select"
+                                title="${difficulty.name} party size"
+                                onchange="
+                                    setPartySize(
+                                        '${boss.id}',
+                                        '${character.id}',
+                                        '${difficulty.name}',
+                                        this.value
+                                    )
+                                "
+                            >
+
+                                ${
+                                    [1,2,3,4,5,6]
+                                        .map(
+                                            size => `
+                                                <option
+                                                    value="${size}"
+                                                    ${
+                                                        partySize === size
+                                                            ? "selected"
+                                                            : ""
+                                                    }
+                                                >
+                                                    ${size}
+                                                </option>
+                                            `
+                                        )
+                                        .join("")
+                                }
+
+                            </select>
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+
+            let selectedMeso = 0;
+
+            let rawBossTotal = 0;
+
+
+            selections.forEach(
+                difficultyName => {
+
+                    const difficulty =
+                        getDifficulty(
+                            boss.id,
+                            difficultyName
+                        );
+
+
+                    if (
+                        difficulty &&
+                        difficulty.value !== null
+                    ) {
+
+                        const partySize =
+                            getPartySize(
+                                boss.id,
+                                character.id,
+                                difficultyName
+                            );
+
+
+                        selectedMeso +=
+                            difficulty.value /
+                            partySize;
+
+
+                        rawBossTotal +=
+                            difficulty.value;
+
+                    }
+
+                }
+            );
+
+
+            let mesoHtml = "—";
+
+
+            if (
+                selections.length > 0 &&
+                selectedMeso > 0
+            ) {
+
+                mesoHtml = `
+
+                    ${formatMeso(
+                        selectedMeso
+                    )}
+
+                    <small>
+                        ${formatMeso(
+                            rawBossTotal
+                        )} total ·
+                        ${selections.length}
+                        clear${selections.length === 1 ? "" : "s"}
+                    </small>
+
+                `;
+
+            }
+
+
+            row.innerHTML = `
+
+                <div class="boss-name">
+
+                    ${escapeHtml(
+                        boss.name
+                    )}
+
+                    <span class="boss-type">
+                        Weekly
+                    </span>
+
+                </div>
+
+
+                <div class="difficulty-list">
+                    ${difficultyHtml}
+                </div>
+
+
+                <div></div>
+
+
+                <div class="meso">
+                    ${mesoHtml}
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    if (
+        !container.children.length
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+                No weekly bosses found.
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   DIFFICULTY CLICK
+========================================================= */
+
+function handleDifficultyClick(
+    event,
+    bossId,
+    difficulty
+) {
+
+    event.preventDefault();
+
+
+    selectDifficulty(
+        bossId,
+        difficulty
+    );
+
+}
+
+
+/* =========================================================
+   ACCOUNT MANAGEMENT
+========================================================= */
+
+function addAccount() {
+
+    let number =
+        state.accounts.length + 1;
+
+
+    let name =
+        `Account ${number}`;
+
+
+    while (
+        state.accounts.some(
+            account =>
+                account.name === name
+        )
+    ) {
+
+        number++;
+
+        name =
+            `Account ${number}`;
+
+    }
+
+
+    const account = {
+
+        id: generateId(),
+
+        name: name,
+
+        characters: []
+
+    };
+
+
+    const character = {
+
+        id: generateId(),
+
+        name: "Character 1",
+
+        selected: {}
+
+    };
+
+
+    account.characters.push(
+        character
+    );
+
+
+    state.accounts.push(
+        account
+    );
+
+
+    state.activeAccountId =
+        account.id;
+
+
+    state.activeCharacterId =
+        character.id;
+
+
+    saveState();
+
+    renderAll();
+
+
+    showToast(
+        `${name} added.`
+    );
+
+}
+
+
+function renameAccount() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return;
+    }
+
+
+    openModal(
+        "Rename Account",
+        account.name,
+        value => {
+
+            if (
+                !value.trim()
+            ) {
+
+                showToast(
+                    "Account name cannot be empty."
+                );
+
+                return;
+
+            }
+
+
+            account.name =
+                value.trim();
+
+
+            saveState();
+
+            renderAll();
+
+        }
+    );
+
+}
+
+
+function deleteAccount() {
+
+    if (
+        state.accounts.length <= 1
+    ) {
+
+        showToast(
+            "You must keep at least one account."
+        );
+
+        return;
+
+    }
+
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Delete "${account.name}" and all of its characters?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const deletedAccountId =
+        account.id;
+
+
+    /*
+        Remove party-size data belonging
+        to all characters in this account.
+    */
+
+    account.characters.forEach(
+        character => {
+
+            Object.keys(
+                state.partySizes
+            ).forEach(
+                key => {
+
+                    if (
+                        key.startsWith(
+                            character.id + ":"
+                        )
+                    ) {
+
+                        delete state.partySizes[
+                            key
+                        ];
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    state.accounts =
+        state.accounts.filter(
+            item =>
+                item.id !==
+                deletedAccountId
+        );
+
+
+    state.activeAccountId =
+        state.accounts[0].id;
+
+
+    state.activeCharacterId =
+        state.accounts[0]
+            .characters[0]
+            .id;
+
+
+    saveState();
+
+    renderAll();
+
+
+    showToast(
+        `${account.name} deleted.`
+    );
+
+}
+
+
+/* =========================================================
+   CHARACTER MANAGEMENT
+========================================================= */
+
+function addCharacter() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return;
+    }
+
+
+    let number =
+        account.characters.length + 1;
+
+
+    let name =
+        `Character ${number}`;
+
+
+    while (
+        account.characters.some(
+            character =>
+                character.name === name
+        )
+    ) {
+
+        number++;
+
+        name =
+            `Character ${number}`;
+
+    }
+
+
+    const character = {
+
+        id: generateId(),
+
+        name: name,
+
+        selected: {}
+
+    };
+
+
+    account.characters.push(
+        character
+    );
+
+
+    state.activeCharacterId =
+        character.id;
+
+
+    saveState();
+
+    renderAll();
+
+
+    showToast(
+        `${name} added.`
+    );
+
+}
+
+
+function renameCharacter() {
+
+    const character =
+        getActiveCharacter();
+
+
+    if (!character) {
+        return;
+    }
+
+
+    openModal(
+        "Rename Character",
+        character.name,
+        value => {
+
+            if (
+                !value.trim()
+            ) {
+
+                showToast(
+                    "Character name cannot be empty."
+                );
+
+                return;
+
+            }
+
+
+            character.name =
+                value.trim();
+
+
+            saveState();
+
+            renderAll();
+
+        }
+    );
+
+}
+
+
+function deleteCharacter() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return;
+    }
+
+
+    if (
+        account.characters.length <= 1
+    ) {
+
+        showToast(
+            "Each account must have at least one character."
+        );
+
+        return;
+
+    }
+
+
+    const character =
+        getActiveCharacter();
+
+
+    if (!character) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Delete "${character.name}"?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const deletedCharacterId =
+        character.id;
+
+
+    Object.keys(
+        state.partySizes
+    ).forEach(
+        key => {
+
+            if (
+                key.startsWith(
+                    deletedCharacterId + ":"
+                )
+            ) {
+
+                delete state.partySizes[
+                    key
+                ];
+
+            }
+
+        }
+    );
+
+
+    account.characters =
+        account.characters.filter(
+            item =>
+                item.id !==
+                deletedCharacterId
+        );
+
+
+    state.activeCharacterId =
+        account.characters[0].id;
+
+
+    saveState();
+
+    renderAll();
+
+
+    showToast(
+        `${character.name} deleted.`
+    );
+
+}
+
+
+/* =========================================================
+   CLEAR / RESET
+========================================================= */
+
+function clearSelected() {
+
+    const character =
+        getActiveCharacter();
+
+
+    if (!character) {
+        return;
+    }
+
+
+    character.selected = {};
+
+
+    saveState();
+
+    renderAll();
+
+
+    showToast(
+        `${character.name}: selections cleared.`
+    );
+
+}
+
+
+function resetAll() {
+
+    const confirmed =
+        confirm(
+            "Reset ALL accounts, characters, selections and party sizes?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+
+    state = {
+
+        accounts: [],
+
+        activeAccountId: null,
+
+        activeCharacterId: null,
+
+        partySizes: {}
+
+    };
+
+
+    createInitialAccount();
+
+
+    saveState();
+
+    renderAll();
+
+
+    showToast(
+        "All data has been reset."
+    );
+
+}
+
+
+/* =========================================================
+   EXAMPLE DATA
+========================================================= */
+
+function loadExampleData() {
+
+    const character =
+        getActiveCharacter();
+
+
+    if (!character) {
+        return;
+    }
+
+
+    character.selected = {};
+
+
+    const exampleSelections = [
+
+        ["lotus", "N"],
+
+        ["damien", "N"],
+
+        ["slime", "N"],
+
+        ["lucid", "N"],
+
+        ["will", "N"],
+
+        ["dusk", "N"],
+
+        ["heretic", "N"],
+
+        ["djunkel", "N"],
+
+        ["seren", "N"],
+
+        ["kalos", "N"],
+
+        ["adversary", "N"],
+
+        ["radiant", "N"]
+
+    ];
+
+
+    exampleSelections.forEach(
+        ([bossId, difficulty]) => {
+
+            character.selected[
+                bossId
+            ] = [
+                difficulty
+            ];
+
+        }
+    );
+
+
+    saveState();
+
+    renderAll();
+
+
+    showToast(
+        "Example data loaded: 12 Boss Crystals."
+    );
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function openModal(
+    title,
+    value,
+    callback
+) {
+
+    modalAction =
+        callback;
+
+
+    document.getElementById(
+        "modalTitle"
+    ).textContent =
+        title;
+
+
+    document.getElementById(
+        "modalInput"
+    ).value =
+        value;
+
+
+    document.getElementById(
+        "modalOverlay"
+    ).classList.add(
+        "show"
+    );
+
+
+    setTimeout(
+        () => {
+
+            const input =
+                document.getElementById(
+                    "modalInput"
+                );
+
+
+            input.focus();
+
+            input.select();
+
+        },
+        50
+    );
+
+}
+
+
+function closeModal() {
+
+    modalAction = null;
+
+
+    document.getElementById(
+        "modalOverlay"
+    ).classList.remove(
+        "show"
+    );
+
+}
+
+
+function confirmModal() {
+
+    const input =
+        document.getElementById(
+            "modalInput"
+        );
+
+
+    const value =
+        input.value;
+
+
+    const callback =
+        modalAction;
+
+
+    closeModal();
+
+
+    if (callback) {
+
+        callback(value);
+
+    }
+
+}
+
+
+document.getElementById(
+    "modalInput"
+).addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            confirmModal();
+
+        }
+
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer = null;
+
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2500
+        );
+
+}
+
+
+/* =========================================================
+   HTML ESCAPING
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+init();
+
+</script>
+
+</body>
+</html>
