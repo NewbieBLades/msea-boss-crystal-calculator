@@ -319,7 +319,7 @@
     .boss-row {
         display: grid;
         grid-template-columns:
-            minmax(150px, 1fr)
+            minmax(190px, 1fr)
             minmax(260px, 2fr)
             120px
             160px;
@@ -335,6 +335,24 @@
 
     .boss-name {
         font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+    }
+
+    .boss-icon {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        border-radius: 7px;
+        flex-shrink: 0;
+        background: #11141a;
+        border: 1px solid #303642;
+    }
+
+    .boss-name-text {
+        min-width: 0;
     }
 
     .boss-type {
@@ -575,6 +593,11 @@
 
         .search {
             min-width: 0;
+        }
+
+        .boss-icon {
+            width: 38px;
+            height: 38px;
         }
 
     }
@@ -917,6 +940,7 @@ const defaultBosses = [
     {
         id: "lotus",
         name: "Lotus",
+        icon: "images/Lotus.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 21.87 },
@@ -928,6 +952,7 @@ const defaultBosses = [
     {
         id: "damien",
         name: "Damien",
+        icon: "images/Damien.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 22.86 },
@@ -938,6 +963,7 @@ const defaultBosses = [
     {
         id: "slime",
         name: "Slime",
+        icon: "images/Slime.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 29.6 },
@@ -948,6 +974,7 @@ const defaultBosses = [
     {
         id: "lucid",
         name: "Lucid",
+        icon: "images/Lucid.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 35.6 },
@@ -959,6 +986,7 @@ const defaultBosses = [
     {
         id: "will",
         name: "Will",
+        icon: "images/Will.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 38.7 },
@@ -970,6 +998,7 @@ const defaultBosses = [
     {
         id: "dusk",
         name: "Dusk",
+        icon: "images/Dusk.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 54 },
@@ -980,6 +1009,7 @@ const defaultBosses = [
     {
         id: "heretic",
         name: "Heretic",
+        icon: "images/Heretic.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 96.3 },
@@ -990,6 +1020,7 @@ const defaultBosses = [
     {
         id: "djunkel",
         name: "Djunkel",
+        icon: "images/Djunkel.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 58.5 },
@@ -1000,6 +1031,7 @@ const defaultBosses = [
     {
         id: "seren",
         name: "Seren",
+        icon: "images/Seren.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 289.8 },
@@ -1011,6 +1043,7 @@ const defaultBosses = [
     {
         id: "kalos",
         name: "Kalos",
+        icon: "images/Kalos.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 338.8 },
@@ -1023,6 +1056,7 @@ const defaultBosses = [
     {
         id: "adversary",
         name: "Adversary",
+        icon: "images/Adversary.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 361 },
@@ -1035,6 +1069,7 @@ const defaultBosses = [
     {
         id: "radiant",
         name: "Radiant",
+        icon: "images/Radiant.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 594 },
@@ -1045,6 +1080,7 @@ const defaultBosses = [
     {
         id: "carling",
         name: "Carling",
+        icon: "images/Carling.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 368.2 },
@@ -1057,6 +1093,7 @@ const defaultBosses = [
     {
         id: "bellona",
         name: "Bellona",
+        icon: "images/Bellona.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: null },
@@ -1068,6 +1105,7 @@ const defaultBosses = [
     {
         id: "limbo",
         name: "Limbo",
+        icon: "images/Limbo.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 900 },
@@ -1078,6 +1116,7 @@ const defaultBosses = [
     {
         id: "baldrix",
         name: "Baldrix",
+        icon: "images/Baldrix.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 1200 },
@@ -1088,6 +1127,7 @@ const defaultBosses = [
     {
         id: "jupiter",
         name: "Jupiter",
+        icon: "images/Jupiter.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 1360 },
@@ -1101,32 +1141,6 @@ const defaultBosses = [
 /* =========================================================
    STATE
 ========================================================= */
-
-/*
-    New structure:
-
-    state = {
-        accounts: [
-            {
-                id,
-                name,
-                characters: [
-                    {
-                        id,
-                        name,
-                        selected: {}
-                    }
-                ]
-            }
-        ],
-
-        activeAccountId,
-        activeCharacterId,
-
-        partySizes: {}
-    }
-
-*/
 
 let state = {
 
@@ -1266,27 +1280,7 @@ function createInitialAccount() {
    STATE MIGRATION
 ========================================================= */
 
-/*
-    This allows your previous version
-    to continue working.
-
-    Old structure:
-
-        characters: []
-        activeCharacterId
-        partySizes
-
-    becomes:
-
-        Account 1
-            └── old characters
-*/
-
 function migrateState() {
-
-    /*
-        Already new format
-    */
 
     if (
         Array.isArray(
@@ -1331,10 +1325,6 @@ function migrateState() {
     }
 
 
-    /*
-        This branch is mostly for safety.
-    */
-
     state.accounts = [];
 
     state.activeAccountId = null;
@@ -1343,10 +1333,6 @@ function migrateState() {
 
 }
 
-
-/* =========================================================
-   LOAD STATE
-========================================================= */
 
 function loadState() {
 
@@ -1357,10 +1343,6 @@ function loadState() {
                 STORAGE_KEY
             );
 
-
-        /*
-            Try new storage first.
-        */
 
         if (saved) {
 
@@ -1401,13 +1383,6 @@ function loadState() {
 
         }
 
-
-        /*
-            Check old v10 storage.
-
-            This is important because you already
-            have data in the previous calculator.
-        */
 
         const oldStorage =
             localStorage.getItem(
@@ -1943,10 +1918,6 @@ function getPartySize(
     }
 
 
-    /*
-        Old format fallback
-    */
-
     const oldKey =
         characterId +
         ":" +
@@ -2158,7 +2129,7 @@ function selectDifficulty(
     /*
         x1 -> x2 normally.
 
-        But if character/account is full,
+        If character/account is full,
         x1 becomes deselect.
     */
 
@@ -2712,8 +2683,6 @@ function renderBosses() {
 
 
                     /*
-                        IMPORTANT:
-
                         Existing selections are NEVER
                         disabled.
 
@@ -2911,13 +2880,28 @@ function renderBosses() {
 
                 <div class="boss-name">
 
-                    ${escapeHtml(
-                        boss.name
-                    )}
+                    <img
+                        class="boss-icon"
+                        src="${escapeHtml(
+                            boss.icon
+                        )}"
+                        alt="${escapeHtml(
+                            boss.name
+                        )}"
+                        loading="lazy"
+                    >
 
-                    <span class="boss-type">
-                        Weekly
-                    </span>
+                    <div class="boss-name-text">
+
+                        ${escapeHtml(
+                            boss.name
+                        )}
+
+                        <span class="boss-type">
+                            Weekly
+                        </span>
+
+                    </div>
 
                 </div>
 
@@ -3145,11 +3129,6 @@ function deleteAccount() {
     const deletedAccountId =
         account.id;
 
-
-    /*
-        Remove party-size data belonging
-        to all characters in this account.
-    */
 
     account.characters.forEach(
         character => {
@@ -3774,3 +3753,4 @@ init();
 
 </body>
 </html>
+```
