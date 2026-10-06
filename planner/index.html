@@ -19,7 +19,8 @@
 
     button,
     input,
-    select {
+    select,
+    textarea {
         font: inherit;
     }
 
@@ -346,10 +347,11 @@
     .boss-row {
         display: grid;
         grid-template-columns:
-            minmax(230px, 1fr)
-            minmax(280px, 2fr)
-            130px
-            180px;
+            minmax(220px, 1fr)
+            minmax(250px, 2fr)
+            150px
+            170px
+            minmax(180px, 1.2fr);
         align-items: center;
         gap: 12px;
         padding: 13px 0;
@@ -464,6 +466,44 @@
         margin-top: 3px;
     }
 
+    /* =========================
+       NOTES
+    ========================= */
+
+    .boss-note {
+        width: 100%;
+        min-height: 40px;
+        height: 40px;
+        resize: vertical;
+        background: #0f1117;
+        border: 1px solid #303642;
+        color: #fff;
+        border-radius: 7px;
+        padding: 8px 9px;
+        outline: none;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .boss-note::placeholder {
+        color: #626a78;
+    }
+
+    .boss-note:focus {
+        border-color: #7c5cff;
+        box-shadow: 0 0 0 1px rgba(124, 92, 255, 0.15);
+    }
+
+    .note-label {
+        color: #777f8d;
+        font-size: 10px;
+        margin-bottom: 4px;
+    }
+
+    /* =========================
+       EMPTY
+    ========================= */
+
     .empty {
         padding: 35px 15px;
         text-align: center;
@@ -557,6 +597,19 @@
        RESPONSIVE
     ========================= */
 
+    @media (max-width: 1150px) {
+
+        .boss-row {
+            grid-template-columns:
+                minmax(200px, 1fr)
+                minmax(220px, 1.5fr)
+                130px
+                150px
+                minmax(160px, 1fr);
+        }
+
+    }
+
     @media (max-width: 1000px) {
 
         .dashboard {
@@ -570,6 +623,10 @@
 
         .status {
             text-align: left;
+        }
+
+        .boss-note {
+            max-width: 500px;
         }
 
     }
@@ -618,6 +675,10 @@
             height: 42px;
         }
 
+        .boss-note {
+            max-width: none;
+        }
+
     }
 </style>
 </head>
@@ -654,9 +715,9 @@
         </div>
 
         <p>
-            Plan your weekly Boss Crystals using the same
-            characters, bosses, icons, difficulties and clear
-            status as the MSEA Boss Crystal Calculator.
+            Plan your weekly and monthly Boss Crystals using the same
+            characters, bosses, icons, difficulties, clear status,
+            party sizes and personal notes as your Calculator.
         </p>
 
     </header>
@@ -884,12 +945,51 @@
             and party sizes are read directly from the
             Calculator.
 
+            <br>
+
+            <strong>Notes:</strong>
+
+            Your personal boss notes are saved separately
+            in the Planner and can be edited freely.
+
             <span
                 class="sync-status"
                 id="syncStatus">
                 Synced
             </span>
 
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         MONTHLY BOSSES
+    ========================= -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-title">
+                    Monthly Boss Planner
+                </div>
+
+                <div class="section-subtitle">
+                    Monthly bosses do not use the weekly 12-crystal limit.
+                    Add your party IGN or any personal reminder in the Note box.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="boss-list"
+            id="monthlyBosses">
         </div>
 
     </section>
@@ -913,6 +1013,8 @@
                     This list is automatically generated from
                     the Calculator's Weekly Boss list.
                     Only selected weekly clears are shown as cleared.
+                    Use the Note box to manually record party IGN,
+                    carry information, or anything else.
                 </div>
 
             </div>
@@ -945,8 +1047,28 @@
         Changing the party size in the Calculator will also
         update here.
 
-        Black Mage is not shown because it is a Monthly Boss
-        and does not use the weekly 12-crystal system.
+        <br><br>
+
+        <strong>How Notes work:</strong><br>
+
+        Each boss has its own personal Note box.
+
+        You can type anything you want, such as:
+
+        <br>
+
+        • Party IGN<br>
+        • Carry IGN<br>
+        • Duo partner<br>
+        • Party size reminder<br>
+        • "Ask guild"<br>
+        • "Need to clear before reset"<br>
+        • Any other personal reminder
+
+        <br>
+
+        Notes are saved automatically in your browser and
+        are separate for each account, character and boss.
 
     </div>
 
@@ -1018,6 +1140,12 @@
 const CALCULATOR_STORAGE_KEY =
     "msea_boss_crystal_calculator_v11";
 
+const PLANNER_NOTES_STORAGE_KEY =
+    "msea_bossing_planner_notes_v1";
+
+const PLANNER_VIEW_STORAGE_KEY =
+    "msea_bossing_planner_v2";
+
 const MAX_BOSSES_PER_CHARACTER = 12;
 
 const MAX_ACCOUNT_CRYSTALS = 90;
@@ -1034,7 +1162,9 @@ let state = {
 
     activeAccountId: null,
 
-    activeCharacterId: null
+    activeCharacterId: null,
+
+    notes: {}
 
 };
 
@@ -1054,6 +1184,8 @@ function init() {
     loadCalculatorState();
 
     loadPlannerViewState();
+
+    loadPlannerNotes();
 
     ensureActiveAccount();
 
@@ -1133,7 +1265,7 @@ function loadPlannerViewState() {
 
         const saved =
             localStorage.getItem(
-                "msea_bossing_planner_v2"
+                PLANNER_VIEW_STORAGE_KEY
             );
 
 
@@ -1183,7 +1315,7 @@ function savePlannerViewState() {
 
     localStorage.setItem(
 
-        "msea_bossing_planner_v2",
+        PLANNER_VIEW_STORAGE_KEY,
 
         JSON.stringify({
 
@@ -1196,6 +1328,135 @@ function savePlannerViewState() {
         })
 
     );
+
+}
+
+
+/* =========================================================
+   PLANNER NOTES
+========================================================= */
+
+function loadPlannerNotes() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                PLANNER_NOTES_STORAGE_KEY
+            );
+
+
+        if (!saved) {
+
+            state.notes = {};
+
+            return;
+
+        }
+
+
+        const parsed =
+            JSON.parse(saved);
+
+
+        if (
+            parsed &&
+            typeof parsed === "object"
+        ) {
+
+            state.notes = parsed;
+
+        }
+
+        else {
+
+            state.notes = {};
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Failed to load Planner notes:",
+            error
+        );
+
+        state.notes = {};
+
+    }
+
+}
+
+
+function savePlannerNotes() {
+
+    localStorage.setItem(
+
+        PLANNER_NOTES_STORAGE_KEY,
+
+        JSON.stringify(
+            state.notes
+        )
+
+    );
+
+}
+
+
+function getNoteKey(
+    characterId,
+    bossId
+) {
+
+    return (
+        characterId +
+        ":" +
+        bossId
+    );
+
+}
+
+
+function getBossNote(
+    characterId,
+    bossId
+) {
+
+    const key =
+        getNoteKey(
+            characterId,
+            bossId
+        );
+
+
+    return (
+        state.notes[key] ||
+        ""
+    );
+
+}
+
+
+function saveBossNote(
+    characterId,
+    bossId,
+    value
+) {
+
+    const key =
+        getNoteKey(
+            characterId,
+            bossId
+        );
+
+
+    state.notes[key] =
+        value;
+
+
+    savePlannerNotes();
 
 }
 
@@ -2170,18 +2431,405 @@ function renderDashboard() {
 
 
 /* =========================================================
+   BOSS ROW CREATOR
+========================================================= */
+
+function createBossRow(
+    boss,
+    character
+) {
+
+    const selections =
+        getBossSelections(
+            character,
+            boss.id
+        );
+
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+
+    row.className =
+        "boss-row";
+
+
+    /* =====================
+       NAME
+    ===================== */
+
+    const nameDiv =
+        document.createElement(
+            "div"
+        );
+
+
+    nameDiv.className =
+        "boss-name";
+
+
+    nameDiv.innerHTML = `
+
+        <img
+            class="boss-icon"
+            src="${escapeHtml(
+                boss.icon
+            )}"
+            alt="${escapeHtml(
+                boss.name
+            )}"
+            loading="lazy"
+        >
+
+        <div class="boss-name-text">
+
+            ${escapeHtml(
+                boss.name
+            )}
+
+            <span class="boss-type">
+                ${escapeHtml(
+                    boss.type
+                )}
+            </span>
+
+        </div>
+
+    `;
+
+
+    /* =====================
+       DIFFICULTIES
+    ===================== */
+
+    const difficultyDiv =
+        document.createElement(
+            "div"
+        );
+
+
+    difficultyDiv.className =
+        "difficulty-list";
+
+
+    if (!selections.length) {
+
+        difficultyDiv.innerHTML = `
+
+            <span
+                class="difficulty-badge not-cleared">
+                Not cleared
+            </span>
+
+        `;
+
+    }
+
+    else {
+
+        const counts = {};
+
+
+        selections.forEach(
+
+            difficulty => {
+
+                counts[difficulty] =
+
+                    (
+                        counts[difficulty] ||
+                        0
+                    ) + 1;
+
+            }
+
+        );
+
+
+        Object.keys(counts).forEach(
+
+            difficulty => {
+
+                const badge =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                badge.className =
+                    "difficulty-badge";
+
+
+                badge.innerHTML = `
+
+                    ${escapeHtml(
+                        difficulty
+                    )}
+
+                    <span
+                        class="difficulty-count">
+                        ${counts[difficulty]}
+                    </span>
+
+                `;
+
+
+                difficultyDiv.appendChild(
+                    badge
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* =====================
+       PARTY SIZE
+    ===================== */
+
+    const partyDiv =
+        document.createElement(
+            "div"
+        );
+
+
+    partyDiv.className =
+        "party-info";
+
+
+    if (!selections.length) {
+
+        partyDiv.innerHTML =
+            "No active clear";
+
+    }
+
+    else {
+
+        const partyParts = [];
+
+
+        selections.forEach(
+
+            difficulty => {
+
+                const partySize =
+                    getPartySize(
+
+                        boss.id,
+
+                        character.id,
+
+                        difficulty
+
+                    );
+
+
+                partyParts.push(
+
+                    `${escapeHtml(
+                        difficulty
+                    )}: Party <strong>${
+                        partySize
+                    }</strong>`
+
+                );
+
+            }
+
+        );
+
+
+        partyDiv.innerHTML =
+            partyParts.join(
+                " · "
+            );
+
+    }
+
+
+    /* =====================
+       STATUS
+    ===================== */
+
+    const statusDiv =
+        document.createElement(
+            "div"
+        );
+
+
+    statusDiv.className =
+        "status";
+
+
+    if (selections.length) {
+
+        statusDiv.classList.add(
+            "status-cleared"
+        );
+
+
+        statusDiv.innerHTML = `
+
+            ✓ Cleared
+
+            <small>
+                ${selections.length}
+                clear${selections.length === 1 ? "" : "s"}
+            </small>
+
+        `;
+
+    }
+
+    else {
+
+        statusDiv.classList.add(
+            "status-not-cleared"
+        );
+
+
+        statusDiv.innerHTML = `
+
+            Not Cleared
+
+            <small>
+                0 clears
+            </small>
+
+        `;
+
+    }
+
+
+    /* =====================
+       NOTE
+    ===================== */
+
+    const noteWrapper =
+        document.createElement(
+            "div"
+        );
+
+
+    const noteLabel =
+        document.createElement(
+            "div"
+        );
+
+
+    noteLabel.className =
+        "note-label";
+
+
+    noteLabel.textContent =
+        "Personal Note";
+
+
+    const note =
+        document.createElement(
+            "textarea"
+        );
+
+
+    note.className =
+        "boss-note";
+
+
+    note.placeholder =
+        "Party IGN / reminder...";
+
+
+    note.value =
+        getBossNote(
+            character.id,
+            boss.id
+        );
+
+
+    note.maxLength =
+        500;
+
+
+    note.oninput = () => {
+
+        saveBossNote(
+
+            character.id,
+
+            boss.id,
+
+            note.value
+
+        );
+
+    };
+
+
+    noteWrapper.appendChild(
+        noteLabel
+    );
+
+    noteWrapper.appendChild(
+        note
+    );
+
+
+    /* =====================
+       APPEND
+    ===================== */
+
+    row.appendChild(
+        nameDiv
+    );
+
+    row.appendChild(
+        difficultyDiv
+    );
+
+    row.appendChild(
+        partyDiv
+    );
+
+    row.appendChild(
+        statusDiv
+    );
+
+    row.appendChild(
+        noteWrapper
+    );
+
+
+    return row;
+
+}
+
+
+/* =========================================================
    BOSS RENDER
 ========================================================= */
 
 function renderBosses() {
 
-    const container =
+    const weeklyContainer =
         document.getElementById(
             "weeklyBosses"
         );
 
 
-    container.innerHTML = "";
+    const monthlyContainer =
+        document.getElementById(
+            "monthlyBosses"
+        );
+
+
+    weeklyContainer.innerHTML = "";
+
+    monthlyContainer.innerHTML = "";
 
 
     const character =
@@ -2190,7 +2838,15 @@ function renderBosses() {
 
     if (!character) {
 
-        container.innerHTML = `
+        weeklyContainer.innerHTML = `
+
+            <div class="empty">
+                No active character found.
+            </div>
+
+        `;
+
+        monthlyContainer.innerHTML = `
 
             <div class="empty">
                 No active character found.
@@ -2214,6 +2870,15 @@ function renderBosses() {
         .toLowerCase();
 
 
+    const monthlyBosses =
+        bossDefinitions.filter(
+
+            boss =>
+                boss.type === "Monthly"
+
+        );
+
+
     const weeklyBosses =
         bossDefinitions.filter(
 
@@ -2222,6 +2887,47 @@ function renderBosses() {
 
         );
 
+
+    /* =====================
+       MONTHLY
+    ===================== */
+
+    monthlyBosses.forEach(
+
+        boss => {
+
+            if (
+
+                search &&
+
+                !boss.name
+                    .toLowerCase()
+                    .includes(search)
+
+            ) {
+
+                return;
+
+            }
+
+
+            monthlyContainer.appendChild(
+
+                createBossRow(
+                    boss,
+                    character
+                )
+
+            );
+
+        }
+
+    );
+
+
+    /* =====================
+       WEEKLY
+    ===================== */
 
     weeklyBosses.forEach(
 
@@ -2242,290 +2948,13 @@ function renderBosses() {
             }
 
 
-            const selections =
-                getBossSelections(
-                    character,
-                    boss.id
-                );
+            weeklyContainer.appendChild(
 
+                createBossRow(
+                    boss,
+                    character
+                )
 
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "boss-row";
-
-
-            /* =====================
-               NAME
-            ===================== */
-
-            const nameDiv =
-                document.createElement(
-                    "div"
-                );
-
-
-            nameDiv.className =
-                "boss-name";
-
-
-            nameDiv.innerHTML = `
-
-                <img
-                    class="boss-icon"
-                    src="${escapeHtml(
-                        boss.icon
-                    )}"
-                    alt="${escapeHtml(
-                        boss.name
-                    )}"
-                    loading="lazy"
-                >
-
-                <div class="boss-name-text">
-
-                    ${escapeHtml(
-                        boss.name
-                    )}
-
-                    <span class="boss-type">
-                        Weekly
-                    </span>
-
-                </div>
-
-            `;
-
-
-            /* =====================
-               DIFFICULTIES
-            ===================== */
-
-            const difficultyDiv =
-                document.createElement(
-                    "div"
-                );
-
-
-            difficultyDiv.className =
-                "difficulty-list";
-
-
-            if (!selections.length) {
-
-                difficultyDiv.innerHTML = `
-
-                    <span
-                        class="difficulty-badge not-cleared">
-                        Not cleared
-                    </span>
-
-                `;
-
-            }
-
-            else {
-
-                const counts = {};
-
-
-                selections.forEach(
-
-                    difficulty => {
-
-                        counts[difficulty] =
-
-                            (
-                                counts[difficulty] ||
-                                0
-                            ) + 1;
-
-                    }
-
-                );
-
-
-                Object.keys(counts).forEach(
-
-                    difficulty => {
-
-                        const badge =
-                            document.createElement(
-                                "span"
-                            );
-
-
-                        badge.className =
-                            "difficulty-badge";
-
-
-                        badge.innerHTML = `
-
-                            ${escapeHtml(
-                                difficulty
-                            )}
-
-                            <span
-                                class="difficulty-count">
-                                ${counts[difficulty]}
-                            </span>
-
-                        `;
-
-
-                        difficultyDiv.appendChild(
-                            badge
-                        );
-
-                    }
-
-                );
-
-            }
-
-
-            /* =====================
-               PARTY SIZE
-            ===================== */
-
-            const partyDiv =
-                document.createElement(
-                    "div"
-                );
-
-
-            partyDiv.className =
-                "party-info";
-
-
-            if (!selections.length) {
-
-                partyDiv.innerHTML =
-                    "No active clear";
-
-            }
-
-            else {
-
-                const partyParts = [];
-
-
-                selections.forEach(
-
-                    difficulty => {
-
-                        const partySize =
-                            getPartySize(
-
-                                boss.id,
-
-                                character.id,
-
-                                difficulty
-
-                            );
-
-
-                        partyParts.push(
-
-                            `${escapeHtml(
-                                difficulty
-                            )}: Party <strong>${
-                                partySize
-                            }</strong>`
-
-                        );
-
-                    }
-
-                );
-
-
-                partyDiv.innerHTML =
-                    partyParts.join(
-                        " · "
-                    );
-
-            }
-
-
-            /* =====================
-               STATUS
-            ===================== */
-
-            const statusDiv =
-                document.createElement(
-                    "div"
-                );
-
-
-            statusDiv.className =
-                "status";
-
-
-            if (selections.length) {
-
-                statusDiv.classList.add(
-                    "status-cleared"
-                );
-
-
-                statusDiv.innerHTML = `
-
-                    ✓ Cleared
-
-                    <small>
-                        ${selections.length}
-                        clear${selections.length === 1 ? "" : "s"}
-                    </small>
-
-                `;
-
-            }
-
-            else {
-
-                statusDiv.classList.add(
-                    "status-not-cleared"
-                );
-
-
-                statusDiv.innerHTML = `
-
-                    Not Cleared
-
-                    <small>
-                        0 clears
-                    </small>
-
-                `;
-
-            }
-
-
-            row.appendChild(
-                nameDiv
-            );
-
-            row.appendChild(
-                difficultyDiv
-            );
-
-            row.appendChild(
-                partyDiv
-            );
-
-            row.appendChild(
-                statusDiv
-            );
-
-
-            container.appendChild(
-                row
             );
 
         }
@@ -2534,10 +2963,25 @@ function renderBosses() {
 
 
     if (
-        !container.children.length
+        !monthlyContainer.children.length
     ) {
 
-        container.innerHTML = `
+        monthlyContainer.innerHTML = `
+
+            <div class="empty">
+                No monthly bosses found.
+            </div>
+
+        `;
+
+    }
+
+
+    if (
+        !weeklyContainer.children.length
+    ) {
+
+        weeklyContainer.innerHTML = `
 
             <div class="empty">
                 No weekly bosses found.
@@ -2820,7 +3264,6 @@ function deleteAccount() {
 
     if (!account) {
         return;
-
     }
 
 
@@ -2840,6 +3283,8 @@ function deleteAccount() {
     const deletedAccountId =
         account.id;
 
+
+    /* Remove old calculator party-size data */
 
     if (
         calculatorState.partySizes
@@ -2878,6 +3323,41 @@ function deleteAccount() {
         );
 
     }
+
+
+    /* Remove planner notes */
+
+    account.characters.forEach(
+
+        character => {
+
+            Object.keys(
+                state.notes
+            ).forEach(
+
+                key => {
+
+                    if (
+                        key.startsWith(
+                            character.id + ":"
+                        )
+                    ) {
+
+                        delete
+                            state.notes[key];
+
+                    }
+
+                }
+
+            );
+
+        }
+
+    );
+
+
+    savePlannerNotes();
 
 
     calculatorState.accounts =
@@ -3123,7 +3603,6 @@ function deleteCharacter() {
 
     if (!character) {
         return;
-
     }
 
 
@@ -3141,6 +3620,8 @@ function deleteCharacter() {
     const deletedCharacterId =
         character.id;
 
+
+    /* Remove calculator party-size data */
 
     if (
         calculatorState.partySizes
@@ -3171,6 +3652,33 @@ function deleteCharacter() {
         );
 
     }
+
+
+    /* Remove planner notes */
+
+    Object.keys(
+        state.notes
+    ).forEach(
+
+        key => {
+
+            if (
+                key.startsWith(
+                    deletedCharacterId + ":"
+                )
+            ) {
+
+                delete
+                    state.notes[key];
+
+            }
+
+        }
+
+    );
+
+
+    savePlannerNotes();
 
 
     account.characters =
@@ -3445,6 +3953,18 @@ window.addEventListener(
 
         }
 
+
+        if (
+            event.key ===
+            PLANNER_NOTES_STORAGE_KEY
+        ) {
+
+            loadPlannerNotes();
+
+            renderBosses();
+
+        }
+
     }
 
 );
@@ -3466,6 +3986,8 @@ document.addEventListener(
         ) {
 
             loadCalculatorState();
+
+            loadPlannerNotes();
 
             ensureActiveAccount();
 
