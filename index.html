@@ -484,17 +484,6 @@
         color: #fff;
     }
 
-    /*
-        IMPORTANT FIX:
-
-        There is intentionally NO
-        input:disabled styling anymore.
-
-        Selected difficulties are ALWAYS clickable.
-        Limits are enforced in JavaScript only
-        when ADDING a selection.
-    */
-
     .difficulty-count {
         display: inline-flex;
         align-items: center;
@@ -702,10 +691,6 @@
 
 <div class="container">
 
-    <!-- =========================
-         HEADER
-    ========================= -->
-
     <header class="main-header">
 
         <div class="header-content">
@@ -728,10 +713,6 @@
 
     </header>
 
-
-    <!-- =========================
-         DASHBOARD
-    ========================= -->
 
     <section class="dashboard">
 
@@ -827,10 +808,6 @@
 
     </section>
 
-
-    <!-- =========================
-         MONTHLY / ANNUAL DASHBOARD
-    ========================= -->
 
     <section class="monthly-dashboard">
 
@@ -933,10 +910,6 @@
     </section>
 
 
-    <!-- =========================
-         ACCOUNTS
-    ========================= -->
-
     <section class="account-section">
 
         <div class="account-top">
@@ -974,10 +947,6 @@
     </section>
 
 
-    <!-- =========================
-         CHARACTERS
-    ========================= -->
-
     <section class="character-section">
 
         <div class="character-top">
@@ -1008,10 +977,6 @@
 
     </section>
 
-
-    <!-- =========================
-         TOOLBAR
-    ========================= -->
 
     <section class="section">
 
@@ -1060,10 +1025,6 @@
     </section>
 
 
-    <!-- =========================
-         MONTHLY BOSSES
-    ========================= -->
-
     <section class="section">
 
         <div class="section-header">
@@ -1090,10 +1051,6 @@
 
     </section>
 
-
-    <!-- =========================
-         WEEKLY BOSSES
-    ========================= -->
 
     <section class="section">
 
@@ -1126,19 +1083,11 @@
 </div>
 
 
-<!-- =========================
-     TOAST
-========================= -->
-
 <div
     class="toast"
     id="toast">
 </div>
 
-
-<!-- =========================
-     MODAL
-========================= -->
 
 <div
     class="modal-overlay"
@@ -2584,12 +2533,7 @@ function selectDifficulty(
     /* =========================================
        x2 -> REMOVE BOTH
 
-       IMPORTANT:
-       This happens BEFORE any character
-       limit check.
-
-       Therefore deselection ALWAYS works,
-       including at 12/12.
+       This ALWAYS works, including at 12/12.
     ========================================= */
 
     if (
@@ -2604,18 +2548,24 @@ function selectDifficulty(
 
     }
 
+
     /* =========================================
-       x1 -> x2
+       x1
+
+       Normally:
+           x1 -> x2
+
+       BUT if the character is already 12/12:
+           x1 -> x0
+
+       This allows the user to remove a
+       selected crystal even when the character
+       has reached the maximum.
     ========================================= */
 
     else if (
         difficultyCount === 1
     ) {
-
-        /*
-            Monthly bosses do not use the
-            12-crystal weekly limit.
-        */
 
         if (
             !isMonthlyBoss(boss)
@@ -2627,45 +2577,104 @@ function selectDifficulty(
                 );
 
 
+            /*
+                IMPORTANT FIX:
+
+                At 12/12, there is no room
+                for another crystal.
+
+                Instead of blocking the click,
+                remove the existing x1 selection.
+            */
+
             if (
                 characterCount >=
                 MAX_BOSSES_PER_CHARACTER
             ) {
 
+                const index =
+                    selections.indexOf(
+                        difficulty
+                    );
+
+
+                if (
+                    index !== -1
+                ) {
+
+                    selections.splice(
+                        index,
+                        1
+                    );
+
+                }
+
+            }
+
+            else {
+
+                /*
+                    Character still has room,
+                    so normal behavior remains:
+
+                    x1 -> x2
+                */
+
+                if (
+                    currentBossClears >=
+                    MAX_CLEARS_PER_BOSS
+                ) {
+
+                    showToast(
+                        "This boss can only be cleared 2 times."
+                    );
+
+                    return;
+
+                }
+
+
+                selections.push(
+                    difficulty
+                );
+
+            }
+
+        }
+
+        else {
+
+            /*
+                Monthly bosses are not affected
+                by the 12 weekly crystal limit.
+
+                Therefore they keep normal behavior:
+
+                x1 -> x2
+            */
+
+            if (
+                currentBossClears >=
+                MAX_CLEARS_PER_BOSS
+            ) {
+
                 showToast(
-                    `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
+                    "This boss can only be cleared 2 times."
                 );
 
                 return;
 
             }
 
-        }
 
-
-        /*
-            A boss can have maximum 2 clears.
-        */
-
-        if (
-            currentBossClears >=
-            MAX_CLEARS_PER_BOSS
-        ) {
-
-            showToast(
-                "This boss can only be cleared 2 times."
+            selections.push(
+                difficulty
             );
 
-            return;
-
         }
 
-
-        selections.push(
-            difficulty
-        );
-
     }
+
 
     /* =========================================
        x0 -> x1
@@ -3140,21 +3149,6 @@ function renderBosses() {
 }
 
 
-/*
-    IMPORTANT FIXED VERSION
-
-    No checkbox is ever disabled.
-
-    This means:
-        x1 -> x0
-        x2 -> x0
-
-    will ALWAYS remain clickable.
-
-    Character/account limits are handled
-    by selectDifficulty() only when adding.
-*/
-
 function renderBossList(
     containerId,
     bossType,
@@ -3355,8 +3349,22 @@ function renderBossList(
                         count === 1
                     ) {
 
-                        tooltip =
-                            "Click again to select x2";
+                        if (
+                            characterLimitReached &&
+                            !isMonthly
+                        ) {
+
+                            tooltip =
+                                "Click to deselect";
+
+                        }
+
+                        else {
+
+                            tooltip =
+                                "Click again to select x2";
+
+                        }
 
                     }
 
