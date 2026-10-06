@@ -857,7 +857,7 @@
 
             <a
                 class="btn"
-                href="/msea-boss-crystal-calculator/">
+                href="../">
                 ↗ Crystal Calculator
             </a>
 
@@ -1011,7 +1011,7 @@ const MAX_BOSSES_PER_CHARACTER = 12;
 const MAX_ACCOUNT_CRYSTALS = 90;
 
 const CALCULATOR_URL =
-    "/msea-boss-crystal-calculator/";
+    "../";
 
 
 /* =========================================================
@@ -1402,16 +1402,14 @@ function ensureActiveCharacter() {
    BOSS DATA
 =========================================================
 
+   These definitions match the Calculator's current boss
+   list.
+
    IMPORTANT:
+   Planner is inside /planner/, while the shared images are
+   inside /images/.
 
-   The Planner gets the boss list directly from the
-   Calculator's boss definitions below.
-
-   Since the Calculator does not save defaultBosses into
-   localStorage, this list mirrors the Calculator's current
-   boss IDs/names/icons/types/difficulties.
-
-   Clear status itself ALWAYS comes from character.selected.
+   Therefore all image paths MUST use ../images/.
 ========================================================= */
 
 const bossDefinitions = [
@@ -1419,7 +1417,7 @@ const bossDefinitions = [
     {
         id: "blackmage",
         name: "Black Mage",
-        icon: "images/BlackMage.png",
+        icon: "../images/BlackMage.png",
         type: "Monthly",
         difficulties: [
             { name: "H", value: 992 },
@@ -1430,7 +1428,7 @@ const bossDefinitions = [
     {
         id: "lotus",
         name: "Lotus",
-        icon: "images/Lotus.png",
+        icon: "../images/Lotus.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 21.87 },
@@ -1442,7 +1440,7 @@ const bossDefinitions = [
     {
         id: "damien",
         name: "Damien",
-        icon: "images/Damien.png",
+        icon: "../images/Damien.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 22.86 },
@@ -1453,7 +1451,7 @@ const bossDefinitions = [
     {
         id: "slime",
         name: "Slime",
-        icon: "images/Slime.png",
+        icon: "../images/Slime.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 29.6 },
@@ -1464,7 +1462,7 @@ const bossDefinitions = [
     {
         id: "lucid",
         name: "Lucid",
-        icon: "images/Lucid.png",
+        icon: "../images/Lucid.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 35.6 },
@@ -1476,7 +1474,7 @@ const bossDefinitions = [
     {
         id: "will",
         name: "Will",
-        icon: "images/Will.png",
+        icon: "../images/Will.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 38.7 },
@@ -1488,7 +1486,7 @@ const bossDefinitions = [
     {
         id: "dusk",
         name: "Dusk",
-        icon: "images/Dusk.png",
+        icon: "../images/Dusk.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 54 },
@@ -1499,7 +1497,7 @@ const bossDefinitions = [
     {
         id: "heretic",
         name: "Heretic",
-        icon: "images/Heretic.png",
+        icon: "../images/Heretic.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 96.3 },
@@ -1510,7 +1508,7 @@ const bossDefinitions = [
     {
         id: "djunkel",
         name: "Djunkel",
-        icon: "images/Djunkel.png",
+        icon: "../images/Djunkel.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 58.5 },
@@ -1521,7 +1519,7 @@ const bossDefinitions = [
     {
         id: "seren",
         name: "Seren",
-        icon: "images/Seren.png",
+        icon: "../images/Seren.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 289.8 },
@@ -1533,7 +1531,7 @@ const bossDefinitions = [
     {
         id: "kalos",
         name: "Kalos",
-        icon: "images/Kalos.png",
+        icon: "../images/Kalos.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 338.8 },
@@ -1546,7 +1544,7 @@ const bossDefinitions = [
     {
         id: "adversary",
         name: "Adversary",
-        icon: "images/Adversary.png",
+        icon: "../images/Adversary.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 361 },
@@ -1559,7 +1557,7 @@ const bossDefinitions = [
     {
         id: "radiant",
         name: "Radiant",
-        icon: "images/Radiant.png",
+        icon: "../images/Radiant.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 594 },
@@ -1570,7 +1568,7 @@ const bossDefinitions = [
     {
         id: "carling",
         name: "Carling",
-        icon: "images/Carling.png",
+        icon: "../images/Carling.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: 368.2 },
@@ -1583,7 +1581,7 @@ const bossDefinitions = [
     {
         id: "bellona",
         name: "Bellona",
-        icon: "images/Bellona.png",
+        icon: "../images/Bellona.png",
         type: "Weekly",
         difficulties: [
             { name: "E", value: null },
@@ -1595,7 +1593,7 @@ const bossDefinitions = [
     {
         id: "limbo",
         name: "Limbo",
-        icon: "images/Limbo.png",
+        icon: "../images/Limbo.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 900 },
@@ -1606,7 +1604,7 @@ const bossDefinitions = [
     {
         id: "baldrix",
         name: "Baldrix",
-        icon: "images/Baldrix.png",
+        icon: "../images/Baldrix.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 1200 },
@@ -1617,7 +1615,7 @@ const bossDefinitions = [
     {
         id: "jupiter",
         name: "Jupiter",
-        icon: "images/Jupiter.png",
+        icon: "../images/Jupiter.png",
         type: "Weekly",
         difficulties: [
             { name: "N", value: 1360 },
@@ -2623,10 +2621,6 @@ function updateSyncStatus() {
 
 /* =========================================================
    ACCOUNT MANAGEMENT
-=========================================================
-
-   These operations modify the Calculator's master state
-   directly, so both pages stay synchronized.
 ========================================================= */
 
 function addAccount() {
@@ -2834,6 +2828,7 @@ function deleteAccount() {
 
     if (!account) {
         return;
+
     }
 
 
@@ -3136,6 +3131,7 @@ function deleteCharacter() {
 
     if (!character) {
         return;
+
     }
 
 
@@ -3432,10 +3428,6 @@ function escapeHtml(value) {
 
 /* =========================================================
    CROSS-TAB SYNC
-=========================================================
-
-   If the Calculator is open in another browser tab and
-   changes its localStorage, Planner automatically refreshes.
 ========================================================= */
 
 window.addEventListener(
@@ -3468,10 +3460,6 @@ window.addEventListener(
 
 /* =========================================================
    VISIBILITY SYNC
-=========================================================
-
-   When returning to the Planner tab, read Calculator
-   localStorage again.
 ========================================================= */
 
 document.addEventListener(
