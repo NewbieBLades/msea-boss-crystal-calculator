@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -632,7 +633,26 @@
 
     <header>
 
-        <h1>MSEA Bossing Planner</h1>
+        <div style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        ">
+
+            <h1 style="margin: 0;">
+                MSEA Bossing Planner
+            </h1>
+
+            <a
+                class="btn"
+                href="../">
+                ↗ Crystal Calculator
+            </a>
+
+        </div>
 
         <p>
             Plan your weekly Boss Crystals using the same
@@ -854,13 +874,6 @@
                 ↻ Sync from Calculator
             </button>
 
-
-            <a
-                class="btn"
-                href="../">
-                ↗ Crystal Calculator
-            </a>
-
         </div>
 
 
@@ -1016,16 +1029,6 @@ const CALCULATOR_URL =
 
 /* =========================================================
    PLANNER STATE
-=========================================================
-
-   IMPORTANT:
-
-   The Planner DOES NOT store boss clear selections.
-
-   Calculator is the master source.
-
-   Planner only remembers which account/character is active
-   if necessary.
 ========================================================= */
 
 let state = {
@@ -1400,16 +1403,6 @@ function ensureActiveCharacter() {
 
 /* =========================================================
    BOSS DATA
-=========================================================
-
-   These definitions match the Calculator's current boss
-   list.
-
-   IMPORTANT:
-   Planner is inside /planner/, while the shared images are
-   inside /images/.
-
-   Therefore all image paths MUST use ../images/.
 ========================================================= */
 
 const bossDefinitions = [
@@ -3500,3 +3493,4 @@ init();
 
 </body>
 </html>
+```
