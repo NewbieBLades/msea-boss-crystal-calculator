@@ -1,1 +1,1260 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSEA Bossing Planner</title>
 
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #0f1117;
+        color: #f2f4f8;
+    }
+
+    button,
+    input {
+        font: inherit;
+    }
+
+    .container {
+        width: min(1100px, calc(100% - 30px));
+        margin: 0 auto;
+        padding: 30px 0 50px;
+    }
+
+    .header {
+        margin-bottom: 24px;
+    }
+
+    .header h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+    }
+
+    .header p {
+        margin: 0;
+        color: #9da5b4;
+        font-size: 15px;
+    }
+
+    .card {
+        background: #171a22;
+        border: 1px solid #292e39;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 18px;
+    }
+
+    .summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .summary-box {
+        background: #11141b;
+        border: 1px solid #292e39;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .summary-label {
+        color: #929aaa;
+        font-size: 13px;
+        margin-bottom: 7px;
+    }
+
+    .summary-value {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    button {
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        cursor: pointer;
+        color: white;
+        background: #2d3442;
+    }
+
+    button:hover {
+        filter: brightness(1.15);
+    }
+
+    .primary {
+        background: #5865f2;
+    }
+
+    .danger {
+        background: #b83b4b;
+    }
+
+    .secondary {
+        background: #242a35;
+    }
+
+    .character-tabs {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .character-tab {
+        flex: 0 0 auto;
+        background: #11141b;
+        border: 1px solid #303643;
+        color: #c7ccd6;
+        padding: 10px 14px;
+        border-radius: 9px;
+        cursor: pointer;
+    }
+
+    .character-tab.active {
+        background: #5865f2;
+        border-color: #5865f2;
+        color: white;
+    }
+
+    .character-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .character-name {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .character-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .progress-section {
+        margin-bottom: 20px;
+    }
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+        color: #b7bdc9;
+        font-size: 14px;
+    }
+
+    .progress-bar {
+        height: 10px;
+        background: #292e39;
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: #5865f2;
+        transition: width 0.2s ease;
+    }
+
+    .boss-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+
+    .boss-slot {
+        background: #11141b;
+        border: 1px solid #303643;
+        border-radius: 12px;
+        padding: 15px;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: 0.15s ease;
+    }
+
+    .boss-slot.cleared {
+        border-color: #5865f2;
+        background: #1a1e2b;
+    }
+
+    .boss-number {
+        color: #777f8e;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .boss-name {
+        font-size: 17px;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+
+    .status {
+        font-size: 13px;
+        color: #9da5b4;
+        margin-bottom: 9px;
+    }
+
+    .boss-slot.cleared .status {
+        color: #aeb7ff;
+    }
+
+    .clear-button {
+        width: 100%;
+        padding: 9px;
+        background: #252b36;
+    }
+
+    .boss-slot.cleared .clear-button {
+        background: #5865f2;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 40px 15px;
+        color: #8d95a3;
+    }
+
+    .footer-note {
+        color: #737b8a;
+        font-size: 12px;
+        text-align: center;
+        margin-top: 18px;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 1000;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+    .modal {
+        width: min(420px, 100%);
+        background: #171a22;
+        border: 1px solid #303643;
+        border-radius: 14px;
+        padding: 22px;
+    }
+
+    .modal h2 {
+        margin: 0 0 15px;
+    }
+
+    .modal input {
+        width: 100%;
+        background: #0f1117;
+        color: white;
+        border: 1px solid #353b48;
+        border-radius: 8px;
+        padding: 11px 12px;
+        outline: none;
+    }
+
+    .modal input:focus {
+        border-color: #5865f2;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    @media (max-width: 850px) {
+        .boss-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            width: min(100% - 20px, 1100px);
+            padding-top: 20px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+        }
+
+        .boss-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .boss-slot {
+            padding: 12px;
+            min-height: 112px;
+        }
+
+        .boss-name {
+            font-size: 15px;
+        }
+
+        .summary {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .summary-box {
+            padding: 12px;
+        }
+
+        .summary-value {
+            font-size: 21px;
+        }
+
+        .character-header {
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .boss-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>MSEA Bossing Planner</h1>
+        <p>Track your weekly boss clears across your MapleStory characters.</p>
+    </div>
+
+    <div class="summary">
+        <div class="summary-box">
+            <div class="summary-label">Current Character</div>
+            <div class="summary-value" id="currentCharacterName">-</div>
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-label">Bosses Cleared</div>
+            <div class="summary-value" id="clearedCount">0 / 12</div>
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-label">Remaining</div>
+            <div class="summary-value" id="remainingCount">12</div>
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-label">Total Characters</div>
+            <div class="summary-value" id="characterCount">0</div>
+        </div>
+    </div>
+
+    <div class="card">
+
+        <div class="toolbar">
+            <button class="primary" id="addCharacterBtn">
+                + Add Character
+            </button>
+
+            <button class="secondary" id="exampleBtn">
+                Example Data
+            </button>
+
+            <button class="danger" id="resetAllBtn">
+                Reset All
+            </button>
+        </div>
+
+        <div class="character-tabs" id="characterTabs"></div>
+
+    </div>
+
+    <div class="card" id="plannerCard">
+
+        <div id="emptyState" class="empty">
+            <h3>No characters yet</h3>
+            <p>Click <strong>+ Add Character</strong> to create your first character.</p>
+        </div>
+
+        <div id="plannerContent" style="display:none;">
+
+            <div class="character-header">
+                <div>
+                    <div class="character-name" id="plannerCharacterName">
+                        Character 1
+                    </div>
+                </div>
+
+                <div class="character-actions">
+                    <button class="secondary" id="renameBtn">
+                        Rename
+                    </button>
+
+                    <button class="secondary" id="clearCharacterBtn">
+                        Clear Clears
+                    </button>
+
+                    <button class="danger" id="deleteCharacterBtn">
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+            <div class="progress-section">
+
+                <div class="progress-info">
+                    <span>Weekly Boss Clear Progress</span>
+                    <span id="progressText">0 / 12</span>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+            </div>
+
+            <div class="boss-grid" id="bossGrid"></div>
+
+        </div>
+
+    </div>
+
+    <div class="footer-note">
+        Your planner is saved automatically in this browser.
+    </div>
+
+</div>
+
+<div class="modal-overlay" id="renameModal">
+
+    <div class="modal">
+
+        <h2>Rename Character</h2>
+
+        <input
+            type="text"
+            id="renameInput"
+            maxlength="30"
+            placeholder="Character name"
+        >
+
+        <div class="modal-actions">
+            <button class="secondary" id="cancelRenameBtn">
+                Cancel
+            </button>
+
+            <button class="primary" id="saveRenameBtn">
+                Save
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+(function () {
+
+    "use strict";
+
+    const STORAGE_KEY = "msea_bossing_planner_v1";
+
+    const MAX_SLOTS = 12;
+
+    /*
+     * You can change these boss names anytime.
+     * The planner only tracks CLEAR / HAVEN'T CLEARED.
+     */
+    const BOSS_NAMES = [
+        "Lotus",
+        "Damien",
+        "Guardian Angel Slime",
+        "Lucid",
+        "Will",
+        "Gloom",
+        "Darknell",
+        "Dunkel",
+        "Seren",
+        "Kalos",
+        "Kaling",
+        "Carling"
+    ];
+
+    let state = {
+        characters: [],
+        activeCharacterId: null
+    };
+
+    const currentCharacterName =
+        document.getElementById("currentCharacterName");
+
+    const clearedCount =
+        document.getElementById("clearedCount");
+
+    const remainingCount =
+        document.getElementById("remainingCount");
+
+    const characterCount =
+        document.getElementById("characterCount");
+
+    const characterTabs =
+        document.getElementById("characterTabs");
+
+    const emptyState =
+        document.getElementById("emptyState");
+
+    const plannerContent =
+        document.getElementById("plannerContent");
+
+    const plannerCharacterName =
+        document.getElementById("plannerCharacterName");
+
+    const progressText =
+        document.getElementById("progressText");
+
+    const progressFill =
+        document.getElementById("progressFill");
+
+    const bossGrid =
+        document.getElementById("bossGrid");
+
+    const addCharacterBtn =
+        document.getElementById("addCharacterBtn");
+
+    const exampleBtn =
+        document.getElementById("exampleBtn");
+
+    const resetAllBtn =
+        document.getElementById("resetAllBtn");
+
+    const renameBtn =
+        document.getElementById("renameBtn");
+
+    const clearCharacterBtn =
+        document.getElementById("clearCharacterBtn");
+
+    const deleteCharacterBtn =
+        document.getElementById("deleteCharacterBtn");
+
+    const renameModal =
+        document.getElementById("renameModal");
+
+    const renameInput =
+        document.getElementById("renameInput");
+
+    const cancelRenameBtn =
+        document.getElementById("cancelRenameBtn");
+
+    const saveRenameBtn =
+        document.getElementById("saveRenameBtn");
+
+
+    function generateId() {
+        return Date.now().toString(36) +
+            Math.random().toString(36).slice(2);
+    }
+
+
+    function createCharacter(name) {
+
+        return {
+            id: generateId(),
+
+            name: name || "Character 1",
+
+            clears: Array(MAX_SLOTS).fill(false)
+        };
+
+    }
+
+
+    function saveState() {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(state)
+        );
+
+    }
+
+
+    function loadState() {
+
+        try {
+
+            const saved =
+                localStorage.getItem(STORAGE_KEY);
+
+            if (!saved) {
+                return;
+            }
+
+            const parsed =
+                JSON.parse(saved);
+
+            if (!parsed ||
+                !Array.isArray(parsed.characters)) {
+                return;
+            }
+
+            state = parsed;
+
+            state.characters =
+                state.characters.map(character => {
+
+                    const clears =
+                        Array.isArray(character.clears)
+                            ? character.clears.slice(0, MAX_SLOTS)
+                            : [];
+
+                    while (clears.length < MAX_SLOTS) {
+                        clears.push(false);
+                    }
+
+                    return {
+                        id: character.id || generateId(),
+                        name: character.name || "Character",
+                        clears: clears.map(Boolean)
+                    };
+
+                });
+
+            if (
+                !state.activeCharacterId ||
+                !state.characters.some(
+                    c => c.id === state.activeCharacterId
+                )
+            ) {
+
+                state.activeCharacterId =
+                    state.characters.length
+                        ? state.characters[0].id
+                        : null;
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Unable to load planner data:",
+                error
+            );
+
+        }
+
+    }
+
+
+    function getActiveCharacter() {
+
+        return state.characters.find(
+            character =>
+                character.id === state.activeCharacterId
+        ) || null;
+
+    }
+
+
+    function getClearedCount(character) {
+
+        if (!character) {
+            return 0;
+        }
+
+        return character.clears.filter(Boolean).length;
+
+    }
+
+
+    function renderCharacterTabs() {
+
+        characterTabs.innerHTML = "";
+
+        state.characters.forEach(character => {
+
+            const button =
+                document.createElement("button");
+
+            button.type = "button";
+
+            button.className =
+                "character-tab" +
+                (
+                    character.id === state.activeCharacterId
+                        ? " active"
+                        : ""
+                );
+
+            const count =
+                getClearedCount(character);
+
+            button.textContent =
+                character.name +
+                " (" +
+                count +
+                "/" +
+                MAX_SLOTS +
+                ")";
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    state.activeCharacterId =
+                        character.id;
+
+                    saveState();
+                    render();
+
+                }
+            );
+
+            characterTabs.appendChild(button);
+
+        });
+
+    }
+
+
+    function renderBossSlots(character) {
+
+        bossGrid.innerHTML = "";
+
+        for (
+            let index = 0;
+            index < MAX_SLOTS;
+            index++
+        ) {
+
+            const cleared =
+                Boolean(character.clears[index]);
+
+            const slot =
+                document.createElement("div");
+
+            slot.className =
+                "boss-slot" +
+                (cleared ? " cleared" : "");
+
+            const number =
+                document.createElement("div");
+
+            number.className =
+                "boss-number";
+
+            number.textContent =
+                "Boss Slot " + (index + 1);
+
+            const name =
+                document.createElement("div");
+
+            name.className =
+                "boss-name";
+
+            name.textContent =
+                BOSS_NAMES[index] ||
+                "Boss " + (index + 1);
+
+            const status =
+                document.createElement("div");
+
+            status.className =
+                "status";
+
+            status.textContent =
+                cleared
+                    ? "✓ Cleared"
+                    : "○ Haven't Cleared";
+
+            const button =
+                document.createElement("button");
+
+            button.type = "button";
+
+            button.className =
+                "clear-button";
+
+            button.textContent =
+                cleared
+                    ? "Mark Haven't Cleared"
+                    : "Mark Cleared";
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    character.clears[index] =
+                        !character.clears[index];
+
+                    saveState();
+                    render();
+
+                }
+            );
+
+            slot.appendChild(number);
+            slot.appendChild(name);
+            slot.appendChild(status);
+            slot.appendChild(button);
+
+            bossGrid.appendChild(slot);
+
+        }
+
+    }
+
+
+    function render() {
+
+        renderCharacterTabs();
+
+        characterCount.textContent =
+            state.characters.length;
+
+        const character =
+            getActiveCharacter();
+
+        if (!character) {
+
+            emptyState.style.display =
+                "block";
+
+            plannerContent.style.display =
+                "none";
+
+            currentCharacterName.textContent =
+                "-";
+
+            clearedCount.textContent =
+                "0 / " + MAX_SLOTS;
+
+            remainingCount.textContent =
+                MAX_SLOTS;
+
+            progressText.textContent =
+                "0 / " + MAX_SLOTS;
+
+            progressFill.style.width =
+                "0%";
+
+            return;
+
+        }
+
+        emptyState.style.display =
+            "none";
+
+        plannerContent.style.display =
+            "block";
+
+        plannerCharacterName.textContent =
+            character.name;
+
+        currentCharacterName.textContent =
+            character.name;
+
+        const cleared =
+            getClearedCount(character);
+
+        const remaining =
+            MAX_SLOTS - cleared;
+
+        const percentage =
+            (cleared / MAX_SLOTS) * 100;
+
+        clearedCount.textContent =
+            cleared + " / " + MAX_SLOTS;
+
+        remainingCount.textContent =
+            remaining;
+
+        progressText.textContent =
+            cleared + " / " + MAX_SLOTS;
+
+        progressFill.style.width =
+            percentage + "%";
+
+        renderBossSlots(character);
+
+    }
+
+
+    function addCharacter() {
+
+        const number =
+            state.characters.length + 1;
+
+        const character =
+            createCharacter(
+                "Character " + number
+            );
+
+        state.characters.push(character);
+
+        state.activeCharacterId =
+            character.id;
+
+        saveState();
+        render();
+
+    }
+
+
+    function openRenameModal() {
+
+        const character =
+            getActiveCharacter();
+
+        if (!character) {
+            return;
+        }
+
+        renameInput.value =
+            character.name;
+
+        renameModal.classList.add("show");
+
+        setTimeout(function () {
+            renameInput.focus();
+            renameInput.select();
+        }, 50);
+
+    }
+
+
+    function closeRenameModal() {
+
+        renameModal.classList.remove("show");
+
+    }
+
+
+    function saveRename() {
+
+        const character =
+            getActiveCharacter();
+
+        if (!character) {
+            return;
+        }
+
+        const newName =
+            renameInput.value.trim();
+
+        if (!newName) {
+            return;
+        }
+
+        character.name =
+            newName.slice(0, 30);
+
+        saveState();
+        closeRenameModal();
+        render();
+
+    }
+
+
+    function clearCurrentCharacter() {
+
+        const character =
+            getActiveCharacter();
+
+        if (!character) {
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                "Clear all 12 boss slots for " +
+                character.name +
+                "?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        character.clears =
+            Array(MAX_SLOTS).fill(false);
+
+        saveState();
+        render();
+
+    }
+
+
+    function deleteCurrentCharacter() {
+
+        const character =
+            getActiveCharacter();
+
+        if (!character) {
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                "Delete " +
+                character.name +
+                "?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const index =
+            state.characters.findIndex(
+                c => c.id === character.id
+            );
+
+        state.characters =
+            state.characters.filter(
+                c => c.id !== character.id
+            );
+
+        if (state.characters.length === 0) {
+
+            state.activeCharacterId =
+                null;
+
+        } else {
+
+            const nextIndex =
+                Math.min(
+                    index,
+                    state.characters.length - 1
+                );
+
+            state.activeCharacterId =
+                state.characters[nextIndex].id;
+
+        }
+
+        saveState();
+        render();
+
+    }
+
+
+    function loadExampleData() {
+
+        const confirmed =
+            confirm(
+                "Replace the current planner data with example characters?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const character1 =
+            createCharacter("Blade Master");
+
+        character1.clears =
+            [
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false
+            ];
+
+        const character2 =
+            createCharacter("Zero");
+
+        character2.clears =
+            [
+                true,
+                true,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ];
+
+        const character3 =
+            createCharacter("Kanna");
+
+        character3.clears =
+            [
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ];
+
+        state.characters =
+            [
+                character1,
+                character2,
+                character3
+            ];
+
+        state.activeCharacterId =
+            character1.id;
+
+        saveState();
+        render();
+
+    }
+
+
+    function resetEverything() {
+
+        const confirmed =
+            confirm(
+                "Delete ALL characters and bossing progress?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        state = {
+            characters: [],
+            activeCharacterId: null
+        };
+
+        saveState();
+        render();
+
+    }
+
+
+    addCharacterBtn.addEventListener(
+        "click",
+        addCharacter
+    );
+
+    exampleBtn.addEventListener(
+        "click",
+        loadExampleData
+    );
+
+    resetAllBtn.addEventListener(
+        "click",
+        resetEverything
+    );
+
+    renameBtn.addEventListener(
+        "click",
+        openRenameModal
+    );
+
+    clearCharacterBtn.addEventListener(
+        "click",
+        clearCurrentCharacter
+    );
+
+    deleteCharacterBtn.addEventListener(
+        "click",
+        deleteCurrentCharacter
+    );
+
+    cancelRenameBtn.addEventListener(
+        "click",
+        closeRenameModal
+    );
+
+    saveRenameBtn.addEventListener(
+        "click",
+        saveRename
+    );
+
+    renameInput.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Enter") {
+                saveRename();
+            }
+
+            if (event.key === "Escape") {
+                closeRenameModal();
+            }
+
+        }
+    );
+
+    renameModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (event.target === renameModal) {
+                closeRenameModal();
+            }
+
+        }
+    );
+
+
+    loadState();
+    render();
+
+})();
+</script>
+
+</body>
+</html>
+```
