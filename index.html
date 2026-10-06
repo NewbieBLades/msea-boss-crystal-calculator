@@ -29,19 +29,52 @@
         padding: 24px 0 50px;
     }
 
-    header {
+    /* =========================
+       HEADER
+    ========================= */
+
+    .main-header {
         margin-bottom: 24px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
     }
 
-    header h1 {
+    .header-content {
+        min-width: 0;
+    }
+
+    .main-header h1 {
         margin: 0 0 6px;
         font-size: 30px;
     }
 
-    header p {
+    .main-header p {
         margin: 0;
         color: #9aa1ad;
         font-size: 14px;
+    }
+
+    .planner-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: #242934;
+        color: #fff;
+        border: 1px solid #7c5cff;
+        border-radius: 8px;
+        padding: 10px 16px;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.15s;
+    }
+
+    .planner-button:hover {
+        background: #332a5d;
+        border-color: #927cff;
     }
 
     /* =========================
@@ -606,8 +639,18 @@
             padding-top: 15px;
         }
 
-        header h1 {
+        .main-header {
+            align-items: stretch;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .main-header h1 {
             font-size: 24px;
+        }
+
+        .planner-button {
+            width: 100%;
         }
 
         .dashboard {
@@ -655,12 +698,30 @@
 
 <div class="container">
 
-    <header>
-        <h1>MSEA Boss Crystal Calculator</h1>
-        <p>
-            Track weekly Boss Crystals, party splits, and meso earnings.
-            Supports multiple accounts and multiple characters.
-        </p>
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header class="main-header">
+
+        <div class="header-content">
+
+            <h1>MSEA Boss Crystal Calculator</h1>
+
+            <p>
+                Track weekly Boss Crystals, party splits, and meso earnings.
+                Supports multiple accounts and multiple characters.
+            </p>
+
+        </div>
+
+        <a
+            href="planner/"
+            class="planner-button"
+        >
+            Planner
+        </a>
+
     </header>
 
 
@@ -850,8 +911,6 @@
         </div>
 
     </section>
-
-
 
 
     <!-- =========================
@@ -2533,7 +2592,7 @@ function selectDifficulty(
         const accountFull =
             !isMonthlyBoss(boss) &&
             accountCount >=
-            MAX_ACCOUNT_CRYSTALS;
+                MAX_ACCOUNT_CRYSTALS;
 
 
         if (
@@ -3443,6 +3502,7 @@ function renderBossList(
     }
 
 }
+
 
 /* =========================================================
    DIFFICULTY CLICK
