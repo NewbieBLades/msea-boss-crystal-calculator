@@ -484,10 +484,16 @@
         color: #fff;
     }
 
-    .difficulty-option input:disabled + label {
-        opacity: 0.35;
-        cursor: not-allowed;
-    }
+    /*
+        IMPORTANT FIX:
+
+        There is intentionally NO
+        input:disabled styling anymore.
+
+        Selected difficulties are ALWAYS clickable.
+        Limits are enforced in JavaScript only
+        when ADDING a selection.
+    */
 
     .difficulty-count {
         display: inline-flex;
@@ -629,7 +635,6 @@
         .party-select {
             max-width: 180px;
         }
-
     }
 
     @media (max-width: 650px) {
@@ -689,7 +694,6 @@
             width: 38px;
             height: 38px;
         }
-
     }
 </style>
 </head>
@@ -1184,12 +1188,6 @@
 
 const MAX_BOSSES_PER_CHARACTER = 12;
 
-/*
-    This is NOT a selection limit.
-
-    It represents the maximum number of weekly Boss Crystals
-    that can eventually be sold/optimized for the account.
-*/
 const MAX_ACCOUNT_CRYSTALS = 90;
 
 const MAX_CLEARS_PER_BOSS = 2;
@@ -1446,9 +1444,7 @@ function init() {
     migrateState();
 
     if (!state.accounts.length) {
-
         createInitialAccount();
-
     }
 
     ensureActiveAccount();
@@ -2136,12 +2132,19 @@ function formatMeso(value) {
 
     if (
         value === null ||
-        value === undefined
+        value === undefined ||
+        !Number.isFinite(
+            Number(value)
+        )
     ) {
 
         return "—";
 
     }
+
+
+    value =
+        Number(value);
 
 
     if (
@@ -2229,7 +2232,7 @@ function setPartySize(
 
 
     state.partySizes[key] =
-        Number(value);
+        Number(value) || 1;
 
 
     saveState();
@@ -2506,10 +2509,6 @@ function getAnnualWeeklyIncome() {
 }
 
 
-/*
-    Fixed automatic-semicolon issue from previous version.
-*/
-
 function getAnnualBlackMageIncome() {
 
     return (
@@ -2582,9 +2581,16 @@ function selectDifficulty(
         selections.length;
 
 
-    /*
-        x2 -> remove both
-    */
+    /* =========================================
+       x2 -> REMOVE BOTH
+
+       IMPORTANT:
+       This happens BEFORE any character
+       limit check.
+
+       Therefore deselection ALWAYS works,
+       including at 12/12.
+    ========================================= */
 
     if (
         difficultyCount === 2
@@ -2598,37 +2604,56 @@ function selectDifficulty(
 
     }
 
-    /*
-        x1 -> x2
-
-        IMPORTANT:
-        Character limit still applies.
-
-        Account 90 limit DOES NOT apply.
-    */
+    /* =========================================
+       x1 -> x2
+    ========================================= */
 
     else if (
         difficultyCount === 1
     ) {
 
-        const characterCount =
-            getCharacterCrystalCount(
-                character
-            );
-
-
-        const characterFull =
-            !isMonthlyBoss(boss) &&
-            characterCount >=
-                MAX_BOSSES_PER_CHARACTER;
-
+        /*
+            Monthly bosses do not use the
+            12-crystal weekly limit.
+        */
 
         if (
-            characterFull
+            !isMonthlyBoss(boss)
+        ) {
+
+            const characterCount =
+                getCharacterCrystalCount(
+                    character
+                );
+
+
+            if (
+                characterCount >=
+                MAX_BOSSES_PER_CHARACTER
+            ) {
+
+                showToast(
+                    `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /*
+            A boss can have maximum 2 clears.
+        */
+
+        if (
+            currentBossClears >=
+            MAX_CLEARS_PER_BOSS
         ) {
 
             showToast(
-                `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
+                "This boss can only be cleared 2 times."
             );
 
             return;
@@ -2642,33 +2667,39 @@ function selectDifficulty(
 
     }
 
-    /*
-        x0 -> x1
-    */
+    /* =========================================
+       x0 -> x1
+    ========================================= */
 
     else {
 
-        const characterCount =
-            getCharacterCrystalCount(
-                character
-            );
-
-
         /*
-            Character limit remains 12.
+            Only check the character limit
+            when ADDING a new weekly crystal.
         */
 
         if (
-            !isMonthlyBoss(boss) &&
-            characterCount >=
-                MAX_BOSSES_PER_CHARACTER
+            !isMonthlyBoss(boss)
         ) {
 
-            showToast(
-                `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
-            );
+            const characterCount =
+                getCharacterCrystalCount(
+                    character
+                );
 
-            return;
+
+            if (
+                characterCount >=
+                MAX_BOSSES_PER_CHARACTER
+            ) {
+
+                showToast(
+                    `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
+                );
+
+                return;
+
+            }
 
         }
 
@@ -2990,23 +3021,11 @@ function renderDashboard() {
         );
 
 
-    /*
-        Account can now exceed 90 selections.
-
-        90 is displayed as the future sell/optimization
-        limit rather than a selection limit.
-    */
-
     document.getElementById(
         "accountCrystalText"
     ).textContent =
         `${accountCrystals} selected · ${MAX_ACCOUNT_CRYSTALS} sell limit`;
 
-
-    /*
-        Progress bar stops at 100% once 90 is reached.
-        Selection itself is NOT blocked.
-    */
 
     const percentage =
         Math.min(
@@ -3121,6 +3140,21 @@ function renderBosses() {
 }
 
 
+/*
+    IMPORTANT FIXED VERSION
+
+    No checkbox is ever disabled.
+
+    This means:
+        x1 -> x0
+        x2 -> x0
+
+    will ALWAYS remain clickable.
+
+    Character/account limits are handled
+    by selectDifficulty() only when adding.
+*/
+
 function renderBossList(
     containerId,
     bossType,
@@ -3232,13 +3266,6 @@ function renderBossList(
                 isMonthlyBoss(boss);
 
 
-            /*
-                Only the CHARACTER limit can disable
-                a new weekly selection.
-
-                There is NO account 90 selection limit.
-            */
-
             const characterLimitReached =
                 !isMonthly &&
                 characterCount >=
@@ -3255,24 +3282,6 @@ function renderBossList(
                         difficultyCounts[
                             difficulty.name
                         ] || 0;
-
-
-                    /*
-                        Existing selections remain clickable
-                        so they can always be removed.
-
-                        New selections are disabled only when:
-                        1. Character has 12 weekly crystals, OR
-                        2. This boss already has 2 clears.
-                    */
-
-                    const disabled =
-                        count === 0 &&
-                        (
-                            characterLimitReached ||
-                            bossClearCount >=
-                            MAX_CLEARS_PER_BOSS
-                        );
 
 
                     const inputId =
@@ -3306,6 +3315,59 @@ function renderBossList(
                         );
 
 
+                    let tooltip;
+
+
+                    if (
+                        count === 0
+                    ) {
+
+                        if (
+                            characterLimitReached &&
+                            !isMonthly
+                        ) {
+
+                            tooltip =
+                                "Character is full. Remove an existing selection first.";
+
+                        }
+
+                        else if (
+                            bossClearCount >=
+                            MAX_CLEARS_PER_BOSS
+                        ) {
+
+                            tooltip =
+                                "This boss already has 2 clears.";
+
+                        }
+
+                        else {
+
+                            tooltip =
+                                `Select ${difficulty.name}`;
+
+                        }
+
+                    }
+
+                    else if (
+                        count === 1
+                    ) {
+
+                        tooltip =
+                            "Click again to select x2";
+
+                    }
+
+                    else {
+
+                        tooltip =
+                            "Click to deselect";
+
+                    }
+
+
                     difficultyHtml += `
 
                         <div
@@ -3321,7 +3383,7 @@ function renderBossList(
                                 type="checkbox"
                                 id="${inputId}"
                                 ${count > 0 ? "checked" : ""}
-                                ${disabled ? "disabled" : ""}
+                                tabindex="-1"
                             >
 
 
@@ -3334,6 +3396,9 @@ function renderBossList(
                                         '${difficulty.name}'
                                     )
                                 "
+                                title="${escapeHtml(
+                                    tooltip
+                                )}"
                             >
                                 ${labelContent}
                             </label>
@@ -3341,7 +3406,10 @@ function renderBossList(
 
                             <select
                                 class="party-select"
-                                title="${difficulty.name} party size"
+                                title="${escapeHtml(
+                                    difficulty.name +
+                                    ' party size'
+                                )}"
                                 onchange="
                                     setPartySize(
                                         '${boss.id}',
@@ -3398,7 +3466,12 @@ function renderBossList(
 
                     if (
                         difficulty &&
-                        difficulty.value !== null
+                        difficulty.value !== null &&
+                        Number.isFinite(
+                            Number(
+                                difficulty.value
+                            )
+                        )
                     ) {
 
                         const partySize =
@@ -3512,7 +3585,9 @@ function renderBossList(
         container.innerHTML = `
 
             <div class="empty">
-                ${escapeHtml(emptyMessage)}
+                ${escapeHtml(
+                    emptyMessage
+                )}
             </div>
 
         `;
@@ -3533,6 +3608,8 @@ function handleDifficultyClick(
 ) {
 
     event.preventDefault();
+
+    event.stopPropagation();
 
 
     selectDifficulty(
