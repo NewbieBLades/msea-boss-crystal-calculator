@@ -3,566 +3,1094 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MSEA Bossing Planner</title>
+
+<title>MSEA Boss Crystal Optimizer</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0f1117;color:#f1f3f5}
-button,input,select,textarea{font:inherit}
-.container{width:min(1400px,calc(100% - 30px));margin:0 auto;padding:24px 0 50px}
-header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{margin:0;color:#9aa1ad;font-size:14px}
-.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.card{background:#171a22;border:1px solid #292e3a;border-radius:12px;padding:16px}
-.card-label{color:#9aa1ad;font-size:13px;margin-bottom:8px}.card-value{font-size:25px;font-weight:700}.card-sub{color:#777f8d;font-size:12px;margin-top:5px}
-.progress-wrap{margin-top:10px}.progress{height:7px;background:#272c36;border-radius:999px;overflow:hidden}.progress-bar{height:100%;width:0%;background:#7c5cff;transition:width .2s ease}
-.section{background:#171a22;border:1px solid #292e3a;border-radius:12px;margin-bottom:16px;overflow:hidden}
-.section-header{padding:14px 16px;border-bottom:1px solid #292e3a;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.section-title{font-size:16px;font-weight:700}.section-subtitle{color:#777f8d;font-size:12px;margin-top:3px}
-.account-section,.character-section{margin-bottom:16px}.account-top,.character-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.account-tabs,.character-tabs{display:flex;gap:8px;flex-wrap:wrap;flex:1}.account-actions,.character-actions{display:flex;gap:8px;flex-shrink:0}
-.account-tab,.character-tab{background:#171a22;color:#aeb5c2;border:1px solid #292e3a;border-radius:9px;padding:9px 12px;cursor:pointer;transition:.15s}
-.account-tab:hover,.character-tab:hover{border-color:#464d5c;color:#fff}.account-tab.active,.character-tab.active{background:#242033;border-color:#7c5cff;color:#fff}
-.account-tab-name,.character-tab-name{font-weight:700}.account-tab-count,.character-tab-count{margin-left:5px;color:#858c99;font-size:12px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px;background:#14171e;border-bottom:1px solid #292e3a}
-.search{flex:1;min-width:220px}.input,.search input{width:100%;background:#0f1117;border:1px solid #303642;color:#fff;border-radius:8px;padding:10px 12px;outline:none}
-.input:focus,.search input:focus{border-color:#7c5cff}.btn{background:#242934;color:#fff;border:1px solid #373e4c;border-radius:8px;padding:9px 12px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
-.btn:hover{background:#2c3240}.btn.primary{background:#6650d9;border-color:#7c5cff}.btn.primary:hover{background:#7560e8}.btn.danger{color:#ff9d9d}
-.reset-notice,.sync-notice{padding:12px 16px;background:#14171e;border-bottom:1px solid #292e3a;color:#9aa1ad;font-size:12px}
-.reset-notice strong,.sync-notice strong{color:#fff}.reset-weekly{color:#7c5cff;font-weight:700}.reset-monthly{color:#b78cff;font-weight:700}.sync-status{color:#7c5cff;font-weight:700}
-.boss-list{padding:8px 16px 16px}.boss-row{display:grid;grid-template-columns:minmax(220px,1fr) minmax(250px,2fr) 150px 170px minmax(180px,1.2fr);align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #242934}
-.boss-row:last-child{border-bottom:none}.boss-name{font-weight:700;display:flex;align-items:center;gap:10px;min-width:0}.boss-icon{width:48px;height:48px;object-fit:contain;border-radius:7px;flex-shrink:0;background:#11141a;border:1px solid #303642}
-.boss-name-text{min-width:0}.boss-type{display:inline-block;margin-left:7px;padding:2px 6px;border-radius:5px;font-size:10px;color:#9da4b1;background:#242934;vertical-align:middle}
-.difficulty-list{display:flex;flex-wrap:wrap;gap:7px}.difficulty-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:48px;padding:7px 9px;background:#332a5d;border:1px solid #7c5cff;color:#fff;border-radius:7px;font-size:12px;font-weight:700}
-.difficulty-badge.not-cleared{background:#11141a;border-color:#303642;color:#777f8d}.difficulty-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#7c5cff;color:#fff;font-size:10px;line-height:1}
-.party-info{color:#aeb5c2;font-size:12px}.party-info strong{color:#fff}.status{text-align:right;font-weight:700}.status-cleared{color:#b7ffcf}.status-not-cleared{color:#777f8d}
-.status small{display:block;color:#777f8d;font-weight:400;font-size:11px;margin-top:3px}.boss-note{width:100%;min-height:40px;height:40px;resize:vertical;background:#0f1117;border:1px solid #303642;color:#fff;border-radius:7px;padding:8px 9px;outline:none;font-size:12px;line-height:1.35}
-.boss-note::placeholder{color:#626a78}.boss-note:focus{border-color:#7c5cff;box-shadow:0 0 0 1px rgba(124,92,255,.15)}.note-label{color:#777f8d;font-size:10px;margin-bottom:4px}
-.empty{padding:35px 15px;text-align:center;color:#777f8d}.info-box{background:#171a22;border:1px solid #292e3a;border-radius:12px;padding:16px;margin-top:16px;color:#9aa1ad;font-size:12px;line-height:1.6}.info-box strong{color:#fff}
-.toast{position:fixed;right:20px;bottom:20px;background:#242934;border:1px solid #424958;color:#fff;padding:12px 15px;border-radius:9px;box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:1000}.toast.show{opacity:1;transform:translateY(0)}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:2000}.modal-overlay.show{display:flex}
-.modal{width:min(420px,calc(100% - 30px));background:#171a22;border:1px solid #303642;border-radius:12px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.modal h3{margin:0 0 12px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
-@media(max-width:1150px){.boss-row{grid-template-columns:minmax(200px,1fr) minmax(220px,1.5fr) 130px 150px minmax(160px,1fr)}}
-@media(max-width:1000px){.dashboard{grid-template-columns:repeat(2,1fr)}.boss-row{grid-template-columns:1fr;gap:8px}.status{text-align:left}.boss-note{max-width:500px}}
-@media(max-width:650px){.container{width:min(100% - 20px,1400px);padding-top:15px}header h1{font-size:24px}.dashboard{grid-template-columns:1fr 1fr}.account-top,.character-top{align-items:stretch;flex-direction:column}.account-actions,.character-actions{width:100%}.account-actions .btn,.character-actions .btn{flex:1}.toolbar{flex-direction:column}.search{min-width:0}.boss-icon{width:42px;height:42px}.boss-note{max-width:none}}
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #0f1117;
+        color: #f1f3f5;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .container {
+        width: min(1200px, calc(100% - 32px));
+        margin: 0 auto;
+    }
+
+    header {
+        padding: 24px 0 18px;
+        border-bottom: 1px solid #252936;
+        background: #11141c;
+    }
+
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 28px;
+    }
+
+    .subtitle {
+        margin-top: 6px;
+        color: #9299a8;
+        font-size: 14px;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        border: 1px solid #303645;
+        background: #1a1e28;
+        color: #f1f3f5;
+        border-radius: 8px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.15s;
+    }
+
+    .btn:hover {
+        background: #232936;
+        border-color: #485063;
+    }
+
+    .btn.primary {
+        background: #315eea;
+        border-color: #315eea;
+    }
+
+    .btn.primary:hover {
+        background: #3f6cf0;
+    }
+
+    .btn.danger {
+        color: #ff8c8c;
+    }
+
+    .sync-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: #8f98a8;
+        font-size: 13px;
+    }
+
+    .sync-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #777;
+    }
+
+    .sync-dot.ok {
+        background: #45d483;
+    }
+
+    .sync-dot.warning {
+        background: #f1b94e;
+    }
+
+    main {
+        padding: 24px 0 50px;
+    }
+
+    .section {
+        margin-bottom: 24px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .section-title {
+        margin: 0;
+        font-size: 20px;
+    }
+
+    .section-subtitle {
+        color: #858d9d;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .stat {
+        background: #171a22;
+        border: 1px solid #282d3a;
+        border-radius: 12px;
+        padding: 18px;
+    }
+
+    .stat-label {
+        color: #8e96a6;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .stat-value.gain {
+        color: #57df8a;
+    }
+
+    .card {
+        background: #171a22;
+        border: 1px solid #282d3a;
+        border-radius: 12px;
+        padding: 18px;
+    }
+
+    .character-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .character-card {
+        background: #13161d;
+        border: 1px solid #292e3b;
+        border-radius: 10px;
+        padding: 16px;
+    }
+
+    .character-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .character-name {
+        font-size: 17px;
+        font-weight: bold;
+    }
+
+    .account-name {
+        margin-top: 4px;
+        color: #858d9d;
+        font-size: 12px;
+    }
+
+    .synced-label {
+        color: #65d995;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .character-info {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .pill {
+        background: #1d222d;
+        border: 1px solid #303644;
+        border-radius: 999px;
+        padding: 6px 10px;
+        color: #aeb5c2;
+        font-size: 12px;
+    }
+
+    .party-character {
+        margin-bottom: 20px;
+    }
+
+    .party-character:last-child {
+        margin-bottom: 0;
+    }
+
+    .party-character-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        background: #13161d;
+        border: 1px solid #292e3b;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .party-character-name {
+        font-weight: bold;
+        font-size: 15px;
+    }
+
+    .party-character-account {
+        color: #858d9d;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .party-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 10px;
+        background: #10131a;
+        border: 1px solid #292e3b;
+        border-top: 0;
+        border-radius: 0 0 10px 10px;
+    }
+
+    .boss-party-card {
+        background: #13161d;
+        border: 1px solid #292e3b;
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .boss-party-card.not-selected {
+        opacity: 0.45;
+    }
+
+    .boss-party-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .boss-icon {
+        width: 38px;
+        height: 38px;
+        object-fit: contain;
+        border-radius: 6px;
+        background: #0e1015;
+    }
+
+    .boss-name {
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .selected-boss-label {
+        color: #65d995;
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+    .difficulty-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 0;
+        border-top: 1px solid #232833;
+    }
+
+    .difficulty-row:first-child {
+        border-top: 0;
+    }
+
+    .difficulty-row.selected {
+        background: rgba(69, 212, 131, 0.05);
+    }
+
+    .difficulty-name {
+        color: #aeb5c2;
+        font-size: 13px;
+    }
+
+    .difficulty-name.selected {
+        color: #65d995;
+        font-weight: bold;
+    }
+
+    .difficulty-count {
+        color: #65d995;
+        font-size: 11px;
+        margin-left: 5px;
+    }
+
+    select {
+        background: #1d222d;
+        color: #f1f3f5;
+        border: 1px solid #343a49;
+        border-radius: 6px;
+        padding: 6px 8px;
+        min-width: 72px;
+    }
+
+    select:disabled {
+        opacity: 0.8;
+        cursor: not-allowed;
+    }
+
+    .optimization-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .optimization-description {
+        color: #9aa2b1;
+        font-size: 13px;
+        line-height: 1.5;
+        max-width: 760px;
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .result-card {
+        background: #13161d;
+        border: 1px solid #292e3b;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .result-header {
+        padding: 15px 16px;
+        border-bottom: 1px solid #292e3b;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .result-header-title {
+        font-weight: bold;
+    }
+
+    .result-header-value {
+        font-weight: bold;
+    }
+
+    .result-header-value.green {
+        color: #57df8a;
+    }
+
+    .result-list {
+        padding: 4px 0;
+    }
+
+    .result-row {
+        display: grid;
+        grid-template-columns: 42px 1fr auto auto;
+        gap: 10px;
+        align-items: center;
+        padding: 9px 14px;
+        border-bottom: 1px solid #222731;
+        font-size: 13px;
+    }
+
+    .result-row:last-child {
+        border-bottom: 0;
+    }
+
+    .rank {
+        color: #6f7787;
+        text-align: center;
+    }
+
+    .result-boss {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .result-boss img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+    }
+
+    .result-boss-text {
+        min-width: 0;
+    }
+
+    .result-boss-name {
+        font-weight: bold;
+    }
+
+    .result-difficulty {
+        color: #858d9d;
+        font-size: 11px;
+        margin-top: 2px;
+    }
+
+    .result-party {
+        color: #9da5b3;
+        white-space: nowrap;
+    }
+
+    .result-meso {
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .current-row {
+        opacity: 0.95;
+    }
+
+    .optimized-row {
+        background: rgba(63, 108, 240, 0.07);
+    }
+
+    .empty {
+        padding: 25px;
+        text-align: center;
+        color: #858d9d;
+        line-height: 1.6;
+    }
+
+    .warning {
+        background: #211d12;
+        border: 1px solid #59491f;
+        color: #d9c483;
+        border-radius: 10px;
+        padding: 14px 16px;
+        line-height: 1.5;
+        font-size: 13px;
+    }
+
+    .info {
+        background: #151922;
+        border: 1px solid #292f3b;
+        border-radius: 10px;
+        padding: 15px 17px;
+        color: #9aa2b1;
+        line-height: 1.6;
+        font-size: 13px;
+    }
+
+    .info strong {
+        color: #e8ebef;
+    }
+
+    .monthly-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .monthly-card {
+        background: #13161d;
+        border: 1px solid #292e3b;
+        border-radius: 10px;
+        padding: 16px;
+    }
+
+    .monthly-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid #242934;
+        font-size: 13px;
+    }
+
+    .monthly-line:last-child {
+        border-bottom: 0;
+    }
+
+    .monthly-label {
+        color: #8d95a4;
+    }
+
+    .monthly-value {
+        font-weight: bold;
+    }
+
+    .sync-note {
+        margin-top: 12px;
+        padding: 10px 12px;
+        background: #12151c;
+        border: 1px solid #282d38;
+        border-radius: 8px;
+        color: #858d9d;
+        font-size: 12px;
+    }
+
+    .toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        background: #20252f;
+        border: 1px solid #3a414f;
+        color: #f1f3f5;
+        padding: 12px 16px;
+        border-radius: 9px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        transition: 0.2s;
+        z-index: 1000;
+        font-size: 13px;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 900px) {
+        .dashboard {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .character-grid,
+        .results-grid,
+        .monthly-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 650px) {
+        .container {
+            width: min(100% - 20px, 1200px);
+        }
+
+        .dashboard {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .party-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .result-row {
+            grid-template-columns: 30px 1fr auto;
+        }
+
+        .result-party {
+            display: none;
+        }
+
+        h1 {
+            font-size: 23px;
+        }
+    }
 </style>
 </head>
+
 <body>
-<div class="container">
 
 <header>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px">
-        <h1 style="margin:0">MSEA Bossing Planner</h1>
-        <a class="btn" href="../">↗ Crystal Calculator</a>
+    <div class="container">
+        <div class="header-row">
+
+            <div>
+                <h1>MSEA Boss Crystal Optimizer</h1>
+
+                <div class="subtitle">
+                    Optimize your weekly Boss Crystals using only bosses you can actually clear.
+                </div>
+            </div>
+
+            <div class="header-actions">
+
+                <span class="sync-status" id="syncStatus">
+                    <span class="sync-dot warning" id="syncDot"></span>
+                    Checking Calculator...
+                </span>
+
+                <button class="btn" onclick="syncFromCalculator(true)">
+                    ↻ Sync from Calculator
+                </button>
+
+                <a class="btn" href="../">
+                    Calculator
+                </a>
+
+            </div>
+
+        </div>
     </div>
-    <p>Plan your weekly and monthly Boss Crystals using the same characters, bosses, icons, difficulties, clear status, party sizes and personal notes as your Calculator.</p>
 </header>
 
-<section class="dashboard">
-    <div class="card"><div class="card-label">Weekly Clears</div><div class="card-value" id="weeklyClears">0</div><div class="card-sub">Maximum 12 Boss Crystals</div></div>
-    <div class="card"><div class="card-label">Remaining</div><div class="card-value" id="remainingClears">12</div><div class="card-sub">Weekly slots available</div></div>
-    <div class="card"><div class="card-label">Character</div><div class="card-value" id="characterName">Character 1</div><div class="card-sub">Active character</div></div>
-    <div class="card"><div class="card-label">Account Weekly Clears</div><div class="card-value" id="accountClears">0</div><div class="card-sub">Unlimited account selections</div><div class="progress-wrap"><div class="progress"><div class="progress-bar" id="accountProgress"></div></div></div></div>
-</section>
 
-<section class="account-section">
-    <div class="account-top">
-        <div class="account-tabs" id="accountTabs"></div>
-        <div class="account-actions">
-            <button class="btn primary" type="button" onclick="addAccount()">+ Add Account</button>
-            <button class="btn" type="button" onclick="renameAccount()">Rename Account</button>
-            <button class="btn danger" type="button" onclick="deleteAccount()">Delete Account</button>
+<main>
+<div class="container">
+
+    <!-- DASHBOARD -->
+
+    <section class="dashboard">
+
+        <div class="stat">
+            <div class="stat-label">Current Weekly Income</div>
+            <div class="stat-value" id="currentIncome">0</div>
         </div>
-    </div>
-</section>
 
-<section class="character-section">
-    <div class="character-top">
-        <div class="character-tabs" id="characterTabs"></div>
-        <div class="character-actions">
-            <button class="btn primary" type="button" onclick="addCharacter()">+ Add Character</button>
-            <button class="btn" type="button" onclick="renameCharacter()">Rename Character</button>
-            <button class="btn danger" type="button" onclick="deleteCharacter()">Delete Character</button>
+        <div class="stat">
+            <div class="stat-label">Optimized Weekly Income</div>
+            <div class="stat-value" id="optimizedIncome">0</div>
         </div>
-    </div>
-</section>
 
-<section class="section">
-    <div class="toolbar">
-        <div class="search"><input id="searchInput" type="text" placeholder="Search boss..." oninput="renderBosses()"></div>
-        <button class="btn primary" type="button" onclick="syncFromCalculator()">↻ Sync from Calculator</button>
-    </div>
-
-    <div class="reset-notice">
-        <strong>Automatic Reset:</strong>
-        Weekly selections reset every <span class="reset-weekly">Thursday 00:00 GMT+8</span>.
-        Monthly selections reset every <span class="reset-monthly">1st of the month 00:00 GMT+8</span>.
-        <br>
-        <strong>Last reset check:</strong> <span id="resetStatus">Checking...</span>
-    </div>
-
-    <div class="sync-notice">
-        <strong>Calculator Sync:</strong> Boss names, icons, difficulties, clear status and party sizes are read directly from the Calculator.
-        <br>
-        <strong>Notes:</strong> Your personal boss notes are saved separately in the Planner and can be edited freely.
-        <span class="sync-status" id="syncStatus">Synced</span>
-    </div>
-</section>
-
-<section class="section">
-    <div class="section-header">
-        <div>
-            <div class="section-title">Monthly Boss Planner</div>
-            <div class="section-subtitle">Monthly bosses do not use the weekly 12-crystal limit. Monthly selections automatically reset on the 1st of every month at 00:00 GMT+8.</div>
+        <div class="stat">
+            <div class="stat-label">Potential Gain</div>
+            <div class="stat-value gain" id="potentialGain">0</div>
         </div>
-    </div>
-    <div class="boss-list" id="monthlyBosses"></div>
-</section>
 
-<section class="section">
-    <div class="section-header">
-        <div>
-            <div class="section-title">Weekly Boss Planner</div>
-            <div class="section-subtitle">This list is automatically generated from the Calculator's Weekly Boss list. Weekly selections automatically reset every Thursday at 00:00 GMT+8.</div>
+        <div class="stat">
+            <div class="stat-label">Characters</div>
+            <div class="stat-value" id="characterCount">0</div>
         </div>
-    </div>
-    <div class="boss-list" id="weeklyBosses"></div>
-</section>
 
-<div class="info-box">
-    <strong>How synchronization works:</strong><br>
-    The MSEA Boss Crystal Calculator is the master source for boss information and clear status.
-    If you select or deselect a boss in the Calculator, this Planner will reflect that selection.
-    Changing the party size in the Calculator will also update here.
-    <br><br>
+    </section>
 
-    <strong>Automatic reset system:</strong><br>
-    <strong>Weekly:</strong> All Weekly Boss selections are automatically cleared every Thursday at 00:00 GMT+8.
-    <br>
-    <strong>Monthly:</strong> All Monthly Boss selections are automatically cleared on the 1st of every month at 00:00 GMT+8.
-    <br><br>
 
-    Resetting selections does <strong>not</strong> delete:
-    <br>
-    • Accounts<br>
-    • Characters<br>
-    • Character names<br>
-    • Party sizes<br>
-    • Personal boss notes<br>
-    • Boss data
-    <br><br>
+    <!-- SYNC WARNING -->
 
-    The reset only removes the corresponding Weekly or Monthly boss clear selections.
-    <br><br>
+    <div id="syncWarning" style="display:none;" class="section"></div>
 
-    <strong>Weekly selection limits:</strong><br>
-    Each character can have a maximum of <strong>12 weekly Boss Crystals</strong>.
-    There is <strong>no account-wide selection limit</strong> in the Planner.
-    <br><br>
 
-    <strong>Important:</strong><br>
-    The Planner does not apply the 90-crystal selling limit.
-    The separate Optimizer can use the 90-crystal limit when calculating which selected weekly Boss Crystals should be sold.
-    <br><br>
+    <!-- CHARACTERS -->
 
-    <strong>How Notes work:</strong><br>
-    Each boss has its own personal Note box.
-    <br><br>
-    • Party IGN<br>
-    • Carry IGN<br>
-    • Duo partner<br>
-    • Party size reminder<br>
-    • "Ask guild"<br>
-    • "Need to clear before reset"<br>
-    • Any other personal reminder
-    <br><br>
-    Notes are saved automatically in your browser and are separate for each account, character and boss.
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+                <h2 class="section-title">
+                    Characters (Synced from Calculator)
+                </h2>
+
+                <div class="section-subtitle">
+                    Characters and their selected Boss Crystals come directly from the Calculator.
+                </div>
+            </div>
+
+            <button class="btn" onclick="clearOptimization()">
+                Clear Optimization
+            </button>
+
+        </div>
+
+
+        <div class="card">
+
+            <div id="characterContainer"></div>
+
+            <div class="sync-note">
+
+                <strong>Calculator is the master source.</strong>
+
+                The Optimizer does not add, remove, rename, or clear characters.
+                Make changes in the Calculator, then press
+                <strong>Sync from Calculator</strong>.
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PARTY SIZE -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Party Size Configuration
+                </h2>
+
+                <div class="section-subtitle">
+                    Party sizes are read-only and synced separately for every character, boss and difficulty.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div id="partyContainer"></div>
+
+            <div class="sync-note">
+
+                Party size cannot be changed in the Optimizer.
+
+                Change the party size in the Calculator, then sync again.
+
+                Each character can have a different party size for the same boss/difficulty.
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- OPTIMIZATION -->
+
+    <section class="section">
+
+        <div class="card">
+
+            <div class="optimization-box">
+
+                <div>
+
+                    <h2 class="section-title" style="margin-bottom:7px;">
+                        Weekly Crystal Optimization
+                    </h2>
+
+                    <div class="optimization-description">
+
+                        The Optimizer chooses the highest-value crystals
+                        <strong>
+                            only from the bosses and difficulties currently selected in your Calculator
+                        </strong>.
+
+                        It will never add a boss or difficulty that is not selected.
+
+                        Party size is also taken directly from the Calculator.
+
+                        Maximum: 12 weekly Boss Crystals per character.
+
+                    </div>
+
+                </div>
+
+                <button
+                    class="btn primary"
+                    onclick="optimizeAllCharacters()"
+                >
+                    Optimize All Characters
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RESULTS -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Current vs Optimized
+                </h2>
+
+                <div class="section-subtitle">
+                    Only Calculator-selected/cleared bosses are considered.
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="resultsContainer" class="results-grid"></div>
+
+    </section>
+
+
+    <!-- MONTHLY -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Monthly Boss Income
+                </h2>
+
+                <div class="section-subtitle">
+                    Black Mage monthly income is separate from the weekly 12-crystal limit.
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="monthlyContainer" class="monthly-grid"></div>
+
+    </section>
+
+
+    <!-- INFORMATION -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+                <h2 class="section-title">
+                    How This Optimizer Works
+                </h2>
+            </div>
+
+        </div>
+
+
+        <div class="info">
+
+            <strong>1. Calculator = Master Source</strong><br>
+
+            Your Calculator determines which characters, bosses and difficulties you can clear.
+            The Optimizer reads that data instead of creating its own selections.
+
+            <br><br>
+
+
+            <strong>2. Difficulty Sync</strong><br>
+
+            If your Calculator has Lotus N selected, the Optimizer gets Lotus N.
+            If you have Lotus H selected instead, it gets Lotus H.
+            If you have both selected, both are synced.
+
+            <br><br>
+
+
+            <strong>3. Only Selected Crystals Are Eligible</strong><br>
+
+            If you cannot clear Carling, Limbo, Baldrix, Jupiter, etc.,
+            and they are not selected in the Calculator, they will not become
+            optimization candidates even if their crystal values are higher.
+
+            <br><br>
+
+
+            <strong>4. Maximum 12 Weekly Crystals</strong><br>
+
+            For each character, the Optimizer ranks the crystals you actually selected
+            and chooses the best 12 based on their meso value after party splitting.
+
+            <br><br>
+
+
+            <strong>5. Party Size</strong><br>
+
+            Party size is synced using the exact
+            <strong>Character + Boss + Difficulty</strong>
+            combination from the Calculator.
+
+            <br><br>
+
+
+            <strong>6. Different Characters Can Have Different Party Sizes</strong><br>
+
+            For example, Character A can have Lotus N ÷1 while Character B
+            can have Lotus N ÷3. The Optimizer keeps those values separate.
+
+            <br><br>
+
+
+            <strong>7. Optimization Does Not Modify Your Calculator</strong><br>
+
+            The Optimizer only calculates which of your available crystals provide
+            the highest income. It does not change your Calculator selections.
+
+            <br><br>
+
+
+            <strong>8. If You Change Your Calculator</strong><br>
+
+            Return here and press <strong>↻ Sync from Calculator</strong>.
+            The Optimizer will rebuild its candidate list from the updated Calculator data.
+
+        </div>
+
+    </section>
+
 </div>
-</div>
+</main>
+
 
 <div class="toast" id="toast"></div>
 
-<div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-        <h3 id="modalTitle">Rename</h3>
-        <input class="input" id="modalInput" type="text" maxlength="30" autocomplete="off">
-        <div class="modal-actions">
-            <button class="btn" type="button" onclick="closeModal()">Cancel</button>
-            <button class="btn primary" type="button" onclick="confirmModal()">Confirm</button>
-        </div>
-    </div>
-</div>
 
 <script>
+
 /* =========================================================
-   SETTINGS
+   CONFIGURATION
 ========================================================= */
 
-const CALCULATOR_STORAGE_KEY = "msea_boss_crystal_calculator_v11";
-const PLANNER_NOTES_STORAGE_KEY = "msea_bossing_planner_notes_v1";
-const PLANNER_VIEW_STORAGE_KEY = "msea_bossing_planner_v2";
-const PLANNER_RESET_STORAGE_KEY = "msea_bossing_planner_reset_v1";
+const CALCULATOR_STORAGE_KEY =
+    "msea_boss_crystal_calculator_v11";
+
+const OPTIMIZER_STORAGE_KEY =
+    "msea_boss_crystal_optimizer_v3";
+
 const MAX_BOSSES_PER_CHARACTER = 12;
-const CALCULATOR_URL = "../";
+const MAX_CLEARS_PER_BOSS = 2;
 
-/* =========================================================
-   STATE
-========================================================= */
-
-let state = {
-    activeAccountId: null,
-    activeCharacterId: null,
-    notes: {}
-};
-
-let calculatorState = null;
-let modalAction = null;
-let toastTimer = null;
-
-/* =========================================================
-   INITIALIZATION
-========================================================= */
-
-function init() {
-    loadCalculatorState();
-    loadPlannerViewState();
-    loadPlannerNotes();
-    ensureActiveAccount();
-    ensureActiveCharacter();
-
-    runAutomaticResets();
-
-    renderAll();
-    startResetWatcher();
-}
-
-/* =========================================================
-   CALCULATOR STATE
-========================================================= */
-
-function loadCalculatorState() {
-    try {
-        const saved = localStorage.getItem(CALCULATOR_STORAGE_KEY);
-
-        if (!saved) {
-            calculatorState = null;
-            return;
-        }
-
-        const parsed = JSON.parse(saved);
-
-        if (!parsed || !Array.isArray(parsed.accounts)) {
-            calculatorState = null;
-            return;
-        }
-
-        calculatorState = parsed;
-    }
-    catch (error) {
-        console.error("Failed to load Calculator state:", error);
-        calculatorState = null;
-    }
-}
-
-/* =========================================================
-   PLANNER VIEW STATE
-========================================================= */
-
-function loadPlannerViewState() {
-    try {
-        const saved = localStorage.getItem(PLANNER_VIEW_STORAGE_KEY);
-
-        if (!saved) return;
-
-        const parsed = JSON.parse(saved);
-
-        if (parsed && typeof parsed === "object") {
-            state.activeAccountId = parsed.activeAccountId || null;
-            state.activeCharacterId = parsed.activeCharacterId || null;
-        }
-    }
-    catch (error) {
-        console.error("Failed to load Planner view state:", error);
-    }
-}
-
-function savePlannerViewState() {
-    localStorage.setItem(
-        PLANNER_VIEW_STORAGE_KEY,
-        JSON.stringify({
-            activeAccountId: state.activeAccountId,
-            activeCharacterId: state.activeCharacterId
-        })
-    );
-}
-
-/* =========================================================
-   PLANNER NOTES
-========================================================= */
-
-function loadPlannerNotes() {
-    try {
-        const saved = localStorage.getItem(PLANNER_NOTES_STORAGE_KEY);
-
-        if (!saved) {
-            state.notes = {};
-            return;
-        }
-
-        const parsed = JSON.parse(saved);
-
-        state.notes =
-            parsed && typeof parsed === "object"
-                ? parsed
-                : {};
-    }
-    catch (error) {
-        console.error("Failed to load Planner notes:", error);
-        state.notes = {};
-    }
-}
-
-function savePlannerNotes() {
-    localStorage.setItem(
-        PLANNER_NOTES_STORAGE_KEY,
-        JSON.stringify(state.notes)
-    );
-}
-
-function getNoteKey(characterId, bossId) {
-    return characterId + ":" + bossId;
-}
-
-function getBossNote(characterId, bossId) {
-    return state.notes[getNoteKey(characterId, bossId)] || "";
-}
-
-function saveBossNote(characterId, bossId, value) {
-    state.notes[getNoteKey(characterId, bossId)] = value;
-    savePlannerNotes();
-}
-
-/* =========================================================
-   CALCULATOR SAVE
-========================================================= */
-
-function saveCalculatorState() {
-    if (!calculatorState) return;
-
-    localStorage.setItem(
-        CALCULATOR_STORAGE_KEY,
-        JSON.stringify(calculatorState)
-    );
-}
-
-/* =========================================================
-   ID
-========================================================= */
-
-function generateId() {
-    return (
-        Date.now().toString(36) +
-        Math.random().toString(36).slice(2)
-    );
-}
-
-/* =========================================================
-   ACCOUNT HELPERS
-========================================================= */
-
-function getAccounts() {
-    if (
-        !calculatorState ||
-        !Array.isArray(calculatorState.accounts)
-    ) {
-        return [];
-    }
-
-    return calculatorState.accounts;
-}
-
-function getActiveAccount() {
-    return getAccounts().find(
-        account => account.id === state.activeAccountId
-    );
-}
-
-function getActiveCharacter() {
-    const account = getActiveAccount();
-
-    if (!account) return null;
-
-    if (!Array.isArray(account.characters)) {
-        account.characters = [];
-    }
-
-    return account.characters.find(
-        character => character.id === state.activeCharacterId
-    );
-}
-
-/* =========================================================
-   ACTIVE ACCOUNT / CHARACTER
-========================================================= */
-
-function ensureActiveAccount() {
-    const accounts = getAccounts();
-
-    if (!accounts.length) {
-        state.activeAccountId = null;
-        state.activeCharacterId = null;
-        savePlannerViewState();
-        return;
-    }
-
-    const accountExists = accounts.some(
-        account => account.id === state.activeAccountId
-    );
-
-    if (!accountExists) {
-        state.activeAccountId = accounts[0].id;
-    }
-}
-
-function ensureActiveCharacter() {
-    const account = getActiveAccount();
-
-    if (!account) {
-        state.activeCharacterId = null;
-        savePlannerViewState();
-        return;
-    }
-
-    if (!Array.isArray(account.characters)) {
-        account.characters = [];
-    }
-
-    const characterExists = account.characters.some(
-        character => character.id === state.activeCharacterId
-    );
-
-    if (!characterExists) {
-        state.activeCharacterId =
-            account.characters.length
-                ? account.characters[0].id
-                : null;
-    }
-
-    savePlannerViewState();
-}
 
 /* =========================================================
    BOSS DATA
 ========================================================= */
 
-const bossDefinitions = [
+const defaultBosses = [
+
     {
         id: "blackmage",
         name: "Black Mage",
+        monthly: true,
         icon: "../images/BlackMage.png",
-        type: "Monthly",
+
         difficulties: [
             { name: "H", value: 992 },
             { name: "EX", value: 9080 }
         ]
     },
+
     {
         id: "lotus",
         name: "Lotus",
         icon: "../images/Lotus.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 21.87 },
             { name: "H", value: 71 },
             { name: "EX", value: 588 }
         ]
     },
+
     {
         id: "damien",
         name: "Damien",
         icon: "../images/Damien.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 22.86 },
             { name: "H", value: 67.5 }
         ]
     },
+
     {
         id: "slime",
         name: "Slime",
         icon: "../images/Slime.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 29.6 },
             { name: "C", value: 99.9 }
         ]
     },
+
     {
         id: "lucid",
         name: "Lucid",
         icon: "../images/Lucid.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "E", value: 35.6 },
             { name: "N", value: 43.2 },
             { name: "H", value: 85 }
         ]
     },
+
     {
         id: "will",
         name: "Will",
         icon: "../images/Will.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "E", value: 38.7 },
             { name: "N", value: 50.4 },
             { name: "H", value: 104.4 }
         ]
     },
+
     {
         id: "dusk",
         name: "Dusk",
         icon: "../images/Dusk.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 54 },
             { name: "H", value: 94.5 }
         ]
     },
+
     {
         id: "heretic",
         name: "Heretic",
         icon: "../images/Heretic.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 96.3 },
             { name: "H", value: 139.7 }
         ]
     },
+
     {
         id: "djunkel",
         name: "Djunkel",
         icon: "../images/Djunkel.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 58.5 },
             { name: "H", value: 124.2 }
         ]
     },
+
     {
         id: "seren",
         name: "Seren",
         icon: "../images/Seren.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 289.8 },
             { name: "H", value: 423 },
             { name: "EX", value: 2280 }
         ]
     },
+
     {
         id: "kalos",
         name: "Kalos",
         icon: "../images/Kalos.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "E", value: 338.8 },
             { name: "N", value: 495 },
@@ -570,11 +1098,12 @@ const bossDefinitions = [
             { name: "EX", value: 2565 }
         ]
     },
+
     {
         id: "adversary",
         name: "Adversary",
         icon: "../images/Adversary.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "E", value: 361 },
             { name: "N", value: 530 },
@@ -582,21 +1111,23 @@ const bossDefinitions = [
             { name: "EX", value: 2920 }
         ]
     },
+
     {
         id: "radiant",
         name: "Radiant",
         icon: "../images/Radiant.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 594 },
             { name: "H", value: 2256 }
         ]
     },
+
     {
         id: "carling",
         name: "Carling",
         icon: "../images/Carling.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "E", value: 368.2 },
             { name: "N", value: 577.5 },
@@ -604,1118 +1135,1760 @@ const bossDefinitions = [
             { name: "EX", value: 3040 }
         ]
     },
+
     {
         id: "bellona",
         name: "Bellona",
         icon: "../images/Bellona.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "E", value: null },
             { name: "N", value: null },
             { name: "H", value: null }
         ]
     },
+
     {
         id: "limbo",
         name: "Limbo",
         icon: "../images/Limbo.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 900 },
             { name: "H", value: 1930 }
         ]
     },
+
     {
         id: "baldrix",
         name: "Baldrix",
         icon: "../images/Baldrix.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 1200 },
             { name: "H", value: 2160 }
         ]
     },
+
     {
         id: "jupiter",
         name: "Jupiter",
         icon: "../images/Jupiter.png",
-        type: "Weekly",
+
         difficulties: [
             { name: "N", value: 1360 },
             { name: "H", value: 3000 }
         ]
     }
+
 ];
 
+
 /* =========================================================
-   BOSS HELPERS
+   STATE
 ========================================================= */
 
-function getBoss(bossId) {
-    return bossDefinitions.find(
-        boss => boss.id === bossId
-    );
+let state = {
+
+    characters: [],
+
+    /*
+     * Character-specific party sizes.
+     *
+     * Key:
+     *
+     * characterOptimizerId:bossId:difficulty
+     *
+     * Example:
+     *
+     * calc:account1:character1:lotus:N
+     */
+
+    partySizes: {},
+
+    optimized: {},
+
+    syncSignature: "",
+
+    calculatorFound: false,
+
+    lastSyncAt: null
+
+};
+
+
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
+
+function normalizeToken(value) {
+
+    return String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[\s_\-\/]+/g, "");
+
 }
 
-function getBossSelections(character, bossId) {
-    if (!character || !character.selected) {
-        return [];
+
+function numberOrNull(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return null;
     }
 
-    const value = character.selected[bossId];
+    const n = Number(value);
 
-    if (Array.isArray(value)) return value;
-    if (typeof value === "string") return [value];
+    return Number.isFinite(n)
+        ? n
+        : null;
 
-    return [];
 }
 
-function getPartySize(bossId, characterId, difficulty) {
-    if (
-        !calculatorState ||
-        !calculatorState.partySizes
-    ) {
+
+function clampPartySize(value) {
+
+    const n = Number(value);
+
+    if (!Number.isFinite(n)) {
         return 1;
     }
 
-    const exactKey =
-        characterId + ":" + bossId + ":" + difficulty;
-
-    if (
-        Object.prototype.hasOwnProperty.call(
-            calculatorState.partySizes,
-            exactKey
+    return Math.max(
+        1,
+        Math.min(
+            6,
+            Math.round(n)
         )
-    ) {
-        return Number(
-            calculatorState.partySizes[exactKey]
-        ) || 1;
+    );
+
+}
+
+
+function formatMeso(value) {
+
+    if (!Number.isFinite(Number(value))) {
+        return "0";
     }
 
-    const oldKey =
-        characterId + ":" + bossId;
+    return Number(value).toLocaleString(
+        "en-MY",
+        {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }
+    );
 
-    return Number(
-        calculatorState.partySizes[oldKey]
-    ) || 1;
 }
+
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    clearTimeout(window.__toastTimer);
+
+    window.__toastTimer =
+        setTimeout(() => {
+
+            toast.classList.remove("show");
+
+        }, 2500);
+
+}
+
 
 /* =========================================================
-   AUTOMATIC RESET SYSTEM
+   BOSS LOOKUP
 ========================================================= */
 
-/*
-   All reset calculations use GMT+8.
+function findBossFromKey(key) {
 
-   Weekly reset:
-   Thursday 00:00 GMT+8
+    const token =
+        normalizeToken(key);
 
-   Monthly reset:
-   1st day of each month 00:00 GMT+8
-*/
+    if (!token) {
+        return null;
+    }
 
-function getGMT8Date() {
-    const now = new Date();
+    for (const boss of defaultBosses) {
 
-    const utcMs =
-        now.getTime() +
-        (now.getTimezoneOffset() * 60000);
-
-    return new Date(
-        utcMs + (8 * 60 * 60 * 1000)
-    );
-}
-
-function formatGMT8Date(date) {
-    return (
-        date.getFullYear() +
-        "-" +
-        String(date.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(date.getDate()).padStart(2, "0")
-    );
-}
-
-function getMonthlyResetPeriod(date) {
-    return (
-        date.getFullYear() +
-        "-" +
-        String(date.getMonth() + 1).padStart(2, "0")
-    );
-}
-
-function getWeeklyResetPeriod(date) {
-    const day = date.getDay();
-
-    /*
-       Sunday = 0
-       Monday = 1
-       Tuesday = 2
-       Wednesday = 3
-       Thursday = 4
-       Friday = 5
-       Saturday = 6
-    */
-
-    const daysSinceThursday =
-        (day - 4 + 7) % 7;
-
-    const resetDate = new Date(date);
-
-    resetDate.setDate(
-        resetDate.getDate() -
-        daysSinceThursday
-    );
-
-    resetDate.setHours(0, 0, 0, 0);
-
-    return formatGMT8Date(resetDate);
-}
-
-function loadResetState() {
-    try {
-        const saved =
-            localStorage.getItem(
-                PLANNER_RESET_STORAGE_KEY
-            );
-
-        if (!saved) {
-            return {
-                weeklyPeriod: null,
-                monthlyPeriod: null
-            };
+        if (
+            normalizeToken(boss.id) ===
+            token
+        ) {
+            return boss;
         }
 
-        const parsed = JSON.parse(saved);
+        if (
+            normalizeToken(boss.name) ===
+            token
+        ) {
+            return boss;
+        }
 
-        return {
-            weeklyPeriod:
-                parsed.weeklyPeriod || null,
-            monthlyPeriod:
-                parsed.monthlyPeriod || null
-        };
     }
+
+    return null;
+
+}
+
+
+function findDifficulty(
+    boss,
+    difficultyKey
+) {
+
+    if (!boss) {
+        return null;
+    }
+
+    const token =
+        normalizeToken(
+            difficultyKey
+        );
+
+    return boss.difficulties.find(
+        diff =>
+            normalizeToken(diff.name) ===
+            token
+    ) || null;
+
+}
+
+
+/* =========================================================
+   SELECTION KEY PARSER
+========================================================= */
+
+function parseSelectionKey(key) {
+
+    if (
+        key === null ||
+        key === undefined
+    ) {
+        return null;
+    }
+
+    const original =
+        String(key).trim();
+
+    if (!original) {
+        return null;
+    }
+
+
+    /*
+     * boss:difficulty
+     */
+
+    const parts =
+        original.split(/[:|\/_\-]+/);
+
+    if (parts.length >= 2) {
+
+        const bossPart =
+            parts[0];
+
+        const diffPart =
+            parts.slice(1).join("");
+
+        const boss =
+            findBossFromKey(
+                bossPart
+            );
+
+        if (boss) {
+
+            const diff =
+                findDifficulty(
+                    boss,
+                    diffPart
+                );
+
+            if (diff) {
+
+                return {
+
+                    bossId: boss.id,
+
+                    difficulty: diff.name
+
+                };
+
+            }
+
+        }
+
+    }
+
+
+    /*
+     * Exact concatenated forms:
+     *
+     * lotusN
+     * lucidH
+     * carlingEX
+     */
+
+    const normalized =
+        normalizeToken(original);
+
+    for (
+        const boss of defaultBosses
+    ) {
+
+        const bossId =
+            normalizeToken(
+                boss.id
+            );
+
+        const bossName =
+            normalizeToken(
+                boss.name
+            );
+
+        for (
+            const diff of boss.difficulties
+        ) {
+
+            const difficulty =
+                normalizeToken(
+                    diff.name
+                );
+
+            if (
+                normalized ===
+                    bossId + difficulty ||
+
+                normalized ===
+                    bossName + difficulty
+            ) {
+
+                return {
+
+                    bossId: boss.id,
+
+                    difficulty: diff.name
+
+                };
+
+            }
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
+/* =========================================================
+   ADD SELECTION
+========================================================= */
+
+function addSelection(
+    selectionMap,
+    bossId,
+    difficulty,
+    count = 1
+) {
+
+    const boss =
+        findBossFromKey(
+            bossId
+        );
+
+    if (!boss) {
+        return;
+    }
+
+    const diff =
+        findDifficulty(
+            boss,
+            difficulty
+        );
+
+    if (!diff) {
+        return;
+    }
+
+    if (
+        diff.value === null ||
+        diff.value === undefined
+    ) {
+        return;
+    }
+
+    const key =
+        `${boss.id}:${diff.name}`;
+
+    const amount =
+        Math.max(
+            0,
+            Math.min(
+                MAX_CLEARS_PER_BOSS,
+                Number(count) || 0
+            )
+        );
+
+    if (amount <= 0) {
+        return;
+    }
+
+    selectionMap[key] =
+        Math.min(
+            MAX_CLEARS_PER_BOSS,
+            (selectionMap[key] || 0) +
+            amount
+        );
+
+}
+
+
+/* =========================================================
+   PARSE ARRAY SELECTIONS
+========================================================= */
+
+function parseSelectionArray(
+    array,
+    selectionMap
+) {
+
+    if (!Array.isArray(array)) {
+        return;
+    }
+
+    for (
+        const item of array
+    ) {
+
+        if (
+            typeof item === "string"
+        ) {
+
+            const parsed =
+                parseSelectionKey(
+                    item
+                );
+
+            if (parsed) {
+
+                addSelection(
+                    selectionMap,
+                    parsed.bossId,
+                    parsed.difficulty,
+                    1
+                );
+
+            }
+
+            continue;
+
+        }
+
+
+        if (
+            !item ||
+            typeof item !== "object"
+        ) {
+            continue;
+        }
+
+
+        const bossId =
+            item.bossId ??
+            item.bossID ??
+            item.boss ??
+            item.bossName ??
+            item.name;
+
+        const difficulty =
+            item.difficulty ??
+            item.diff ??
+            item.mode ??
+            item.level;
+
+
+        if (
+            bossId !== undefined &&
+            difficulty !== undefined
+        ) {
+
+            const count =
+                item.count ??
+                item.quantity ??
+                item.clears ??
+                item.times ??
+                1;
+
+            addSelection(
+                selectionMap,
+                bossId,
+                difficulty,
+                count
+            );
+
+            continue;
+
+        }
+
+
+        for (
+            const [key, value]
+            of Object.entries(item)
+        ) {
+
+            const parsed =
+                parseSelectionKey(
+                    key
+                );
+
+            if (!parsed) {
+                continue;
+            }
+
+            let count = 1;
+
+            if (
+                typeof value === "number" ||
+                typeof value === "string"
+            ) {
+
+                count =
+                    Number(value) || 1;
+
+            }
+
+            else if (
+                value &&
+                typeof value === "object"
+            ) {
+
+                count =
+                    value.count ??
+                    value.quantity ??
+                    value.clears ??
+                    value.times ??
+                    1;
+
+            }
+
+            addSelection(
+                selectionMap,
+                parsed.bossId,
+                parsed.difficulty,
+                count
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   PARSE OBJECT SELECTIONS
+========================================================= */
+
+function parseSelectionObject(
+    object,
+    selectionMap
+) {
+
+    if (
+        !object ||
+        typeof object !== "object"
+    ) {
+        return;
+    }
+
+
+    for (
+        const [key, value]
+        of Object.entries(object)
+    ) {
+
+        const directKey =
+            parseSelectionKey(
+                key
+            );
+
+
+        /*
+         * Direct:
+         *
+         * {
+         *   "lotus:N": 2
+         * }
+         */
+
+        if (directKey) {
+
+            let count = 1;
+
+            if (
+                typeof value === "number" ||
+                typeof value === "string"
+            ) {
+
+                count =
+                    Number(value) || 1;
+
+            }
+
+            else if (
+                value &&
+                typeof value === "object"
+            ) {
+
+                count =
+                    value.count ??
+                    value.quantity ??
+                    value.clears ??
+                    value.times ??
+                    1;
+
+            }
+
+            else if (
+                value === false ||
+                value === null
+            ) {
+
+                count = 0;
+
+            }
+
+            if (count > 0) {
+
+                addSelection(
+                    selectionMap,
+                    directKey.bossId,
+                    directKey.difficulty,
+                    count
+                );
+
+            }
+
+            continue;
+
+        }
+
+
+        /*
+         * Nested:
+         *
+         * {
+         *   lotus: {
+         *      N: 2,
+         *      H: 1
+         *   }
+         * }
+         */
+
+        const boss =
+            findBossFromKey(
+                key
+            );
+
+        if (!boss) {
+            continue;
+        }
+
+
+        if (Array.isArray(value)) {
+
+            for (
+                const diffValue of value
+            ) {
+
+                if (
+                    typeof diffValue ===
+                    "string"
+                ) {
+
+                    const diff =
+                        findDifficulty(
+                            boss,
+                            diffValue
+                        );
+
+                    if (diff) {
+
+                        addSelection(
+                            selectionMap,
+                            boss.id,
+                            diff.name,
+                            1
+                        );
+
+                    }
+
+                }
+
+                else if (
+                    diffValue &&
+                    typeof diffValue ===
+                    "object"
+                ) {
+
+                    const diff =
+                        diffValue.difficulty ??
+                        diffValue.diff ??
+                        diffValue.mode;
+
+                    const count =
+                        diffValue.count ??
+                        diffValue.quantity ??
+                        diffValue.clears ??
+                        diffValue.times ??
+                        1;
+
+                    if (
+                        diff !== undefined
+                    ) {
+
+                        addSelection(
+                            selectionMap,
+                            boss.id,
+                            diff,
+                            count
+                        );
+
+                    }
+
+                }
+
+            }
+
+            continue;
+
+        }
+
+
+        if (
+            value &&
+            typeof value === "object"
+        ) {
+
+            for (
+                const [
+                    diffKey,
+                    diffValue
+                ]
+                of Object.entries(value)
+            ) {
+
+                const diff =
+                    findDifficulty(
+                        boss,
+                        diffKey
+                    );
+
+                if (!diff) {
+                    continue;
+                }
+
+                let count = 1;
+
+                if (
+                    typeof diffValue ===
+                        "number" ||
+
+                    typeof diffValue ===
+                        "string"
+                ) {
+
+                    count =
+                        Number(diffValue) || 0;
+
+                }
+
+                else if (
+                    diffValue &&
+                    typeof diffValue ===
+                    "object"
+                ) {
+
+                    count =
+                        diffValue.count ??
+                        diffValue.quantity ??
+                        diffValue.clears ??
+                        diffValue.times ??
+                        1;
+
+                }
+
+                else if (
+                    diffValue === false ||
+                    diffValue === null
+                ) {
+
+                    count = 0;
+
+                }
+
+                if (count > 0) {
+
+                    addSelection(
+                        selectionMap,
+                        boss.id,
+                        diff.name,
+                        count
+                    );
+
+                }
+
+            }
+
+            continue;
+
+        }
+
+
+        if (
+            typeof value === "number" ||
+            typeof value === "string"
+        ) {
+
+            const numericValue =
+                Number(value);
+
+            if (
+                boss.difficulties.length === 1 &&
+                Number.isFinite(
+                    numericValue
+                ) &&
+                numericValue > 0
+            ) {
+
+                addSelection(
+                    selectionMap,
+                    boss.id,
+                    boss.difficulties[0].name,
+                    numericValue
+                );
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   EXTRACT CHARACTER SELECTIONS
+========================================================= */
+
+function extractCharacterSelections(
+    character
+) {
+
+    /*
+     * IMPORTANT:
+     *
+     * Calculator v11 stores selections in:
+     *
+     * character.selected
+     *
+     * where:
+     *
+     * selected[bossId] = ["N"]
+     *
+     * or:
+     *
+     * selected[bossId] = ["N","N"]
+     *
+     * for two clears.
+     */
+
+    const source =
+        character?.selected;
+
+    if (
+        source &&
+        typeof source === "object"
+    ) {
+
+        const selectionMap = {};
+
+
+        for (
+            const [bossKey, value]
+            of Object.entries(source)
+        ) {
+
+            const boss =
+                findBossFromKey(
+                    bossKey
+                );
+
+            if (!boss) {
+                continue;
+            }
+
+
+            /*
+             * Current Calculator format:
+             *
+             * {
+             *   lotus: ["N"],
+             *   lucid: ["N","H"]
+             * }
+             */
+
+            if (
+                Array.isArray(value)
+            ) {
+
+                for (
+                    const difficulty
+                    of value
+                ) {
+
+                    addSelection(
+                        selectionMap,
+                        boss.id,
+                        difficulty,
+                        1
+                    );
+
+                }
+
+                continue;
+
+            }
+
+
+            /*
+             * Compatibility with possible
+             * object formats.
+             */
+
+            if (
+                value &&
+                typeof value === "object"
+            ) {
+
+                parseSelectionObject(
+                    {
+                        [boss.id]: value
+                    },
+                    selectionMap
+                );
+
+                continue;
+
+            }
+
+
+            /*
+             * Compatibility with a direct
+             * selection key.
+             */
+
+            const parsed =
+                parseSelectionKey(
+                    bossKey
+                );
+
+            if (parsed) {
+
+                addSelection(
+                    selectionMap,
+                    parsed.bossId,
+                    parsed.difficulty,
+                    Number(value) || 1
+                );
+
+            }
+
+        }
+
+
+        return selectionMap;
+
+    }
+
+
+    /*
+     * Fallback support for older/alternate
+     * Calculator formats.
+     */
+
+    const possibleSources = [
+
+        character?.selections,
+
+        character?.selectedBosses,
+
+        character?.bossSelections,
+
+        character?.current,
+
+        character?.weeklyBosses,
+
+        character?.weeklySelections
+
+    ];
+
+
+    for (
+        const fallbackSource
+        of possibleSources
+    ) {
+
+        if (
+            fallbackSource === null ||
+            fallbackSource === undefined
+        ) {
+            continue;
+        }
+
+        const selectionMap = {};
+
+
+        if (
+            Array.isArray(
+                fallbackSource
+            )
+        ) {
+
+            parseSelectionArray(
+                fallbackSource,
+                selectionMap
+            );
+
+        }
+
+        else if (
+            typeof fallbackSource ===
+            "object"
+        ) {
+
+            parseSelectionObject(
+                fallbackSource,
+                selectionMap
+            );
+
+        }
+
+
+        if (
+            Object.keys(
+                selectionMap
+            ).length > 0
+        ) {
+
+            return selectionMap;
+
+        }
+
+    }
+
+
+    return {};
+
+}
+
+
+/* =========================================================
+   GET ACCOUNTS
+========================================================= */
+
+function getAccounts(
+    calculatorData
+) {
+
+    let accounts =
+        calculatorData?.accounts;
+
+
+    if (
+        Array.isArray(accounts)
+    ) {
+
+        return accounts;
+
+    }
+
+
+    if (
+        accounts &&
+        typeof accounts === "object"
+    ) {
+
+        return Object.entries(
+            accounts
+        ).map(
+            ([id, account]) => {
+
+                if (
+                    account &&
+                    typeof account === "object"
+                ) {
+
+                    return {
+
+                        ...account,
+
+                        id:
+                            account.id ??
+                            account.accountId ??
+                            id
+
+                    };
+
+                }
+
+                return {
+
+                    id,
+
+                    name:
+                        String(account)
+
+                };
+
+            }
+        );
+
+    }
+
+
+    /*
+     * Single-account fallback.
+     */
+
+    const topCharacters =
+        calculatorData?.characters ??
+        calculatorData?.chars;
+
+
+    if (topCharacters) {
+
+        return [
+
+            {
+
+                id:
+                    "default-account",
+
+                name:
+                    calculatorData?.accountName ??
+                    "Account 1",
+
+                characters:
+                    topCharacters,
+
+                partySizes:
+                    calculatorData?.partySizes
+
+            }
+
+        ];
+
+    }
+
+
+    return [];
+
+}
+
+
+/* =========================================================
+   CHARACTER ARRAY
+========================================================= */
+
+function getCharacterArray(
+    account
+) {
+
+    const chars =
+        account?.characters ??
+        account?.chars ??
+        account?.characterList ??
+        [];
+
+
+    if (
+        Array.isArray(chars)
+    ) {
+
+        return chars;
+
+    }
+
+
+    if (
+        chars &&
+        typeof chars === "object"
+    ) {
+
+        return Object.entries(
+            chars
+        ).map(
+            ([id, character]) => {
+
+                if (
+                    character &&
+                    typeof character ===
+                    "object"
+                ) {
+
+                    return {
+
+                        ...character,
+
+                        id:
+                            character.id ??
+                            character.characterId ??
+                            id
+
+                    };
+
+                }
+
+                return {
+
+                    id,
+
+                    name:
+                        String(character)
+
+                };
+
+            }
+        );
+
+    }
+
+
+    return [];
+
+}
+
+
+/* =========================================================
+   READ CALCULATOR
+========================================================= */
+
+function readCalculatorState() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                CALCULATOR_STORAGE_KEY
+            );
+
+        if (!raw) {
+            return null;
+        }
+
+        const parsed =
+            JSON.parse(raw);
+
+        if (
+            !parsed ||
+            typeof parsed !== "object"
+        ) {
+
+            return null;
+
+        }
+
+        return parsed;
+
+    }
+
     catch (error) {
+
         console.error(
-            "Failed to load reset state:",
+            "Unable to read Calculator data:",
             error
         );
 
-        return {
-            weeklyPeriod: null,
-            monthlyPeriod: null
-        };
+        return null;
+
     }
+
 }
 
-function saveResetState(resetState) {
-    localStorage.setItem(
-        PLANNER_RESET_STORAGE_KEY,
-        JSON.stringify(resetState)
-    );
-}
-
-/*
-   Clears only selected boss data.
-
-   Weekly reset:
-   Removes every Weekly boss selection.
-
-   Monthly reset:
-   Removes every Monthly boss selection.
-
-   Party sizes are intentionally preserved.
-*/
-
-function clearBossSelectionsByType(type) {
-    if (!calculatorState) {
-        return false;
-    }
-
-    let changed = false;
-
-    const accounts =
-        Array.isArray(calculatorState.accounts)
-            ? calculatorState.accounts
-            : [];
-
-    accounts.forEach(account => {
-
-        if (!Array.isArray(account.characters)) {
-            return;
-        }
-
-        account.characters.forEach(character => {
-
-            if (!character.selected) {
-                character.selected = {};
-            }
-
-            bossDefinitions.forEach(boss => {
-
-                if (boss.type !== type) {
-                    return;
-                }
-
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        character.selected,
-                        boss.id
-                    )
-                ) {
-
-                    /*
-                       Delete the selection entirely.
-                       This is compatible with the Calculator
-                       data structure used by the Planner.
-                    */
-
-                    delete character.selected[boss.id];
-
-                    changed = true;
-                }
-
-            });
-
-        });
-
-    });
-
-    return changed;
-}
-
-function runAutomaticResets() {
-
-    if (!calculatorState) {
-        updateResetStatus();
-        return;
-    }
-
-    const now =
-        getGMT8Date();
-
-    const currentWeeklyPeriod =
-        getWeeklyResetPeriod(now);
-
-    const currentMonthlyPeriod =
-        getMonthlyResetPeriod(now);
-
-    const resetState =
-        loadResetState();
-
-    let weeklyResetPerformed = false;
-    let monthlyResetPerformed = false;
-    let calculatorChanged = false;
-
-    /*
-       First visit with no stored reset period:
-       We establish the current period WITHOUT wiping
-       existing selections.
-
-       This prevents installing the new Planner version
-       from unexpectedly deleting the user's current clears.
-    */
-
-    if (!resetState.weeklyPeriod) {
-
-        resetState.weeklyPeriod =
-            currentWeeklyPeriod;
-
-    }
-    else if (
-        resetState.weeklyPeriod !==
-        currentWeeklyPeriod
-    ) {
-
-        calculatorChanged =
-            clearBossSelectionsByType(
-                "Weekly"
-            ) ||
-            calculatorChanged;
-
-        resetState.weeklyPeriod =
-            currentWeeklyPeriod;
-
-        weeklyResetPerformed = true;
-    }
-
-    if (!resetState.monthlyPeriod) {
-
-        resetState.monthlyPeriod =
-            currentMonthlyPeriod;
-
-    }
-    else if (
-        resetState.monthlyPeriod !==
-        currentMonthlyPeriod
-    ) {
-
-        calculatorChanged =
-            clearBossSelectionsByType(
-                "Monthly"
-            ) ||
-            calculatorChanged;
-
-        resetState.monthlyPeriod =
-            currentMonthlyPeriod;
-
-        monthlyResetPerformed = true;
-    }
-
-    if (calculatorChanged) {
-        saveCalculatorState();
-    }
-
-    saveResetState(resetState);
-
-    if (
-        weeklyResetPerformed &&
-        monthlyResetPerformed
-    ) {
-
-        showToast(
-            "Weekly and monthly boss selections reset."
-        );
-
-    }
-    else if (weeklyResetPerformed) {
-
-        showToast(
-            "Weekly boss selections reset."
-        );
-
-    }
-    else if (monthlyResetPerformed) {
-
-        showToast(
-            "Monthly boss selections reset."
-        );
-    }
-
-    updateResetStatus();
-}
-
-function updateResetStatus() {
-
-    const element =
-        document.getElementById(
-            "resetStatus"
-        );
-
-    if (!element) {
-        return;
-    }
-
-    const now =
-        getGMT8Date();
-
-    const weekly =
-        getWeeklyResetPeriod(now);
-
-    const monthly =
-        getMonthlyResetPeriod(now);
-
-    element.textContent =
-        "GMT+8 • Weekly period " +
-        weekly +
-        " • Monthly period " +
-        monthly;
-}
-
-/*
-   Check periodically while the page remains open.
-
-   Every 30 seconds is enough for this purpose.
-*/
-function startResetWatcher() {
-
-    setInterval(
-        () => {
-
-            const previous =
-                loadResetState();
-
-            const now =
-                getGMT8Date();
-
-            const weekly =
-                getWeeklyResetPeriod(now);
-
-            const monthly =
-                getMonthlyResetPeriod(now);
-
-            if (
-                previous.weeklyPeriod !== weekly ||
-                previous.monthlyPeriod !== monthly
-            ) {
-
-                loadCalculatorState();
-
-                runAutomaticResets();
-
-                ensureActiveAccount();
-
-                ensureActiveCharacter();
-
-                renderAll();
-
-                updateSyncStatus();
-            }
-
-            else {
-
-                updateResetStatus();
-            }
-
-        },
-        30000
-    );
-}
 
 /* =========================================================
-   WEEKLY CLEAR COUNT
+   CHARACTER PARTY SIZE KEY
 ========================================================= */
 
-function getCharacterWeeklyClearCount(character) {
+/*
+ * This is the critical part of the fix.
+ *
+ * Calculator v11:
+ *
+ * partySizes[
+ *     `${characterId}:${bossId}:${difficulty}`
+ * ]
+ *
+ * Example:
+ *
+ * partySizes["char123:lotus:N"] = 3
+ *
+ * The Optimizer now keeps that character
+ * association instead of collapsing it.
+ */
+
+function getCalculatorPartySize(
+    calculatorData,
+    characterId,
+    bossId,
+    difficulty
+) {
+
+    const exactKey =
+        `${characterId}:${bossId}:${difficulty}`;
+
+
+    const oldKey =
+        `${characterId}:${bossId}`;
+
+
+    const partySizes =
+        calculatorData?.partySizes;
+
 
     if (
-        !character ||
-        !character.selected
+        partySizes &&
+        typeof partySizes === "object"
     ) {
-        return 0;
-    }
-
-    let total = 0;
-
-    Object.keys(
-        character.selected
-    ).forEach(bossId => {
-
-        const boss =
-            getBoss(bossId);
 
         if (
-            !boss ||
-            boss.type !== "Weekly"
+            partySizes[exactKey] !==
+            undefined
         ) {
-            return;
+
+            return clampPartySize(
+                partySizes[exactKey]
+            );
+
         }
 
-        total +=
-            getBossSelections(
-                character,
-                bossId
-            ).length;
-    });
 
-    return total;
-}
+        if (
+            partySizes[oldKey] !==
+            undefined
+        ) {
 
-function getAccountWeeklyClearCount(account) {
+            return clampPartySize(
+                partySizes[oldKey]
+            );
 
-    if (
-        !account ||
-        !Array.isArray(
-            account.characters
-        )
-    ) {
-        return 0;
+        }
+
     }
 
-    return account.characters.reduce(
-        (total, character) =>
-            total +
-            getCharacterWeeklyClearCount(
-                character
-            ),
-        0
-    );
+
+    return 1;
+
 }
+
 
 /* =========================================================
-   RENDER ALL
+   SYNC FROM CALCULATOR
 ========================================================= */
 
-function renderAll() {
-    renderAccounts();
-    renderCharacters();
-    renderDashboard();
-    renderBosses();
-}
+function syncFromCalculator(
+    showMessage = false
+) {
 
-/* =========================================================
-   ACCOUNT RENDER
-========================================================= */
+    const calculator =
+        readCalculatorState();
 
-function renderAccounts() {
 
-    const container =
-        document.getElementById(
-            "accountTabs"
-        );
+    if (!calculator) {
 
-    container.innerHTML = "";
+        state.calculatorFound =
+            false;
 
-    const accounts =
-        getAccounts();
+        state.characters = [];
 
-    if (!accounts.length) {
+        state.partySizes = {};
 
-        container.innerHTML =
-            `<div class="empty">No Calculator accounts found.</div>`;
+        state.optimized = {};
 
-        return;
-    }
+        state.syncSignature = "";
 
-    accounts.forEach(account => {
+        saveOptimizerState();
 
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.type = "button";
-
-        button.className =
-            "account-tab" +
-            (
-                account.id ===
-                state.activeAccountId
-                    ? " active"
-                    : ""
-            );
-
-        const crystalCount =
-            getAccountWeeklyClearCount(
-                account
-            );
-
-        button.innerHTML = `
-            <span class="account-tab-name">
-                ${escapeHtml(account.name)}
-            </span>
-            <span class="account-tab-count">
-                ${crystalCount} selected
-            </span>
-        `;
-
-        button.onclick = () => {
-
-            state.activeAccountId =
-                account.id;
-
-            state.activeCharacterId =
-                account.characters &&
-                account.characters.length
-                    ? account.characters[0].id
-                    : null;
-
-            savePlannerViewState();
-
-            renderAll();
-        };
-
-        container.appendChild(button);
-    });
-}
-
-/* =========================================================
-   CHARACTER RENDER
-========================================================= */
-
-function renderCharacters() {
-
-    const container =
-        document.getElementById(
-            "characterTabs"
-        );
-
-    container.innerHTML = "";
-
-    const account =
-        getActiveAccount();
-
-    if (!account) {
-        return;
-    }
-
-    if (
-        !Array.isArray(
-            account.characters
-        ) ||
-        !account.characters.length
-    ) {
-
-        container.innerHTML =
-            `<div class="empty">No characters in this account.</div>`;
-
-        return;
-    }
-
-    account.characters.forEach(character => {
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.type = "button";
-
-        button.className =
-            "character-tab" +
-            (
-                character.id ===
-                state.activeCharacterId
-                    ? " active"
-                    : ""
-            );
-
-        const count =
-            getCharacterWeeklyClearCount(
-                character
-            );
-
-        button.innerHTML = `
-            <span class="character-tab-name">
-                ${escapeHtml(character.name)}
-            </span>
-            <span class="character-tab-count">
-                ${count}/${MAX_BOSSES_PER_CHARACTER}
-            </span>
-        `;
-
-        button.onclick = () => {
-
-            state.activeCharacterId =
-                character.id;
-
-            savePlannerViewState();
-
-            renderAll();
-        };
-
-        container.appendChild(button);
-    });
-}
-
-/* =========================================================
-   DASHBOARD
-========================================================= */
-
-function renderDashboard() {
-
-    const character =
-        getActiveCharacter();
-
-    const account =
-        getActiveAccount();
-
-    const characterClears =
-        getCharacterWeeklyClearCount(
-            character
-        );
-
-    const remaining =
-        Math.max(
-            0,
-            MAX_BOSSES_PER_CHARACTER -
-            characterClears
-        );
-
-    const accountClears =
-        getAccountWeeklyClearCount(
-            account
-        );
-
-    document.getElementById(
-        "weeklyClears"
-    ).textContent =
-        characterClears;
-
-    document.getElementById(
-        "remainingClears"
-    ).textContent =
-        remaining;
-
-    document.getElementById(
-        "characterName"
-    ).textContent =
-        character
-            ? character.name
-            : "—";
-
-    document.getElementById(
-        "accountClears"
-    ).textContent =
-        accountClears;
-
-    const percentage =
-        accountClears <= 0
-            ? 0
-            : Math.min(
-                100,
-                (
-                    accountClears /
-                    Math.max(
-                        12,
-                        accountClears
-                    )
-                ) * 100
-            );
-
-    document.getElementById(
-        "accountProgress"
-    ).style.width =
-        percentage + "%";
-}
-
-/* =========================================================
-   BOSS ROW
-========================================================= */
-
-function createBossRow(boss, character) {
-
-    const selections =
-        getBossSelections(
-            character,
-            boss.id
-        );
-
-    const row =
-        document.createElement(
-            "div"
-        );
-
-    row.className = "boss-row";
-
-    const nameDiv =
-        document.createElement(
-            "div"
-        );
-
-    nameDiv.className =
-        "boss-name";
-
-    nameDiv.innerHTML = `
-        <img
-            class="boss-icon"
-            src="${escapeHtml(boss.icon)}"
-            alt="${escapeHtml(boss.name)}"
-            loading="lazy"
-        >
-        <div class="boss-name-text">
-            ${escapeHtml(boss.name)}
-            <span class="boss-type">
-                ${escapeHtml(boss.type)}
-            </span>
-        </div>
-    `;
-
-    const difficultyDiv =
-        document.createElement(
-            "div"
-        );
-
-    difficultyDiv.className =
-        "difficulty-list";
-
-    if (!selections.length) {
-
-        difficultyDiv.innerHTML = `
-            <span class="difficulty-badge not-cleared">
-                Not cleared
-            </span>
-        `;
-
-    } else {
-
-        const counts = {};
-
-        selections.forEach(difficulty => {
-            counts[difficulty] =
-                (counts[difficulty] || 0) + 1;
-        });
-
-        Object.keys(counts).forEach(difficulty => {
-
-            const badge =
-                document.createElement(
-                    "span"
-                );
-
-            badge.className =
-                "difficulty-badge";
-
-            badge.innerHTML = `
-                ${escapeHtml(difficulty)}
-                <span class="difficulty-count">
-                    ${counts[difficulty]}
-                </span>
-            `;
-
-            difficultyDiv.appendChild(
-                badge
-            );
-        });
-    }
-
-    const partyDiv =
-        document.createElement(
-            "div"
-        );
-
-    partyDiv.className =
-        "party-info";
-
-    if (!selections.length) {
-
-        partyDiv.innerHTML =
-            "No active clear";
-
-    } else {
-
-        const partyParts = [];
-
-        selections.forEach(difficulty => {
-
-            const partySize =
-                getPartySize(
-                    boss.id,
-                    character.id,
-                    difficulty
-                );
-
-            partyParts.push(
-                `${escapeHtml(difficulty)}: Party <strong>${partySize}</strong>`
-            );
-        });
-
-        partyDiv.innerHTML =
-            partyParts.join(" · ");
-    }
-
-    const statusDiv =
-        document.createElement(
-            "div"
-        );
-
-    statusDiv.className =
-        "status";
-
-    if (selections.length) {
-
-        statusDiv.classList.add(
-            "status-cleared"
-        );
-
-        statusDiv.innerHTML = `
-            ✓ Cleared
-            <small>
-                ${selections.length}
-                clear${selections.length === 1 ? "" : "s"}
-            </small>
-        `;
-
-    } else {
-
-        statusDiv.classList.add(
-            "status-not-cleared"
-        );
-
-        statusDiv.innerHTML = `
-            Not Cleared
-            <small>0 clears</small>
-        `;
-    }
-
-    const noteWrapper =
-        document.createElement(
-            "div"
-        );
-
-    const noteLabel =
-        document.createElement(
-            "div"
-        );
-
-    noteLabel.className =
-        "note-label";
-
-    noteLabel.textContent =
-        "Personal Note";
-
-    const note =
-        document.createElement(
-            "textarea"
-        );
-
-    note.className =
-        "boss-note";
-
-    note.placeholder =
-        "Party IGN / reminder...";
-
-    note.value =
-        getBossNote(
-            character.id,
-            boss.id
-        );
-
-    note.maxLength = 500;
-
-    note.oninput = () => {
-
-        saveBossNote(
-            character.id,
-            boss.id,
-            note.value
-        );
-    };
-
-    noteWrapper.appendChild(
-        noteLabel
-    );
-
-    noteWrapper.appendChild(
-        note
-    );
-
-    row.appendChild(nameDiv);
-    row.appendChild(difficultyDiv);
-    row.appendChild(partyDiv);
-    row.appendChild(statusDiv);
-    row.appendChild(noteWrapper);
-
-    return row;
-}
-
-/* =========================================================
-   BOSS RENDER
-========================================================= */
-
-function renderBosses() {
-
-    const weeklyContainer =
-        document.getElementById(
-            "weeklyBosses"
-        );
-
-    const monthlyContainer =
-        document.getElementById(
-            "monthlyBosses"
-        );
-
-    weeklyContainer.innerHTML = "";
-    monthlyContainer.innerHTML = "";
-
-    const character =
-        getActiveCharacter();
-
-    if (!character) {
-
-        weeklyContainer.innerHTML =
-            `<div class="empty">No active character found.</div>`;
-
-        monthlyContainer.innerHTML =
-            `<div class="empty">No active character found.</div>`;
+        renderAll();
 
         updateSyncStatus();
 
-        return;
-    }
 
-    const search =
-        document.getElementById(
-            "searchInput"
-        )
-        .value
-        .trim()
-        .toLowerCase();
+        if (showMessage) {
 
-    const monthlyBosses =
-        bossDefinitions.filter(
-            boss => boss.type === "Monthly"
-        );
+            showToast(
+                "Calculator data was not found."
+            );
 
-    const weeklyBosses =
-        bossDefinitions.filter(
-            boss => boss.type === "Weekly"
-        );
-
-    monthlyBosses.forEach(boss => {
-
-        if (
-            search &&
-            !boss.name
-                .toLowerCase()
-                .includes(search)
-        ) {
-            return;
         }
 
-        monthlyContainer.appendChild(
-            createBossRow(
-                boss,
-                character
-            )
+        return false;
+
+    }
+
+
+    const accounts =
+        getAccounts(
+            calculator
         );
-    });
 
-    weeklyBosses.forEach(boss => {
 
-        if (
-            search &&
-            !boss.name
-                .toLowerCase()
-                .includes(search)
-        ) {
-            return;
+    const syncedCharacters = [];
+
+    const syncedPartySizes = {};
+
+
+    accounts.forEach(
+        (
+            account,
+            accountIndex
+        ) => {
+
+            const accountId =
+                String(
+                    account?.id ??
+                    account?.accountId ??
+                    `account-${accountIndex + 1}`
+                );
+
+
+            const accountName =
+                account?.name ??
+                account?.accountName ??
+                `Account ${accountIndex + 1}`;
+
+
+            const characters =
+                getCharacterArray(
+                    account
+                );
+
+
+            characters.forEach(
+                (
+                    character,
+                    characterIndex
+                ) => {
+
+                    const characterId =
+                        String(
+                            character?.id ??
+                            character?.characterId ??
+                            `character-${characterIndex + 1}`
+                        );
+
+
+                    /*
+                     * Optimizer-specific character ID.
+                     *
+                     * This guarantees characters from
+                     * different accounts cannot collide.
+                     */
+
+                    const optimizerCharacterId =
+                        `calc:${accountId}:${characterId}`;
+
+
+                    const selectionMap =
+                        extractCharacterSelections(
+                            character
+                        );
+
+
+                    /*
+                     * Store party size separately
+                     * for every selected boss/difficulty
+                     * of THIS character.
+                     */
+
+                    for (
+                        const [
+                            selectionKey
+                        ]
+                        of Object.entries(
+                            selectionMap
+                        )
+                    ) {
+
+                        const parts =
+                            selectionKey.split(":");
+
+                        if (
+                            parts.length !== 2
+                        ) {
+                            continue;
+                        }
+
+                        const bossId =
+                            parts[0];
+
+                        const difficulty =
+                            parts[1];
+
+
+                        const partySize =
+                            getCalculatorPartySize(
+                                calculator,
+                                characterId,
+                                bossId,
+                                difficulty
+                            );
+
+
+                        const optimizerPartyKey =
+                            `${optimizerCharacterId}:${bossId}:${difficulty}`;
+
+
+                        syncedPartySizes[
+                            optimizerPartyKey
+                        ] =
+                            partySize;
+
+                    }
+
+
+                    syncedCharacters.push({
+
+                        id:
+                            optimizerCharacterId,
+
+                        calculatorId:
+                            characterId,
+
+                        accountId:
+                            accountId,
+
+                        accountName:
+                            String(accountName),
+
+                        name:
+                            String(
+                                character?.name ??
+                                character?.characterName ??
+                                `Character ${characterIndex + 1}`
+                            ),
+
+                        current:
+                            selectionMap
+
+                    });
+
+                }
+            );
+
         }
+    );
 
-        weeklyContainer.appendChild(
-            createBossRow(
-                boss,
-                character
-            )
+
+    const syncData = {
+
+        characters:
+            syncedCharacters,
+
+        partySizes:
+            syncedPartySizes
+
+    };
+
+
+    const newSignature =
+        JSON.stringify(
+            syncData
         );
-    });
 
-    if (!monthlyContainer.children.length) {
-        monthlyContainer.innerHTML =
-            `<div class="empty">No monthly bosses found.</div>`;
-    }
 
-    if (!weeklyContainer.children.length) {
-        weeklyContainer.innerHTML =
-            `<div class="empty">No weekly bosses found.</div>`;
-    }
+    const changed =
+        newSignature !==
+        state.syncSignature;
 
-    updateSyncStatus();
-}
 
-/* =========================================================
-   SYNC
-========================================================= */
+    state.characters =
+        syncedCharacters;
 
-function syncFromCalculator() {
+    state.partySizes =
+        syncedPartySizes;
 
-    loadCalculatorState();
+    state.calculatorFound =
+        true;
+
+    state.lastSyncAt =
+        Date.now();
+
 
     /*
-       Check reset again when manually syncing.
-    */
-    runAutomaticResets();
+     * If Calculator selections or party
+     * sizes changed, previous optimization
+     * is no longer valid.
+     */
 
-    ensureActiveAccount();
-    ensureActiveCharacter();
+    if (changed) {
+
+        state.optimized = {};
+
+    }
+
+
+    state.syncSignature =
+        newSignature;
+
+
+    saveOptimizerState();
 
     renderAll();
+
     updateSyncStatus();
 
-    showToast(
-        "Planner synced with Calculator."
-    );
+
+    if (showMessage) {
+
+        if (changed) {
+
+            showToast(
+                "Optimizer synced with Calculator."
+            );
+
+        }
+
+        else {
+
+            showToast(
+                "Already synced with Calculator."
+            );
+
+        }
+
+    }
+
+
+    return true;
+
 }
+
+
+/* =========================================================
+   OPTIMIZER STORAGE
+========================================================= */
+
+function saveOptimizerState() {
+
+    try {
+
+        localStorage.setItem(
+            OPTIMIZER_STORAGE_KEY,
+            JSON.stringify(state)
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Unable to save Optimizer state:",
+            error
+        );
+
+    }
+
+}
+
+
+function loadOptimizerState() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                OPTIMIZER_STORAGE_KEY
+            );
+
+
+        if (!raw) {
+            return;
+        }
+
+
+        const saved =
+            JSON.parse(raw);
+
+
+        if (
+            !saved ||
+            typeof saved !== "object"
+        ) {
+            return;
+        }
+
+
+        state = {
+
+            ...state,
+
+            ...saved,
+
+            characters:
+                Array.isArray(
+                    saved.characters
+                )
+                    ? saved.characters
+                    : [],
+
+            partySizes:
+                saved.partySizes &&
+                typeof saved.partySizes ===
+                "object"
+                    ? saved.partySizes
+                    : {},
+
+            optimized:
+                saved.optimized &&
+                typeof saved.optimized ===
+                "object"
+                    ? saved.optimized
+                    : {}
+
+        };
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Unable to load Optimizer state:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   UPDATE SYNC STATUS
+========================================================= */
 
 function updateSyncStatus() {
 
@@ -1724,618 +2897,1510 @@ function updateSyncStatus() {
             "syncStatus"
         );
 
-    if (!status) return;
-
-    if (!calculatorState) {
-
-        status.textContent =
-            "Calculator data not found";
-
-        status.style.color =
-            "#ff9d9d";
-
+    if (!status) {
         return;
     }
 
-    status.textContent =
-        "Synced with Calculator";
 
-    status.style.color =
-        "#7c5cff";
+    if (!state.calculatorFound) {
+
+        status.innerHTML = `
+            <span class="sync-dot warning"></span>
+            Calculator data not found
+        `;
+
+        return;
+
+    }
+
+
+    let timeText = "";
+
+
+    if (state.lastSyncAt) {
+
+        timeText =
+            " · " +
+            new Date(
+                state.lastSyncAt
+            ).toLocaleTimeString();
+
+    }
+
+
+    status.innerHTML = `
+        <span class="sync-dot ok"></span>
+        Synced from Calculator${timeText}
+    `;
+
 }
 
+
 /* =========================================================
-   ACCOUNT MANAGEMENT
+   GET PARTY SIZE FOR CHARACTER
 ========================================================= */
 
-function addAccount() {
+function getCharacterPartySize(
+    character,
+    bossId,
+    difficulty
+) {
 
-    if (!calculatorState) {
+    const key =
+        `${character.id}:${bossId}:${difficulty}`;
+
+
+    if (
+        state.partySizes[key] !==
+        undefined
+    ) {
+
+        return clampPartySize(
+            state.partySizes[key]
+        );
+
+    }
+
+
+    /*
+     * Safety fallback.
+     *
+     * Normally all selected entries should
+     * already have a character-specific value.
+     */
+
+    return 1;
+
+}
+
+
+/* =========================================================
+   GET SELECTED CRYSTALS
+========================================================= */
+
+function getEligibleCrystals(
+    character
+) {
+
+    const candidates = [];
+
+    const selected =
+        character.current || {};
+
+
+    /*
+     * ONLY loop through Calculator selections.
+     */
+
+    for (
+        const [key, count]
+        of Object.entries(selected)
+    ) {
+
+        const parts =
+            key.split(":");
+
+        if (
+            parts.length !== 2
+        ) {
+            continue;
+        }
+
+
+        const bossId =
+            parts[0];
+
+        const difficulty =
+            parts[1];
+
+
+        const boss =
+            findBossFromKey(
+                bossId
+            );
+
+        if (!boss) {
+            continue;
+        }
+
+
+        /*
+         * Black Mage is monthly and
+         * must not enter the weekly
+         * optimization.
+         */
+
+        if (boss.monthly) {
+            continue;
+        }
+
+
+        const diff =
+            findDifficulty(
+                boss,
+                difficulty
+            );
+
+        if (!diff) {
+            continue;
+        }
+
+
+        if (
+            diff.value === null ||
+            diff.value === undefined
+        ) {
+            continue;
+        }
+
+
+        const crystalCount =
+            Math.min(
+                MAX_CLEARS_PER_BOSS,
+                Math.max(
+                    0,
+                    Number(count) || 0
+                )
+            );
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Create one crystal entry per
+         * Calculator-selected clear.
+         */
+
+        for (
+            let i = 0;
+            i < crystalCount;
+            i++
+        ) {
+
+            const partySize =
+                getCharacterPartySize(
+                    character,
+                    boss.id,
+                    diff.name
+                );
+
+
+            const dividedValue =
+                Number(diff.value) /
+                partySize;
+
+
+            candidates.push({
+
+                bossId:
+                    boss.id,
+
+                bossName:
+                    boss.name,
+
+                difficulty:
+                    diff.name,
+
+                value:
+                    Number(diff.value),
+
+                partySize:
+                    partySize,
+
+                dividedValue:
+                    dividedValue,
+
+                icon:
+                    boss.icon,
+
+                /*
+                 * Used to uniquely identify
+                 * individual duplicate clears.
+                 */
+
+                selectionKey:
+                    `${boss.id}:${diff.name}:${i}`
+
+            });
+
+        }
+
+    }
+
+
+    return candidates;
+
+}
+
+
+/* =========================================================
+   CALCULATE CURRENT INCOME
+========================================================= */
+
+function calculateCurrentIncome(
+    character
+) {
+
+    const crystals =
+        getEligibleCrystals(
+            character
+        );
+
+
+    return crystals.reduce(
+        (
+            total,
+            crystal
+        ) =>
+            total +
+            crystal.dividedValue,
+        0
+    );
+
+}
+
+
+/* =========================================================
+   OPTIMIZE CHARACTER
+========================================================= */
+
+function optimizeCharacter(
+    character
+) {
+
+    /*
+     * Candidate pool is ONLY:
+     *
+     * Calculator-selected bosses
+     * +
+     * Calculator-selected difficulties
+     * +
+     * Calculator-selected number of clears
+     */
+
+    const candidates =
+        getEligibleCrystals(
+            character
+        );
+
+
+    /*
+     * Highest actual per-person
+     * meso value first.
+     */
+
+    candidates.sort(
+        (
+            a,
+            b
+        ) =>
+            b.dividedValue -
+            a.dividedValue
+    );
+
+
+    /*
+     * Maximum 12 weekly crystals.
+     */
+
+    return candidates.slice(
+        0,
+        MAX_BOSSES_PER_CHARACTER
+    );
+
+}
+
+
+/* =========================================================
+   OPTIMIZE ALL
+========================================================= */
+
+function optimizeAllCharacters() {
+
+    if (
+        !state.calculatorFound
+    ) {
 
         showToast(
-            "Calculator data not found."
+            "Calculator data was not found."
         );
 
         return;
+
     }
 
-    if (
-        !Array.isArray(
-            calculatorState.accounts
-        )
+
+    state.optimized = {};
+
+
+    for (
+        const character
+        of state.characters
     ) {
 
-        calculatorState.accounts = [];
+        state.optimized[
+            character.id
+        ] =
+            optimizeCharacter(
+                character
+            );
+
     }
 
-    let number =
-        calculatorState.accounts.length + 1;
 
-    let name =
-        `Account ${number}`;
+    saveOptimizerState();
 
-    while (
-        calculatorState.accounts.some(
-            account => account.name === name
-        )
-    ) {
+    renderAll();
 
-        number++;
 
-        name =
-            `Account ${number}`;
-    }
-
-    const account = {
-        id: generateId(),
-        name: name,
-        characters: []
-    };
-
-    const character = {
-        id: generateId(),
-        name: "Character 1",
-        selected: {}
-    };
-
-    account.characters.push(
-        character
+    showToast(
+        "Optimization completed using Calculator selections and party sizes."
     );
 
-    calculatorState.accounts.push(
-        account
-    );
+}
 
-    calculatorState.activeAccountId =
-        account.id;
 
-    calculatorState.activeCharacterId =
-        character.id;
+/* =========================================================
+   CLEAR OPTIMIZATION
+========================================================= */
 
-    state.activeAccountId =
-        account.id;
+function clearOptimization() {
 
-    state.activeCharacterId =
-        character.id;
+    state.optimized = {};
 
-    saveCalculatorState();
-    savePlannerViewState();
+    saveOptimizerState();
+
     renderAll();
 
     showToast(
-        `${name} added to Calculator and Planner.`
+        "Optimization results cleared."
     );
+
 }
 
-/* =========================================================
-   RENAME ACCOUNT
-========================================================= */
-
-function renameAccount() {
-
-    const account =
-        getActiveAccount();
-
-    if (!account) return;
-
-    openModal(
-        "Rename Account",
-        account.name,
-        value => {
-
-            const trimmed =
-                value.trim();
-
-            if (!trimmed) {
-
-                showToast(
-                    "Account name cannot be empty."
-                );
-
-                return;
-            }
-
-            account.name =
-                trimmed;
-
-            saveCalculatorState();
-            renderAll();
-
-            showToast(
-                "Account renamed."
-            );
-        }
-    );
-}
 
 /* =========================================================
-   DELETE ACCOUNT
+   RENDER CHARACTERS
 ========================================================= */
 
-function deleteAccount() {
+function renderCharacters() {
 
-    if (!calculatorState) return;
-
-    const accounts =
-        getAccounts();
-
-    if (accounts.length <= 1) {
-
-        showToast(
-            "You must keep at least one account."
+    const container =
+        document.getElementById(
+            "characterContainer"
         );
+
+
+    if (
+        !state.characters.length
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                ${
+                    state.calculatorFound
+
+                    ? "No characters were found in the Calculator."
+
+                    : "Open the Calculator first, create your characters and select your Boss Crystals, then sync here."
+
+                }
+
+            </div>
+
+        `;
 
         return;
+
     }
 
-    const account =
-        getActiveAccount();
 
-    if (!account) return;
+    container.innerHTML = `
 
-    const confirmed =
-        confirm(
-            `Delete "${account.name}" and all of its characters?`
+        <div class="character-grid">
+
+            ${
+                state.characters.map(
+                    character => {
+
+                        const selected =
+                            getEligibleCrystals(
+                                character
+                            );
+
+                        const count =
+                            selected.length;
+
+
+                        return `
+
+                        <div class="character-card">
+
+                            <div class="character-top">
+
+                                <div>
+
+                                    <div class="character-name">
+                                        ${escapeHtml(character.name)}
+                                    </div>
+
+                                    <div class="account-name">
+                                        ${escapeHtml(character.accountName)}
+                                    </div>
+
+                                </div>
+
+                                <div class="synced-label">
+                                    ● Calculator Synced
+                                </div>
+
+                            </div>
+
+
+                            <div class="character-info">
+
+                                <span class="pill">
+                                    ${count} / ${MAX_BOSSES_PER_CHARACTER}
+                                    Weekly Crystals
+                                </span>
+
+                                <span class="pill">
+                                    ${
+                                        count === 0
+                                            ? "No eligible crystals"
+                                            : "Only Calculator-selected crystals"
+                                    }
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        `;
+
+                    }
+                ).join("")
+            }
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   RENDER PARTY SIZES
+========================================================= */
+
+function renderPartySizes() {
+
+    const container =
+        document.getElementById(
+            "partyContainer"
         );
 
-    if (!confirmed) return;
 
-    const deletedAccountId =
-        account.id;
+    if (
+        !state.characters.length
+    ) {
 
-    if (calculatorState.partySizes) {
+        container.innerHTML = `
 
-        account.characters.forEach(
+            <div class="empty">
+                No Calculator characters available.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+
+        state.characters.map(
             character => {
 
-                Object.keys(
-                    calculatorState.partySizes
-                ).forEach(key => {
+                const selected =
+                    character.current || {};
+
+
+                const selectedBosses =
+                    Object.keys(
+                        selected
+                    );
+
+
+                if (
+                    selectedBosses.length === 0
+                ) {
+
+                    return `
+
+                    <div class="party-character">
+
+                        <div class="party-character-header">
+
+                            <div>
+
+                                <div class="party-character-name">
+                                    ${escapeHtml(character.name)}
+                                </div>
+
+                                <div class="party-character-account">
+                                    ${escapeHtml(character.accountName)}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="empty"
+                             style="
+                                background:#10131a;
+                                border:1px solid #292e3b;
+                                border-top:0;
+                                border-radius:0 0 10px 10px;
+                             "
+                        >
+                            No weekly Boss Crystals selected in Calculator.
+                        </div>
+
+                    </div>
+
+                    `;
+
+                }
+
+
+                /*
+                 * Only display bosses that are
+                 * actually selected in Calculator.
+                 */
+
+                const bossMap = {};
+
+
+                for (
+                    const key
+                    of selectedBosses
+                ) {
+
+                    const parts =
+                        key.split(":");
 
                     if (
-                        key.startsWith(
-                            character.id + ":"
+                        parts.length !== 2
+                    ) {
+                        continue;
+                    }
+
+                    const bossId =
+                        parts[0];
+
+                    const difficulty =
+                        parts[1];
+
+
+                    const boss =
+                        findBossFromKey(
+                            bossId
+                        );
+
+                    if (
+                        !boss ||
+                        boss.monthly
+                    ) {
+                        continue;
+                    }
+
+
+                    if (
+                        !bossMap[boss.id]
+                    ) {
+
+                        bossMap[boss.id] = [];
+
+                    }
+
+
+                    if (
+                        !bossMap[boss.id].includes(
+                            difficulty
                         )
                     ) {
 
-                        delete
-                            calculatorState.partySizes[key];
+                        bossMap[
+                            boss.id
+                        ].push(
+                            difficulty
+                        );
+
                     }
-                });
+
+                }
+
+
+                const bossIds =
+                    Object.keys(
+                        bossMap
+                    );
+
+
+                return `
+
+                <div class="party-character">
+
+                    <div class="party-character-header">
+
+                        <div>
+
+                            <div class="party-character-name">
+                                ${escapeHtml(character.name)}
+                            </div>
+
+                            <div class="party-character-account">
+                                ${escapeHtml(character.accountName)}
+                            </div>
+
+                        </div>
+
+                        <div class="synced-label">
+                            ● Synced
+                        </div>
+
+                    </div>
+
+
+                    <div class="party-grid">
+
+                        ${
+                            bossIds.map(
+                                bossId => {
+
+                                    const boss =
+                                        findBossFromKey(
+                                            bossId
+                                        );
+
+                                    if (!boss) {
+                                        return "";
+                                    }
+
+
+                                    const selectedDiffs =
+                                        bossMap[
+                                            boss.id
+                                        ];
+
+
+                                    return `
+
+                                    <div class="boss-party-card">
+
+                                        <div class="boss-party-header">
+
+                                            <img
+                                                class="boss-icon"
+                                                src="${boss.icon}"
+                                                alt="${escapeHtml(boss.name)}"
+                                                onerror="this.style.display='none'"
+                                            >
+
+                                            <div>
+
+                                                <div class="boss-name">
+                                                    ${escapeHtml(boss.name)}
+                                                </div>
+
+                                                <div class="selected-boss-label">
+                                                    Calculator selected
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        ${
+                                            selectedDiffs
+                                                .map(
+                                                    difficulty => {
+
+                                                        const diff =
+                                                            findDifficulty(
+                                                                boss,
+                                                                difficulty
+                                                            );
+
+                                                        if (!diff) {
+                                                            return "";
+                                                        }
+
+
+                                                        const count =
+                                                            Math.min(
+                                                                MAX_CLEARS_PER_BOSS,
+                                                                Number(
+                                                                    selected[
+                                                                        `${boss.id}:${diff.name}`
+                                                                    ]
+                                                                ) || 0
+                                                            );
+
+
+                                                        const party =
+                                                            getCharacterPartySize(
+                                                                character,
+                                                                boss.id,
+                                                                diff.name
+                                                            );
+
+
+                                                        return `
+
+                                                        <div class="difficulty-row selected">
+
+                                                            <span
+                                                                class="difficulty-name selected"
+                                                            >
+
+                                                                ${escapeHtml(diff.name)}
+
+                                                                ${
+                                                                    count > 1
+                                                                        ? `<span class="difficulty-count">×${count}</span>`
+                                                                        : ""
+                                                                }
+
+                                                            </span>
+
+
+                                                            <select disabled>
+
+                                                                ${
+                                                                    [1,2,3,4,5,6]
+                                                                        .map(
+                                                                            n => `
+
+                                                                            <option
+                                                                                value="${n}"
+                                                                                ${
+                                                                                    n === party
+                                                                                        ? "selected"
+                                                                                        : ""
+                                                                                }
+                                                                            >
+                                                                                ${n} player${n > 1 ? "s" : ""}
+                                                                            </option>
+
+                                                                        `
+                                                                        )
+                                                                        .join("")
+                                                                }
+
+                                                            </select>
+
+                                                        </div>
+
+                                                        `;
+
+                                                    }
+                                                )
+                                                .join("")
+                                        }
+
+                                    </div>
+
+                                    `;
+
+                                }
+                            ).join("")
+                        }
+
+                    </div>
+
+                </div>
+
+                `;
+
             }
+        ).join("");
+
+}
+
+
+/* =========================================================
+   RENDER RESULTS
+========================================================= */
+
+function renderResults() {
+
+    const container =
+        document.getElementById(
+            "resultsContainer"
         );
+
+
+    if (
+        !state.characters.length
+    ) {
+
+        container.innerHTML = `
+
+            <div class="card">
+
+                <div class="empty">
+                    No Calculator characters available.
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
     }
 
-    account.characters.forEach(
-        character => {
 
-            Object.keys(
-                state.notes
-            ).forEach(key => {
+    container.innerHTML =
 
-                if (
-                    key.startsWith(
-                        character.id + ":"
+        state.characters.map(
+            character => {
+
+                const current =
+                    getEligibleCrystals(
+                        character
+                    );
+
+
+                const optimized =
+                    state.optimized[
+                        character.id
+                    ] || [];
+
+
+                const currentTotal =
+                    current.reduce(
+                        (
+                            sum,
+                            crystal
+                        ) =>
+                            sum +
+                            crystal.dividedValue,
+                        0
+                    );
+
+
+                const optimizedTotal =
+                    optimized.reduce(
+                        (
+                            sum,
+                            crystal
+                        ) =>
+                            sum +
+                            crystal.dividedValue,
+                        0
+                    );
+
+
+                const gain =
+                    optimizedTotal -
+                    currentTotal;
+
+
+                return `
+
+                <div class="result-card">
+
+                    <div class="result-header">
+
+                        <div>
+
+                            <div class="result-header-title">
+                                ${escapeHtml(character.name)}
+                            </div>
+
+                            <div class="account-name">
+                                ${escapeHtml(character.accountName)}
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="result-header-value ${
+                                gain > 0
+                                    ? "green"
+                                    : ""
+                            }"
+                        >
+                            ${
+                                gain >= 0
+                                    ? "+"
+                                    : ""
+                            }${formatMeso(gain)}
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-list">
+
+                        <!-- CURRENT -->
+
+                        <div
+                            class="result-row current-row"
+                            style="background:#171b23;"
+                        >
+
+                            <div class="rank">
+                                —
+                            </div>
+
+                            <div class="result-boss">
+
+                                <div class="result-boss-text">
+
+                                    <div class="result-boss-name">
+                                        Current
+                                    </div>
+
+                                    <div class="result-difficulty">
+                                        Calculator selection
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="result-party">
+                                ${current.length} crystals
+                            </div>
+
+                            <div class="result-meso">
+                                ${formatMeso(currentTotal)}
+                            </div>
+
+                        </div>
+
+
+                        ${
+                            optimized.length
+
+                                ? optimized.map(
+                                    (
+                                        crystal,
+                                        index
+                                    ) => {
+
+                                        return `
+
+                                        <div class="result-row optimized-row">
+
+                                            <div class="rank">
+                                                ${index + 1}
+                                            </div>
+
+
+                                            <div class="result-boss">
+
+                                                <img
+                                                    src="${crystal.icon}"
+                                                    alt=""
+                                                    onerror="this.style.display='none'"
+                                                >
+
+                                                <div class="result-boss-text">
+
+                                                    <div class="result-boss-name">
+                                                        ${escapeHtml(crystal.bossName)}
+                                                    </div>
+
+                                                    <div class="result-difficulty">
+
+                                                        ${escapeHtml(crystal.difficulty)}
+
+                                                        ${
+                                                            crystal.partySize > 1
+                                                                ? ` · Party ${crystal.partySize}`
+                                                                : ` · Solo`
+                                                        }
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="result-party">
+                                                ÷${crystal.partySize}
+                                            </div>
+
+
+                                            <div class="result-meso">
+                                                ${formatMeso(crystal.dividedValue)}
+                                            </div>
+
+                                        </div>
+
+                                        `;
+
+                                    }
+                                ).join("")
+
+                                : `
+
+                                <div class="empty">
+
+                                    Press
+                                    <strong>
+                                        Optimize All Characters
+                                    </strong>
+                                    to calculate the best 12 crystals.
+
+                                </div>
+
+                                `
+                        }
+
+
+                        ${
+                            optimized.length
+
+                                ? `
+
+                                <div
+                                    class="result-row"
+                                    style="
+                                        background:#11141b;
+                                        border-top:1px solid #303645;
+                                    "
+                                >
+
+                                    <div></div>
+
+                                    <div>
+                                        <strong>
+                                            Optimized Total
+                                        </strong>
+                                    </div>
+
+                                    <div></div>
+
+                                    <div
+                                        class="result-meso"
+                                        style="color:#57df8a;"
+                                    >
+                                        ${formatMeso(optimizedTotal)}
+                                    </div>
+
+                                </div>
+
+                                `
+
+                                : ""
+                        }
+
+                    </div>
+
+                </div>
+
+                `;
+
+            }
+        ).join("");
+
+}
+
+
+/* =========================================================
+   RENDER MONTHLY
+========================================================= */
+
+function renderMonthly() {
+
+    const container =
+        document.getElementById(
+            "monthlyContainer"
+        );
+
+
+    if (
+        !state.characters.length
+    ) {
+
+        container.innerHTML = `
+
+            <div class="monthly-card">
+
+                <div class="empty">
+                    No characters available.
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const blackMage =
+        defaultBosses.find(
+            boss =>
+                boss.id ===
+                "blackmage"
+        );
+
+
+    container.innerHTML =
+
+        state.characters.map(
+            character => {
+
+                const selected =
+                    character.current || {};
+
+
+                let monthlyIncome = 0;
+
+
+                /*
+                 * Black Mage is separate from
+                 * weekly optimization.
+                 */
+
+                for (
+                    const [
+                        key,
+                        count
+                    ]
+                    of Object.entries(
+                        selected
                     )
                 ) {
 
-                    delete
-                        state.notes[key];
+                    if (
+                        !key.startsWith(
+                            "blackmage:"
+                        )
+                    ) {
+                        continue;
+                    }
+
+
+                    const difficulty =
+                        key.split(":")[1];
+
+
+                    const diff =
+                        findDifficulty(
+                            blackMage,
+                            difficulty
+                        );
+
+
+                    if (
+                        !diff ||
+                        diff.value === null
+                    ) {
+                        continue;
+                    }
+
+
+                    monthlyIncome +=
+                        Number(diff.value) *
+                        Math.min(
+                            MAX_CLEARS_PER_BOSS,
+                            Number(count) || 0
+                        );
+
                 }
-            });
-        }
-    );
 
-    savePlannerNotes();
 
-    calculatorState.accounts =
-        accounts.filter(
-            item =>
-                item.id !==
-                deletedAccountId
-        );
+                const annual =
+                    monthlyIncome * 12;
 
-    const nextAccount =
-        calculatorState.accounts[0];
 
-    state.activeAccountId =
-        nextAccount.id;
+                return `
 
-    state.activeCharacterId =
-        nextAccount.characters.length
-            ? nextAccount.characters[0].id
-            : null;
+                <div class="monthly-card">
 
-    calculatorState.activeAccountId =
-        state.activeAccountId;
+                    <div class="character-name">
+                        ${escapeHtml(character.name)}
+                    </div>
 
-    calculatorState.activeCharacterId =
-        state.activeCharacterId;
+                    <div class="account-name">
+                        ${escapeHtml(character.accountName)}
+                    </div>
 
-    saveCalculatorState();
-    savePlannerViewState();
-    renderAll();
+                    <div style="height:10px;"></div>
 
-    showToast(
-        `${account.name} deleted.`
-    );
-}
 
-/* =========================================================
-   CHARACTER MANAGEMENT
-========================================================= */
+                    <div class="monthly-line">
 
-function addCharacter() {
+                        <span class="monthly-label">
+                            Black Mage Monthly
+                        </span>
 
-    const account =
-        getActiveAccount();
+                        <span class="monthly-value">
+                            ${formatMeso(monthlyIncome)}
+                        </span>
 
-    if (!account) {
+                    </div>
 
-        showToast(
-            "No active account."
-        );
 
-        return;
-    }
+                    <div class="monthly-line">
 
-    if (
-        !Array.isArray(
-            account.characters
-        )
-    ) {
+                        <span class="monthly-label">
+                            Annual ×12
+                        </span>
 
-        account.characters = [];
-    }
+                        <span class="monthly-value">
+                            ${formatMeso(annual)}
+                        </span>
 
-    let number =
-        account.characters.length + 1;
+                    </div>
 
-    let name =
-        `Character ${number}`;
+                </div>
 
-    while (
-        account.characters.some(
-            character =>
-                character.name === name
-        )
-    ) {
+                `;
 
-        number++;
-
-        name =
-            `Character ${number}`;
-    }
-
-    const character = {
-        id: generateId(),
-        name: name,
-        selected: {}
-    };
-
-    account.characters.push(
-        character
-    );
-
-    state.activeCharacterId =
-        character.id;
-
-    calculatorState.activeAccountId =
-        account.id;
-
-    calculatorState.activeCharacterId =
-        character.id;
-
-    saveCalculatorState();
-    savePlannerViewState();
-    renderAll();
-
-    showToast(
-        `${name} added to Calculator and Planner.`
-    );
-}
-
-/* =========================================================
-   RENAME CHARACTER
-========================================================= */
-
-function renameCharacter() {
-
-    const character =
-        getActiveCharacter();
-
-    if (!character) return;
-
-    openModal(
-        "Rename Character",
-        character.name,
-        value => {
-
-            const trimmed =
-                value.trim();
-
-            if (!trimmed) {
-
-                showToast(
-                    "Character name cannot be empty."
-                );
-
-                return;
             }
+        ).join("");
 
-            character.name =
-                trimmed;
+}
 
-            saveCalculatorState();
-            renderAll();
 
-            showToast(
-                "Character renamed."
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard() {
+
+    let currentTotal = 0;
+
+    let optimizedTotal = 0;
+
+
+    for (
+        const character
+        of state.characters
+    ) {
+
+        currentTotal +=
+            calculateCurrentIncome(
+                character
             );
-        }
-    );
+
+
+        const optimized =
+            state.optimized[
+                character.id
+            ] || [];
+
+
+        optimizedTotal +=
+            optimized.reduce(
+                (
+                    sum,
+                    crystal
+                ) =>
+                    sum +
+                    crystal.dividedValue,
+                0
+            );
+
+    }
+
+
+    const hasOptimization =
+        state.characters.some(
+            character =>
+                Array.isArray(
+                    state.optimized[
+                        character.id
+                    ]
+                )
+        );
+
+
+    const displayedOptimized =
+        hasOptimization
+            ? optimizedTotal
+            : 0;
+
+
+    document.getElementById(
+        "currentIncome"
+    ).textContent =
+        formatMeso(
+            currentTotal
+        );
+
+
+    document.getElementById(
+        "optimizedIncome"
+    ).textContent =
+        formatMeso(
+            displayedOptimized
+        );
+
+
+    document.getElementById(
+        "potentialGain"
+    ).textContent =
+        formatMeso(
+            Math.max(
+                0,
+                displayedOptimized -
+                currentTotal
+            )
+        );
+
+
+    document.getElementById(
+        "characterCount"
+    ).textContent =
+        state.characters.length;
+
 }
 
+
 /* =========================================================
-   DELETE CHARACTER
+   RENDER WARNING
 ========================================================= */
 
-function deleteCharacter() {
+function renderWarning() {
 
-    const account =
-        getActiveAccount();
+    const container =
+        document.getElementById(
+            "syncWarning"
+        );
 
-    if (!account) return;
 
     if (
-        account.characters.length <= 1
+        state.calculatorFound
     ) {
 
-        showToast(
-            "Each account must have at least one character."
-        );
+        container.style.display =
+            "none";
+
+        container.innerHTML =
+            "";
 
         return;
+
     }
 
-    const character =
-        getActiveCharacter();
 
-    if (!character) return;
+    container.style.display =
+        "block";
 
-    const confirmed =
-        confirm(
-            `Delete "${character.name}"?`
-        );
 
-    if (!confirmed) return;
+    container.innerHTML = `
 
-    const deletedCharacterId =
-        character.id;
+        <div class="warning">
 
-    if (calculatorState.partySizes) {
+            <strong>
+                Calculator data not found.
+            </strong>
 
-        Object.keys(
-            calculatorState.partySizes
-        ).forEach(key => {
+            <br>
 
-            if (
-                key.startsWith(
-                    deletedCharacterId + ":"
-                )
-            ) {
+            This Optimizer uses the Calculator as
+            its master source.
 
-                delete
-                    calculatorState
-                        .partySizes[key];
-            }
-        });
-    }
+            Open your Calculator, make sure your
+            characters and Boss Crystal selections
+            are saved, then return here and click
+            <strong>
+                ↻ Sync from Calculator
+            </strong>.
 
-    Object.keys(
-        state.notes
-    ).forEach(key => {
+            <br><br>
 
-        if (
-            key.startsWith(
-                deletedCharacterId + ":"
-            )
-        ) {
+            The Optimizer will not create example
+            characters or bosses on its own.
 
-            delete
-                state.notes[key];
-        }
-    });
+        </div>
 
-    savePlannerNotes();
+    `;
 
-    account.characters =
-        account.characters.filter(
-            item =>
-                item.id !==
-                deletedCharacterId
-        );
-
-    state.activeCharacterId =
-        account.characters[0].id;
-
-    calculatorState.activeAccountId =
-        account.id;
-
-    calculatorState.activeCharacterId =
-        state.activeCharacterId;
-
-    saveCalculatorState();
-    savePlannerViewState();
-    renderAll();
-
-    showToast(
-        `${character.name} deleted.`
-    );
 }
 
+
 /* =========================================================
-   MODAL
+   RENDER EVERYTHING
 ========================================================= */
 
-function openModal(
-    title,
-    value,
-    callback
-) {
+function renderAll() {
 
-    modalAction =
-        callback;
+    renderDashboard();
 
-    document.getElementById(
-        "modalTitle"
-    ).textContent =
-        title;
+    renderWarning();
 
-    document.getElementById(
-        "modalInput"
-    ).value =
-        value;
+    renderCharacters();
 
-    document.getElementById(
-        "modalOverlay"
-    ).classList.add(
-        "show"
-    );
+    renderPartySizes();
 
-    setTimeout(
-        () => {
+    renderResults();
 
-            const input =
-                document.getElementById(
-                    "modalInput"
-                );
+    renderMonthly();
 
-            input.focus();
-            input.select();
+    updateSyncStatus();
 
-        },
-        50
-    );
 }
 
-function closeModal() {
-
-    modalAction = null;
-
-    document.getElementById(
-        "modalOverlay"
-    ).classList.remove(
-        "show"
-    );
-}
-
-function confirmModal() {
-
-    const input =
-        document.getElementById(
-            "modalInput"
-        );
-
-    const value =
-        input.value;
-
-    const callback =
-        modalAction;
-
-    closeModal();
-
-    if (callback) {
-        callback(value);
-    }
-}
-
-document.getElementById(
-    "modalInput"
-).addEventListener(
-    "keydown",
-    event => {
-
-        if (event.key === "Enter") {
-            confirmModal();
-        }
-
-        if (event.key === "Escape") {
-            closeModal();
-        }
-    }
-);
 
 /* =========================================================
-   TOAST
-========================================================= */
-
-function showToast(message) {
-
-    const toast =
-        document.getElementById(
-            "toast"
-        );
-
-    toast.textContent =
-        message;
-
-    toast.classList.add(
-        "show"
-    );
-
-    clearTimeout(
-        toastTimer
-    );
-
-    toastTimer =
-        setTimeout(
-            () => {
-                toast.classList.remove(
-                    "show"
-                );
-            },
-            2500
-        );
-}
-
-/* =========================================================
-   HTML ESCAPING
+   ESCAPE HTML
 ========================================================= */
 
 function escapeHtml(value) {
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return String(value ?? "")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }
 
+
 /* =========================================================
-   CROSS-TAB SYNC
+   AUTO SYNC
 ========================================================= */
+
+/*
+ * Calculator and Optimizer can be opened
+ * in different tabs.
+ *
+ * The storage event detects Calculator
+ * changes.
+ */
 
 window.addEventListener(
     "storage",
@@ -2346,33 +4411,31 @@ window.addEventListener(
             CALCULATOR_STORAGE_KEY
         ) {
 
-            loadCalculatorState();
+            syncFromCalculator(
+                true
+            );
 
-            runAutomaticResets();
-
-            ensureActiveAccount();
-            ensureActiveCharacter();
-
-            renderAll();
-            updateSyncStatus();
-        }
-
-        if (
-            event.key ===
-            PLANNER_NOTES_STORAGE_KEY
-        ) {
-
-            loadPlannerNotes();
-
-            renderBosses();
         }
 
     }
 );
 
-/* =========================================================
-   VISIBILITY SYNC
-========================================================= */
+
+/*
+ * Sync again when returning to this page.
+ */
+
+window.addEventListener(
+    "focus",
+    () => {
+
+        syncFromCalculator(
+            false
+        );
+
+    }
+);
+
 
 document.addEventListener(
     "visibilitychange",
@@ -2383,27 +4446,54 @@ document.addEventListener(
             "visible"
         ) {
 
-            loadCalculatorState();
-            loadPlannerNotes();
+            syncFromCalculator(
+                false
+            );
 
-            runAutomaticResets();
-
-            ensureActiveAccount();
-            ensureActiveCharacter();
-
-            renderAll();
-            updateSyncStatus();
         }
 
     }
 );
 
+
+/*
+ * Safety check every 8 seconds.
+ */
+
+setInterval(
+    () => {
+
+        if (
+            document.visibilityState ===
+            "visible"
+        ) {
+
+            syncFromCalculator(
+                false
+            );
+
+        }
+
+    },
+    8000
+);
+
+
 /* =========================================================
-   START
+   INITIAL LOAD
 ========================================================= */
 
-init();
+loadOptimizerState();
+
+/*
+ * Always read Calculator first.
+ */
+
+syncFromCalculator(false);
+
+renderAll();
 
 </script>
+
 </body>
 </html>
