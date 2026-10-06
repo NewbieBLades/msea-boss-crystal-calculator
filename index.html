@@ -732,77 +732,93 @@
     <section class="dashboard">
 
         <div class="card">
+
             <div class="card-label">
                 Character Crystals
             </div>
 
-            <div class="card-value"
-                 id="characterCrystals">
+            <div
+                class="card-value"
+                id="characterCrystals">
                 0
             </div>
 
             <div class="card-sub">
-                Maximum 12 clears
+                Maximum 12 selected
             </div>
+
         </div>
 
 
         <div class="card">
+
             <div class="card-label">
                 Character Remaining
             </div>
 
-            <div class="card-value"
-                 id="characterRemaining">
+            <div
+                class="card-value"
+                id="characterRemaining">
                 12
             </div>
 
             <div class="card-sub">
-                Boss Crystal slots
+                Boss Crystal sell slots
             </div>
+
         </div>
 
 
         <div class="card">
+
             <div class="card-label">
                 Character Total
             </div>
 
-            <div class="card-value"
-                 id="characterTotal">
+            <div
+                class="card-value"
+                id="characterTotal">
                 0
             </div>
 
             <div class="card-sub">
                 Meso per person
             </div>
+
         </div>
 
 
         <div class="card">
+
             <div class="card-label">
                 Account Total
             </div>
 
-            <div class="card-value"
-                 id="accountTotal">
+            <div
+                class="card-value"
+                id="accountTotal">
                 0
             </div>
 
             <div class="card-sub">
                 <span id="accountCrystalText">
-                    0 / 90 Boss Crystals
+                    0 selected · 90 sell limit
                 </span>
             </div>
 
             <div class="progress-wrap">
+
                 <div class="progress">
+
                     <div
                         class="progress-bar"
                         id="accountProgress">
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
     </section>
@@ -884,7 +900,7 @@
                 <div
                     class="card-sub"
                     id="weeklyAnnualSub">
-                    0 / 90 weekly crystals × 52 weeks
+                    0 selected weekly crystals × 52 weeks
                 </div>
 
             </div>
@@ -1087,6 +1103,7 @@
 
                 <div class="section-subtitle">
                     Maximum 12 Boss Crystals per character
+                    · Account selection is unlimited
                     · Each boss can be cleared up to 2 times
                 </div>
 
@@ -1167,6 +1184,12 @@
 
 const MAX_BOSSES_PER_CHARACTER = 12;
 
+/*
+    This is NOT a selection limit.
+
+    It represents the maximum number of weekly Boss Crystals
+    that can eventually be sold/optimized for the account.
+*/
 const MAX_ACCOUNT_CRYSTALS = 90;
 
 const MAX_CLEARS_PER_BOSS = 2;
@@ -1191,7 +1214,7 @@ const defaultBosses = [
             { name: "EX", value: 9080 }
         ]
     },
-   
+
     {
         id: "lotus",
         name: "Lotus",
@@ -1754,7 +1777,9 @@ function migrateOldSelections() {
                     account.characters
                 )
             ) {
+
                 account.characters = [];
+
             }
 
 
@@ -2239,11 +2264,14 @@ function getCharacterTotal(
             const boss =
                 getBoss(bossId);
 
+
             if (
                 !boss ||
                 boss.type !== "Weekly"
             ) {
+
                 return;
+
             }
 
 
@@ -2370,7 +2398,9 @@ function getCharacterBlackMageMonthlyTotal(
                 !difficulty ||
                 difficulty.value === null
             ) {
+
                 return;
+
             }
 
 
@@ -2476,20 +2506,26 @@ function getAnnualWeeklyIncome() {
 }
 
 
+/*
+    Fixed automatic-semicolon issue from previous version.
+*/
+
 function getAnnualBlackMageIncome() {
 
-    return
+    return (
         getAccountBlackMageMonthlyTotal() *
-        12;
+        12
+    );
 
 }
 
 
 function getAnnualTotalIncome() {
 
-    return
+    return (
         getAnnualWeeklyIncome() +
-        getAnnualBlackMageIncome();
+        getAnnualBlackMageIncome()
+    );
 
 }
 
@@ -2563,10 +2599,12 @@ function selectDifficulty(
     }
 
     /*
-        x1 -> x2 normally.
+        x1 -> x2
 
-        If character/account is full,
-        x1 becomes deselect.
+        IMPORTANT:
+        Character limit still applies.
+
+        Account 90 limit DOES NOT apply.
     */
 
     else if (
@@ -2579,42 +2617,28 @@ function selectDifficulty(
             );
 
 
-        const accountCount =
-            getAccountCrystalCount();
-
-
         const characterFull =
             !isMonthlyBoss(boss) &&
             characterCount >=
                 MAX_BOSSES_PER_CHARACTER;
 
 
-        const accountFull =
-            !isMonthlyBoss(boss) &&
-            accountCount >=
-                MAX_ACCOUNT_CRYSTALS;
-
-
         if (
-            characterFull ||
-            accountFull
+            characterFull
         ) {
 
-            selections =
-                selections.filter(
-                    item =>
-                        item !== difficulty
-                );
-
-        }
-
-        else {
-
-            selections.push(
-                difficulty
+            showToast(
+                `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
             );
 
+            return;
+
         }
+
+
+        selections.push(
+            difficulty
+        );
 
     }
 
@@ -2630,9 +2654,9 @@ function selectDifficulty(
             );
 
 
-        const accountCount =
-            getAccountCrystalCount();
-
+        /*
+            Character limit remains 12.
+        */
 
         if (
             !isMonthlyBoss(boss) &&
@@ -2649,20 +2673,9 @@ function selectDifficulty(
         }
 
 
-        if (
-            !isMonthlyBoss(boss) &&
-            accountCount >=
-            MAX_ACCOUNT_CRYSTALS
-        ) {
-
-            showToast(
-                `Account limit reached: ${MAX_ACCOUNT_CRYSTALS} Boss Crystals.`
-            );
-
-            return;
-
-        }
-
+        /*
+            Maximum 2 clears for the same boss.
+        */
 
         if (
             currentBossClears >=
@@ -2787,7 +2800,7 @@ function renderAccounts() {
                 </span>
 
                 <span class="account-tab-count">
-                    ${crystalCount}/${MAX_ACCOUNT_CRYSTALS}
+                    ${crystalCount} selected
                 </span>
 
             `;
@@ -2977,11 +2990,23 @@ function renderDashboard() {
         );
 
 
+    /*
+        Account can now exceed 90 selections.
+
+        90 is displayed as the future sell/optimization
+        limit rather than a selection limit.
+    */
+
     document.getElementById(
         "accountCrystalText"
     ).textContent =
-        `${accountCrystals} / ${MAX_ACCOUNT_CRYSTALS} Boss Crystals`;
+        `${accountCrystals} selected · ${MAX_ACCOUNT_CRYSTALS} sell limit`;
 
+
+    /*
+        Progress bar stops at 100% once 90 is reached.
+        Selection itself is NOT blocked.
+    */
 
     const percentage =
         Math.min(
@@ -3063,7 +3088,7 @@ function renderMonthlyDashboard() {
     document.getElementById(
         "weeklyAnnualSub"
     ).textContent =
-        `${weeklyCrystals} / ${MAX_ACCOUNT_CRYSTALS} weekly crystals × 52 weeks`;
+        `${weeklyCrystals} selected weekly crystals × 52 weeks · ${MAX_ACCOUNT_CRYSTALS} sell limit`;
 
 
     document.getElementById(
@@ -3140,10 +3165,6 @@ function renderBossList(
         );
 
 
-    const accountCount =
-        getAccountCrystalCount();
-
-
     const bosses =
         defaultBosses.filter(
             boss =>
@@ -3211,16 +3232,17 @@ function renderBossList(
                 isMonthlyBoss(boss);
 
 
+            /*
+                Only the CHARACTER limit can disable
+                a new weekly selection.
+
+                There is NO account 90 selection limit.
+            */
+
             const characterLimitReached =
                 !isMonthly &&
                 characterCount >=
                 MAX_BOSSES_PER_CHARACTER;
-
-
-            const accountLimitReached =
-                !isMonthly &&
-                accountCount >=
-                MAX_ACCOUNT_CRYSTALS;
 
 
             let difficultyHtml = "";
@@ -3236,22 +3258,18 @@ function renderBossList(
 
 
                     /*
-                        Existing selections are NEVER
-                        disabled.
+                        Existing selections remain clickable
+                        so they can always be removed.
 
-                        This allows x1/x2 selections to
-                        always be clicked and removed,
-                        even at 12/12 or 90/90.
-
-                        Monthly bosses ignore weekly
-                        character/account limits.
+                        New selections are disabled only when:
+                        1. Character has 12 weekly crystals, OR
+                        2. This boss already has 2 clears.
                     */
 
                     const disabled =
                         count === 0 &&
                         (
                             characterLimitReached ||
-                            accountLimitReached ||
                             bossClearCount >=
                             MAX_CLEARS_PER_BOSS
                         );
