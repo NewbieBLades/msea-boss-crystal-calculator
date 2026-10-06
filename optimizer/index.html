@@ -1,1 +1,3290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>MSEA Boss Crystal Optimizer</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #0f1117;
+        color: #f1f3f5;
+    }
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
+
+    .container {
+        width: min(1400px, calc(100% - 30px));
+        margin: 0 auto;
+        padding: 24px 0 50px;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .main-header {
+        margin-bottom: 24px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .header-content {
+        min-width: 0;
+    }
+
+    .main-header h1 {
+        margin: 0 0 6px;
+        font-size: 30px;
+    }
+
+    .main-header p {
+        margin: 0;
+        color: #9aa1ad;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .header-buttons {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .header-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #242934;
+        color: #fff;
+        border: 1px solid #7c5cff;
+        border-radius: 8px;
+        padding: 10px 16px;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.15s;
+    }
+
+    .header-button:hover {
+        background: #332a5d;
+        border-color: #927cff;
+    }
+
+    /* =========================
+       DASHBOARD
+    ========================= */
+
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .card {
+        background: #171a22;
+        border: 1px solid #292e3a;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .card-label {
+        color: #9aa1ad;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .card-value {
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .card-sub {
+        color: #777f8d;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .positive {
+        color: #8ee6a7;
+    }
+
+    .negative {
+        color: #ff9d9d;
+    }
+
+    /* =========================
+       SECTION
+    ========================= */
+
+    .section {
+        background: #171a22;
+        border: 1px solid #292e3a;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid #292e3a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .section-subtitle {
+        color: #777f8d;
+        font-size: 12px;
+        margin-top: 3px;
+        line-height: 1.5;
+    }
+
+    .section-body {
+        padding: 16px;
+    }
+
+    /* =========================
+       TOOLBAR
+    ========================= */
+
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        background: #242934;
+        color: #fff;
+        border: 1px solid #373e4c;
+        border-radius: 8px;
+        padding: 9px 12px;
+        cursor: pointer;
+        transition: 0.15s;
+    }
+
+    .btn:hover {
+        background: #2c3240;
+    }
+
+    .btn.primary {
+        background: #6650d9;
+        border-color: #7c5cff;
+    }
+
+    .btn.primary:hover {
+        background: #7560e8;
+    }
+
+    .btn.danger {
+        color: #ff9d9d;
+    }
+
+    /* =========================
+       CHARACTER SETUP
+    ========================= */
+
+    .character-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    .character-card {
+        background: #14171e;
+        border: 1px solid #292e3a;
+        border-radius: 10px;
+        padding: 14px;
+    }
+
+    .character-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .character-name {
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .character-number {
+        color: #777f8d;
+        font-size: 11px;
+    }
+
+    .character-controls {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .input,
+    .select {
+        width: 100%;
+        background: #0f1117;
+        border: 1px solid #303642;
+        color: #fff;
+        border-radius: 8px;
+        padding: 9px 10px;
+        outline: none;
+    }
+
+    .input:focus,
+    .select:focus {
+        border-color: #7c5cff;
+    }
+
+    .character-status {
+        margin-top: 10px;
+        color: #777f8d;
+        font-size: 12px;
+    }
+
+    /* =========================
+       BOSS CONFIG
+    ========================= */
+
+    .boss-list {
+        padding: 8px 16px 16px;
+    }
+
+    .boss-row {
+        display: grid;
+        grid-template-columns:
+            minmax(190px, 1fr)
+            minmax(400px, 3fr);
+        align-items: center;
+        gap: 16px;
+        padding: 13px 0;
+        border-bottom: 1px solid #242934;
+    }
+
+    .boss-row:last-child {
+        border-bottom: none;
+    }
+
+    .boss-name {
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+    }
+
+    .boss-icon {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        border-radius: 7px;
+        flex-shrink: 0;
+        background: #11141a;
+        border: 1px solid #303642;
+    }
+
+    .boss-name-text {
+        min-width: 0;
+    }
+
+    .boss-type {
+        display: inline-block;
+        margin-left: 7px;
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-size: 10px;
+        color: #9da4b1;
+        background: #242934;
+        vertical-align: middle;
+    }
+
+    .difficulty-config {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .difficulty-box {
+        background: #11141a;
+        border: 1px solid #303642;
+        border-radius: 8px;
+        padding: 8px;
+        min-width: 125px;
+    }
+
+    .difficulty-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .difficulty-value {
+        color: #8d95a3;
+        font-size: 11px;
+        font-weight: 400;
+    }
+
+    .difficulty-party {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .difficulty-party span {
+        color: #777f8d;
+        font-size: 11px;
+    }
+
+    .party-select {
+        width: 58px;
+        background: #0f1117;
+        color: #fff;
+        border: 1px solid #303642;
+        border-radius: 7px;
+        padding: 6px 5px;
+        outline: none;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .party-select:focus {
+        border-color: #7c5cff;
+    }
+
+    /* =========================
+       RESULTS
+    ========================= */
+
+    .result-character {
+        margin-bottom: 16px;
+        border: 1px solid #292e3a;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #14171e;
+    }
+
+    .result-character:last-child {
+        margin-bottom: 0;
+    }
+
+    .result-header {
+        padding: 13px 14px;
+        background: #171a22;
+        border-bottom: 1px solid #292e3a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .result-character-name {
+        font-weight: 700;
+    }
+
+    .result-character-total {
+        font-weight: 700;
+    }
+
+    .result-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .result-table th,
+    .result-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #242934;
+        text-align: left;
+        font-size: 12px;
+    }
+
+    .result-table th {
+        color: #777f8d;
+        font-weight: 600;
+        background: #11141a;
+    }
+
+    .result-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .result-meso {
+        text-align: right !important;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .result-party {
+        color: #9da4b1;
+    }
+
+    .rank-number {
+        color: #777f8d;
+        width: 35px;
+    }
+
+    .empty {
+        padding: 35px 15px;
+        text-align: center;
+        color: #777f8d;
+    }
+
+    /* =========================
+       CURRENT SETUP
+    ========================= */
+
+    .current-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .current-card {
+        background: #14171e;
+        border: 1px solid #292e3a;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .current-card-header {
+        padding: 11px 13px;
+        border-bottom: 1px solid #292e3a;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .current-card-body {
+        padding: 12px 13px;
+    }
+
+    .current-boss {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid #242934;
+        font-size: 12px;
+    }
+
+    .current-boss:last-child {
+        border-bottom: none;
+    }
+
+    /* =========================
+       INFO
+    ========================= */
+
+    .info-box {
+        background: #14171e;
+        border: 1px solid #292e3a;
+        border-radius: 9px;
+        padding: 13px;
+        color: #9da4b1;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .info-box strong {
+        color: #fff;
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+
+    .toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        background: #242934;
+        border: 1px solid #424958;
+        color: #fff;
+        padding: 12px 15px;
+        border-radius: 9px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        transition: 0.2s;
+        z-index: 1000;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 1050px) {
+
+        .dashboard {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .character-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .boss-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 700px) {
+
+        .container {
+            width: min(100% - 20px, 1400px);
+            padding-top: 15px;
+        }
+
+        .main-header {
+            flex-direction: column;
+        }
+
+        .header-buttons {
+            width: 100%;
+        }
+
+        .header-button {
+            flex: 1;
+        }
+
+        .dashboard {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .character-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .current-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .result-table {
+            min-width: 650px;
+        }
+
+        .result-character {
+            overflow-x: auto;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <header class="main-header">
+
+        <div class="header-content">
+
+            <h1>MSEA Boss Crystal Optimizer</h1>
+
+            <p>
+                Find the highest-meso weekly Boss Crystal setup
+                for each character based on party size.
+            </p>
+
+        </div>
+
+        <div class="header-buttons">
+
+            <a
+                href="../"
+                class="header-button"
+            >
+                Calculator
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- DASHBOARD -->
+
+    <section class="dashboard">
+
+        <div class="card">
+
+            <div class="card-label">
+                Current Weekly Income
+            </div>
+
+            <div
+                class="card-value"
+                id="currentIncome"
+            >
+                0
+            </div>
+
+            <div class="card-sub">
+                All configured characters
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Optimized Weekly Income
+            </div>
+
+            <div
+                class="card-value"
+                id="optimizedIncome"
+            >
+                0
+            </div>
+
+            <div class="card-sub">
+                Maximum possible from available bosses
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Potential Gain
+            </div>
+
+            <div
+                class="card-value positive"
+                id="potentialGain"
+            >
+                0
+            </div>
+
+            <div class="card-sub">
+                Optimized − current
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Characters
+            </div>
+
+            <div
+                class="card-value"
+                id="characterCount"
+            >
+                0
+            </div>
+
+            <div class="card-sub">
+                12 weekly crystals each
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CHARACTER SETUP -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-title">
+                    Characters
+                </div>
+
+                <div class="section-subtitle">
+                    Add the characters you want to optimize.
+                    Each character can use up to 12 weekly Boss Crystals.
+                </div>
+
+            </div>
+
+            <div class="toolbar">
+
+                <button
+                    class="btn primary"
+                    onclick="addCharacter()"
+                >
+                    + Add Character
+                </button>
+
+                <button
+                    class="btn"
+                    onclick="loadExampleData()"
+                >
+                    Example Data
+                </button>
+
+                <button
+                    class="btn danger"
+                    onclick="resetOptimizer()"
+                >
+                    Reset
+                </button>
+
+            </div>
+
+        </div>
+
+        <div
+            class="section-body"
+            id="characterGrid"
+        ></div>
+
+    </section>
+
+
+    <!-- PARTY SIZE CONFIGURATION -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-title">
+                    Party Size Configuration
+                </div>
+
+                <div class="section-subtitle">
+                    Set the party size separately for every boss difficulty.
+                    The optimizer uses value ÷ party size as your meso per person.
+                </div>
+
+            </div>
+
+            <button
+                class="btn"
+                onclick="setAllPartySizes(1)"
+            >
+                Set All to 1
+            </button>
+
+        </div>
+
+        <div
+            class="boss-list"
+            id="bossConfig"
+        ></div>
+
+    </section>
+
+
+    <!-- OPTIMIZE -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-title">
+                    Optimization
+                </div>
+
+                <div class="section-subtitle">
+                    The optimizer selects the 12 highest-value weekly clears
+                    for each character. Each boss difficulty can be selected up to 2 times.
+                </div>
+
+            </div>
+
+            <button
+                class="btn primary"
+                onclick="optimizeAll()"
+            >
+                Optimize All Characters
+            </button>
+
+        </div>
+
+        <div
+            class="section-body"
+            id="optimizerResults"
+        >
+
+            <div class="empty">
+                Click "Optimize All Characters" to generate the best setup.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CURRENT VS OPTIMIZED -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-title">
+                    Current vs Optimized
+                </div>
+
+                <div class="section-subtitle">
+                    This standalone optimizer uses its own saved setup.
+                    It does not modify your Calculator.
+                </div>
+
+            </div>
+
+        </div>
+
+        <div
+            class="section-body"
+            id="comparison"
+        >
+
+            <div class="empty">
+                No optimization has been calculated yet.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MONTHLY -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-title">
+                    Monthly Income
+                </div>
+
+                <div class="section-subtitle">
+                    Black Mage is treated separately because it is a monthly boss.
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="section-body">
+
+            <div class="info-box">
+
+                <strong>Black Mage:</strong>
+                This optimizer keeps Black Mage outside the 12 weekly
+                Boss Crystal slots. Monthly income is calculated separately
+                using the same values and party-size system as the Calculator.
+
+            </div>
+
+            <div
+                style="height:12px"
+            ></div>
+
+            <div class="current-grid">
+
+                <div class="current-card">
+
+                    <div class="current-card-header">
+                        <span>Monthly</span>
+                        <strong id="blackMageMonthly">
+                            0
+                        </strong>
+                    </div>
+
+                    <div
+                        class="current-card-body"
+                        id="blackMageMonthlyDetails"
+                    >
+                        No Black Mage selections.
+                    </div>
+
+                </div>
+
+
+                <div class="current-card">
+
+                    <div class="current-card-header">
+                        <span>Annual</span>
+                        <strong id="blackMageAnnual">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="current-card-body">
+                        Monthly Black Mage income × 12
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- INFORMATION -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div class="section-title">
+                How the Optimizer Works
+            </div>
+
+        </div>
+
+        <div class="section-body">
+
+            <div class="info-box">
+
+                <strong>1.</strong>
+                Every weekly boss difficulty is treated as a possible clear.
+
+                <br><br>
+
+                <strong>2.</strong>
+                Each difficulty can be cleared up to 2 times.
+
+                <br><br>
+
+                <strong>3.</strong>
+                Your actual income is calculated as:
+
+                <br>
+
+                <strong>
+                    Boss Crystal Value ÷ Party Size
+                </strong>
+
+                <br><br>
+
+                <strong>4.</strong>
+                The optimizer sorts all possible clears from highest
+                meso-per-person to lowest.
+
+                <br><br>
+
+                <strong>5.</strong>
+                It then takes the best 12 clears for each character.
+
+                <br><br>
+
+                <strong>6.</strong>
+                Monthly Black Mage income is not counted toward the
+                12 weekly crystal slots.
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+
+/* =========================
+   SETTINGS
+========================= */
+
+const MAX_BOSSES_PER_CHARACTER = 12;
+const MAX_CLEARS_PER_BOSS = 2;
+
+const STORAGE_KEY =
+    "msea_boss_crystal_optimizer_v1";
+
+
+/* =========================
+   BOSS DATA
+   SAME VALUES AS CALCULATOR
+========================= */
+
+const defaultBosses = [
+
+    {
+        id: "blackmage",
+        name: "Black Mage",
+        icon: "../images/BlackMage.png",
+        type: "Monthly",
+        difficulties: [
+            { name: "H", value: 992 },
+            { name: "EX", value: 9080 }
+        ]
+    },
+
+    {
+        id: "lotus",
+        name: "Lotus",
+        icon: "../images/Lotus.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 21.87 },
+            { name: "H", value: 71 },
+            { name: "EX", value: 588 }
+        ]
+    },
+
+    {
+        id: "damien",
+        name: "Damien",
+        icon: "../images/Damien.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 22.86 },
+            { name: "H", value: 67.5 }
+        ]
+    },
+
+    {
+        id: "slime",
+        name: "Slime",
+        icon: "../images/Slime.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 29.6 },
+            { name: "C", value: 99.9 }
+        ]
+    },
+
+    {
+        id: "lucid",
+        name: "Lucid",
+        icon: "../images/Lucid.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 35.6 },
+            { name: "N", value: 43.2 },
+            { name: "H", value: 85 }
+        ]
+    },
+
+    {
+        id: "will",
+        name: "Will",
+        icon: "../images/Will.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 38.7 },
+            { name: "N", value: 50.4 },
+            { name: "H", value: 104.4 }
+        ]
+    },
+
+    {
+        id: "dusk",
+        name: "Dusk",
+        icon: "../images/Dusk.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 54 },
+            { name: "H", value: 94.5 }
+        ]
+    },
+
+    {
+        id: "heretic",
+        name: "Heretic",
+        icon: "../images/Heretic.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 96.3 },
+            { name: "H", value: 139.7 }
+        ]
+    },
+
+    {
+        id: "djunkel",
+        name: "Djunkel",
+        icon: "../images/Djunkel.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 58.5 },
+            { name: "H", value: 124.2 }
+        ]
+    },
+
+    {
+        id: "seren",
+        name: "Seren",
+        icon: "../images/Seren.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 289.8 },
+            { name: "H", value: 423 },
+            { name: "EX", value: 2280 }
+        ]
+    },
+
+    {
+        id: "kalos",
+        name: "Kalos",
+        icon: "../images/Kalos.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 338.8 },
+            { name: "N", value: 495 },
+            { name: "C", value: 1056 },
+            { name: "EX", value: 2565 }
+        ]
+    },
+
+    {
+        id: "adversary",
+        name: "Adversary",
+        icon: "../images/Adversary.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 361 },
+            { name: "N", value: 530 },
+            { name: "H", value: 1260 },
+            { name: "EX", value: 2920 }
+        ]
+    },
+
+    {
+        id: "radiant",
+        name: "Radiant",
+        icon: "../images/Radiant.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 594 },
+            { name: "H", value: 2256 }
+        ]
+    },
+
+    {
+        id: "carling",
+        name: "Carling",
+        icon: "../images/Carling.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: 368.2 },
+            { name: "N", value: 577.5 },
+            { name: "H", value: 1232 },
+            { name: "EX", value: 3040 }
+        ]
+    },
+
+    {
+        id: "bellona",
+        name: "Bellona",
+        icon: "../images/Bellona.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "E", value: null },
+            { name: "N", value: null },
+            { name: "H", value: null }
+        ]
+    },
+
+    {
+        id: "limbo",
+        name: "Limbo",
+        icon: "../images/Limbo.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 900 },
+            { name: "H", value: 1930 }
+        ]
+    },
+
+    {
+        id: "baldrix",
+        name: "Baldrix",
+        icon: "../images/Baldrix.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 1200 },
+            { name: "H", value: 2160 }
+        ]
+    },
+
+    {
+        id: "jupiter",
+        name: "Jupiter",
+        icon: "../images/Jupiter.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 1360 },
+            { name: "H", value: 3000 }
+        ]
+    }
+
+];
+
+
+/* =========================
+   STATE
+========================= */
+
+let state = {
+    characters: [],
+    partySizes: {},
+    optimized: {}
+};
+
+
+/* =========================
+   INITIALIZATION
+========================= */
+
+function init() {
+
+    loadState();
+
+    if (
+        !state.characters.length
+    ) {
+        createInitialCharacter();
+    }
+
+    renderAll();
+}
+
+
+/* =========================
+   ID
+========================= */
+
+function generateId() {
+
+    return (
+        Date.now().toString(36) +
+        Math.random()
+            .toString(36)
+            .slice(2)
+    );
+}
+
+
+/* =========================
+   CHARACTER
+========================= */
+
+function createInitialCharacter() {
+
+    state.characters.push({
+        id: generateId(),
+        name: "Character 1",
+        current: []
+    });
+}
+
+
+function addCharacter() {
+
+    let number =
+        state.characters.length + 1;
+
+    let name =
+        `Character ${number}`;
+
+    while (
+        state.characters.some(
+            character =>
+                character.name === name
+        )
+    ) {
+        number++;
+
+        name =
+            `Character ${number}`;
+    }
+
+    state.characters.push({
+        id: generateId(),
+        name: name,
+        current: []
+    });
+
+    saveState();
+    renderAll();
+
+    showToast(
+        `${name} added.`
+    );
+}
+
+
+function removeCharacter(
+    characterId
+) {
+
+    if (
+        state.characters.length <= 1
+    ) {
+        showToast(
+            "You must keep at least one character."
+        );
+
+        return;
+    }
+
+    const character =
+        state.characters.find(
+            item =>
+                item.id === characterId
+        );
+
+    if (!character) {
+        return;
+    }
+
+    state.characters =
+        state.characters.filter(
+            item =>
+                item.id !== characterId
+        );
+
+    delete state.optimized[
+        characterId
+    ];
+
+    saveState();
+    renderAll();
+
+    showToast(
+        `${character.name} removed.`
+    );
+}
+
+
+function renameCharacter(
+    characterId
+) {
+
+    const character =
+        state.characters.find(
+            item =>
+                item.id === characterId
+        );
+
+    if (!character) {
+        return;
+    }
+
+    const newName =
+        prompt(
+            "Enter character name:",
+            character.name
+        );
+
+    if (
+        newName === null
+    ) {
+        return;
+    }
+
+    const trimmed =
+        newName.trim();
+
+    if (!trimmed) {
+        showToast(
+            "Character name cannot be empty."
+        );
+
+        return;
+    }
+
+    character.name =
+        trimmed;
+
+    saveState();
+    renderAll();
+}
+
+
+/* =========================
+   BOSS HELPERS
+========================= */
+
+function getBoss(
+    bossId
+) {
+
+    return defaultBosses.find(
+        boss =>
+            boss.id === bossId
+    );
+}
+
+
+function getDifficulty(
+    bossId,
+    difficultyName
+) {
+
+    const boss =
+        getBoss(bossId);
+
+    if (!boss) {
+        return null;
+    }
+
+    return boss.difficulties.find(
+        difficulty =>
+            difficulty.name ===
+            difficultyName
+    );
+}
+
+
+function getPartySize(
+    bossId,
+    difficulty
+) {
+
+    const key =
+        bossId +
+        ":" +
+        difficulty;
+
+    return (
+        Number(
+            state.partySizes[key]
+        ) || 1
+    );
+}
+
+
+function setPartySize(
+    bossId,
+    difficulty,
+    value
+) {
+
+    const key =
+        bossId +
+        ":" +
+        difficulty;
+
+    state.partySizes[key] =
+        Number(value) || 1;
+
+    saveState();
+
+    renderDashboard();
+    renderBossConfig();
+    renderResults();
+    renderComparison();
+    renderMonthly();
+}
+
+
+/* =========================
+   CURRENT SELECTIONS
+========================= */
+
+function getCurrentSelectionCount(
+    character,
+    bossId,
+    difficulty
+) {
+
+    if (
+        !Array.isArray(
+            character.current
+        )
+    ) {
+        return 0;
+    }
+
+    return character.current.filter(
+        item =>
+            item.bossId === bossId &&
+            item.difficulty === difficulty
+    ).length;
+}
+
+
+function getCurrentWeeklySelections(
+    character
+) {
+
+    if (
+        !Array.isArray(
+            character.current
+        )
+    ) {
+        return [];
+    }
+
+    return character.current.filter(
+        item => {
+
+            const boss =
+                getBoss(
+                    item.bossId
+                );
+
+            return (
+                boss &&
+                boss.type === "Weekly"
+            );
+        }
+    );
+}
+
+
+function getCurrentWeeklyIncome(
+    character
+) {
+
+    return getCurrentWeeklySelections(
+        character
+    ).reduce(
+        (
+            total,
+            item
+        ) => {
+
+            const difficulty =
+                getDifficulty(
+                    item.bossId,
+                    item.difficulty
+                );
+
+            if (
+                !difficulty ||
+                difficulty.value === null
+            ) {
+                return total;
+            }
+
+            return (
+                total +
+                (
+                    difficulty.value /
+                    getPartySize(
+                        item.bossId,
+                        item.difficulty
+                    )
+                )
+            );
+        },
+        0
+    );
+}
+
+
+/* =========================
+   OPTIMIZATION
+========================= */
+
+function getAllPossibleWeeklyClears() {
+
+    const possible = [];
+
+    defaultBosses
+        .filter(
+            boss =>
+                boss.type === "Weekly"
+        )
+        .forEach(
+            boss => {
+
+                boss.difficulties.forEach(
+                    difficulty => {
+
+                        if (
+                            difficulty.value === null ||
+                            !Number.isFinite(
+                                Number(
+                                    difficulty.value
+                                )
+                            )
+                        ) {
+                            return;
+                        }
+
+                        const partySize =
+                            getPartySize(
+                                boss.id,
+                                difficulty.name
+                            );
+
+                        const mesoPerPerson =
+                            difficulty.value /
+                            partySize;
+
+                        for (
+                            let clear = 1;
+                            clear <= MAX_CLEARS_PER_BOSS;
+                            clear++
+                        ) {
+
+                            possible.push({
+
+                                bossId:
+                                    boss.id,
+
+                                bossName:
+                                    boss.name,
+
+                                difficulty:
+                                    difficulty.name,
+
+                                value:
+                                    Number(
+                                        difficulty.value
+                                    ),
+
+                                partySize:
+                                    partySize,
+
+                                mesoPerPerson:
+                                    mesoPerPerson,
+
+                                clearNumber:
+                                    clear
+
+                            });
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    return possible;
+}
+
+
+function optimizeCharacter(
+    character
+) {
+
+    const possible =
+        getAllPossibleWeeklyClears();
+
+    possible.sort(
+        (
+            a,
+            b
+        ) => {
+
+            if (
+                b.mesoPerPerson !==
+                a.mesoPerPerson
+            ) {
+                return (
+                    b.mesoPerPerson -
+                    a.mesoPerPerson
+                );
+            }
+
+            if (
+                b.value !==
+                a.value
+            ) {
+                return (
+                    b.value -
+                    a.value
+                );
+            }
+
+            return (
+                a.bossName.localeCompare(
+                    b.bossName
+                )
+            );
+        }
+    );
+
+
+    const result =
+        possible.slice(
+            0,
+            MAX_BOSSES_PER_CHARACTER
+        );
+
+
+    return result;
+}
+
+
+function optimizeAll() {
+
+    state.optimized = {};
+
+    state.characters.forEach(
+        character => {
+
+            state.optimized[
+                character.id
+            ] =
+                optimizeCharacter(
+                    character
+                );
+
+        }
+    );
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        "Optimization complete."
+    );
+}
+
+
+/* =========================
+   INCOME
+========================= */
+
+function getOptimizedCharacterIncome(
+    characterId
+) {
+
+    const selections =
+        state.optimized[
+            characterId
+        ];
+
+    if (
+        !Array.isArray(
+            selections
+        )
+    ) {
+        return 0;
+    }
+
+    return selections.reduce(
+        (
+            total,
+            item
+        ) =>
+            total +
+            item.mesoPerPerson,
+        0
+    );
+}
+
+
+function getCurrentIncome() {
+
+    return state.characters.reduce(
+        (
+            total,
+            character
+        ) =>
+            total +
+            getCurrentWeeklyIncome(
+                character
+            ),
+        0
+    );
+}
+
+
+function getOptimizedIncome() {
+
+    return state.characters.reduce(
+        (
+            total,
+            character
+        ) =>
+            total +
+            getOptimizedCharacterIncome(
+                character.id
+            ),
+        0
+    );
+}
+
+
+/* =========================
+   BLACK MAGE
+========================= */
+
+function getBlackMageMonthlyIncome() {
+
+    let total = 0;
+
+    state.characters.forEach(
+        character => {
+
+            if (
+                !Array.isArray(
+                    character.current
+                )
+            ) {
+                return;
+            }
+
+            character.current
+                .filter(
+                    item =>
+                        item.bossId ===
+                        "blackmage"
+                )
+                .forEach(
+                    item => {
+
+                        const difficulty =
+                            getDifficulty(
+                                "blackmage",
+                                item.difficulty
+                            );
+
+                        if (
+                            !difficulty ||
+                            difficulty.value === null
+                        ) {
+                            return;
+                        }
+
+                        total +=
+                            difficulty.value /
+                            getPartySize(
+                                "blackmage",
+                                item.difficulty
+                            );
+
+                    }
+                );
+
+        }
+    );
+
+    return total;
+}
+
+
+/* =========================
+   FORMAT
+========================= */
+
+function formatMeso(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(
+            Number(value)
+        )
+    ) {
+        return "—";
+    }
+
+    value =
+        Number(value);
+
+    if (
+        value >= 1000
+    ) {
+
+        return (
+            value / 1000
+        ).toFixed(
+            value % 1000 === 0
+                ? 0
+                : 2
+        ) + "b";
+
+    }
+
+    return (
+        value.toFixed(
+            Number.isInteger(value)
+                ? 0
+                : 2
+        ) + "m"
+    );
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function renderDashboard() {
+
+    const current =
+        getCurrentIncome();
+
+    const optimized =
+        getOptimizedIncome();
+
+    const gain =
+        optimized -
+        current;
+
+    document.getElementById(
+        "currentIncome"
+    ).textContent =
+        formatMeso(current);
+
+    document.getElementById(
+        "optimizedIncome"
+    ).textContent =
+        formatMeso(optimized);
+
+    document.getElementById(
+        "potentialGain"
+    ).textContent =
+        (
+            gain >= 0
+                ? "+"
+                : ""
+        ) +
+        formatMeso(gain);
+
+    document.getElementById(
+        "potentialGain"
+    ).className =
+        "card-value " +
+        (
+            gain >= 0
+                ? "positive"
+                : "negative"
+        );
+
+    document.getElementById(
+        "characterCount"
+    ).textContent =
+        state.characters.length;
+}
+
+
+/* =========================
+   CHARACTER RENDER
+========================= */
+
+function renderCharacters() {
+
+    const container =
+        document.getElementById(
+            "characterGrid"
+        );
+
+    container.innerHTML = "";
+
+    state.characters.forEach(
+        (
+            character,
+            index
+        ) => {
+
+            const currentCount =
+                getCurrentWeeklySelections(
+                    character
+                ).length;
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "character-card";
+
+            card.innerHTML = `
+
+                <div class="character-card-header">
+
+                    <div>
+
+                        <div class="character-name">
+                            ${escapeHtml(
+                                character.name
+                            )}
+                        </div>
+
+                        <div class="character-number">
+                            Character ${index + 1}
+                        </div>
+
+                    </div>
+
+                    <button
+                        class="btn danger"
+                        onclick="
+                            removeCharacter(
+                                '${character.id}'
+                            )
+                        "
+                    >
+                        Remove
+                    </button>
+
+                </div>
+
+
+                <div class="character-controls">
+
+                    <input
+                        class="input"
+                        value="${escapeHtml(
+                            character.name
+                        )}"
+                        onchange="
+                            changeCharacterName(
+                                '${character.id}',
+                                this.value
+                            )
+                        "
+                    >
+
+                    <button
+                        class="btn"
+                        onclick="
+                            clearCharacter(
+                                '${character.id}'
+                            )
+                        "
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+
+                <div class="character-status">
+
+                    Current weekly crystals:
+                    <strong>
+                        ${currentCount}/${MAX_BOSSES_PER_CHARACTER}
+                    </strong>
+
+                </div>
+
+            `;
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+}
+
+
+function changeCharacterName(
+    characterId,
+    value
+) {
+
+    const character =
+        state.characters.find(
+            item =>
+                item.id === characterId
+        );
+
+    if (!character) {
+        return;
+    }
+
+    const trimmed =
+        value.trim();
+
+    if (!trimmed) {
+
+        showToast(
+            "Character name cannot be empty."
+        );
+
+        renderCharacters();
+
+        return;
+    }
+
+    character.name =
+        trimmed;
+
+    saveState();
+
+    renderCharacters();
+    renderResults();
+    renderComparison();
+}
+
+
+function clearCharacter(
+    characterId
+) {
+
+    const character =
+        state.characters.find(
+            item =>
+                item.id === characterId
+        );
+
+    if (!character) {
+        return;
+    }
+
+    character.current = [];
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        `${character.name} current setup cleared.`
+    );
+}
+
+
+/* =========================
+   BOSS CONFIG RENDER
+========================= */
+
+function renderBossConfig() {
+
+    const container =
+        document.getElementById(
+            "bossConfig"
+        );
+
+    container.innerHTML = "";
+
+
+    defaultBosses
+        .filter(
+            boss =>
+                boss.type === "Weekly"
+        )
+        .forEach(
+            boss => {
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+                row.className =
+                    "boss-row";
+
+
+                let difficultyHtml =
+                    "";
+
+
+                boss.difficulties.forEach(
+                    difficulty => {
+
+                        const disabled =
+                            difficulty.value === null;
+
+
+                        const partySize =
+                            getPartySize(
+                                boss.id,
+                                difficulty.name
+                            );
+
+
+                        difficultyHtml += `
+
+                            <div
+                                class="difficulty-box"
+                                ${
+                                    disabled
+                                        ? 'style="opacity:0.45"'
+                                        : ""
+                                }
+                            >
+
+                                <div class="difficulty-title">
+
+                                    <span>
+                                        ${escapeHtml(
+                                            difficulty.name
+                                        )}
+                                    </span>
+
+                                    <span class="difficulty-value">
+                                        ${
+                                            difficulty.value === null
+                                                ? "N/A"
+                                                : formatMeso(
+                                                    difficulty.value
+                                                )
+                                        }
+                                    </span>
+
+                                </div>
+
+
+                                <div class="difficulty-party">
+
+                                    <span>
+                                        Party
+                                    </span>
+
+                                    <select
+                                        class="party-select"
+                                        ${
+                                            disabled
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                        onchange="
+                                            setPartySize(
+                                                '${boss.id}',
+                                                '${difficulty.name}',
+                                                this.value
+                                            )
+                                        "
+                                    >
+
+                                        ${
+                                            [1,2,3,4,5,6]
+                                                .map(
+                                                    size =>
+                                                        `
+                                                            <option
+                                                                value="${size}"
+                                                                ${
+                                                                    partySize === size
+                                                                        ? "selected"
+                                                                        : ""
+                                                                }
+                                                            >
+                                                                ${size}
+                                                            </option>
+                                                        `
+                                                )
+                                                .join("")
+                                        }
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                );
+
+
+                row.innerHTML = `
+
+                    <div class="boss-name">
+
+                        <img
+                            class="boss-icon"
+                            src="${escapeHtml(
+                                boss.icon
+                            )}"
+                            alt="${escapeHtml(
+                                boss.name
+                            )}"
+                            loading="lazy"
+                        >
+
+                        <div class="boss-name-text">
+
+                            ${escapeHtml(
+                                boss.name
+                            )}
+
+                            <span class="boss-type">
+                                Weekly
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="difficulty-config">
+
+                        ${difficultyHtml}
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(
+                    row
+                );
+
+            }
+        );
+}
+
+
+/* =========================
+   RESULTS RENDER
+========================= */
+
+function renderResults() {
+
+    const container =
+        document.getElementById(
+            "optimizerResults"
+        );
+
+    container.innerHTML = "";
+
+
+    if (
+        !state.characters.length
+    ) {
+
+        container.innerHTML = `
+            <div class="empty">
+                No characters configured.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    let hasResults = false;
+
+
+    state.characters.forEach(
+        character => {
+
+            const selections =
+                state.optimized[
+                    character.id
+                ];
+
+
+            if (
+                !Array.isArray(
+                    selections
+                )
+            ) {
+                return;
+            }
+
+
+            hasResults = true;
+
+
+            const total =
+                getOptimizedCharacterIncome(
+                    character.id
+                );
+
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+            wrapper.className =
+                "result-character";
+
+
+            let rows = "";
+
+
+            selections.forEach(
+                (
+                    item,
+                    index
+                ) => {
+
+                    rows += `
+
+                        <tr>
+
+                            <td class="rank-number">
+                                ${index + 1}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    item.bossName
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    item.difficulty
+                                )}
+                            </td>
+
+                            <td class="result-party">
+                                ${item.partySize}-man
+                            </td>
+
+                            <td>
+                                ${formatMeso(
+                                    item.value
+                                )}
+                            </td>
+
+                            <td class="result-meso">
+                                ${formatMeso(
+                                    item.mesoPerPerson
+                                )}
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            );
+
+
+            wrapper.innerHTML = `
+
+                <div class="result-header">
+
+                    <div class="result-character-name">
+                        ${escapeHtml(
+                            character.name
+                        )}
+                    </div>
+
+                    <div class="result-character-total">
+                        ${formatMeso(total)}
+                    </div>
+
+                </div>
+
+
+                <table class="result-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Boss
+                            </th>
+
+                            <th>
+                                Difficulty
+                            </th>
+
+                            <th>
+                                Party
+                            </th>
+
+                            <th>
+                                Crystal
+                            </th>
+
+                            <th style="text-align:right">
+                                Per Person
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${rows}
+
+                    </tbody>
+
+                </table>
+
+            `;
+
+
+            container.appendChild(
+                wrapper
+            );
+
+        }
+    );
+
+
+    if (!hasResults) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                Click
+                <strong>
+                    Optimize All Characters
+                </strong>
+                to generate the recommended setup.
+
+            </div>
+
+        `;
+
+    }
+}
+
+
+/* =========================
+   CURRENT VS OPTIMIZED
+========================= */
+
+function renderComparison() {
+
+    const container =
+        document.getElementById(
+            "comparison"
+        );
+
+    container.innerHTML = "";
+
+
+    let hasCharacters = false;
+
+
+    state.characters.forEach(
+        character => {
+
+            hasCharacters = true;
+
+
+            const current =
+                getCurrentWeeklyIncome(
+                    character
+                );
+
+            const optimized =
+                getOptimizedCharacterIncome(
+                    character.id
+                );
+
+            const gain =
+                optimized -
+                current;
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "current-card";
+
+
+            const currentSelections =
+                getCurrentWeeklySelections(
+                    character
+                );
+
+
+            let currentHtml = "";
+
+
+            if (
+                currentSelections.length
+            ) {
+
+                currentSelections.forEach(
+                    item => {
+
+                        const difficulty =
+                            getDifficulty(
+                                item.bossId,
+                                item.difficulty
+                            );
+
+                        if (!difficulty) {
+                            return;
+                        }
+
+                        currentHtml += `
+
+                            <div class="current-boss">
+
+                                <span>
+                                    ${escapeHtml(
+                                        getBoss(
+                                            item.bossId
+                                        ).name
+                                    )}
+                                    ${escapeHtml(
+                                        item.difficulty
+                                    )}
+                                </span>
+
+                                <strong>
+                                    ${formatMeso(
+                                        difficulty.value /
+                                        getPartySize(
+                                            item.bossId,
+                                            item.difficulty
+                                        )
+                                    )}
+                                </strong>
+
+                            </div>
+
+                        `;
+
+                    }
+                );
+
+            }
+            else {
+
+                currentHtml = `
+                    <div
+                        style="
+                            color:#777f8d;
+                            font-size:12px;
+                        "
+                    >
+                        No current weekly clears.
+                    </div>
+                `;
+
+            }
+
+
+            card.innerHTML = `
+
+                <div class="current-card-header">
+
+                    <span>
+                        ${escapeHtml(
+                            character.name
+                        )}
+                    </span>
+
+                    <strong>
+                        ${formatMeso(current)}
+                        →
+                        ${formatMeso(optimized)}
+                    </strong>
+
+                </div>
+
+
+                <div class="current-card-body">
+
+                    ${currentHtml}
+
+                    <div
+                        style="
+                            margin-top:10px;
+                            padding-top:10px;
+                            border-top:1px solid #292e3a;
+                        "
+                    >
+
+                        <span
+                            style="
+                                color:#777f8d;
+                                font-size:12px;
+                            "
+                        >
+                            Potential gain:
+                        </span>
+
+                        <strong
+                            class="${
+                                gain >= 0
+                                    ? "positive"
+                                    : "negative"
+                            }"
+                        >
+                            ${
+                                gain >= 0
+                                    ? "+"
+                                    : ""
+                            }${formatMeso(gain)}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    if (!hasCharacters) {
+
+        container.innerHTML = `
+            <div class="empty">
+                No characters configured.
+            </div>
+        `;
+
+    }
+}
+
+
+/* =========================
+   MONTHLY RENDER
+========================= */
+
+function renderMonthly() {
+
+    const monthly =
+        getBlackMageMonthlyIncome();
+
+    document.getElementById(
+        "blackMageMonthly"
+    ).textContent =
+        formatMeso(monthly);
+
+
+    document.getElementById(
+        "blackMageAnnual"
+    ).textContent =
+        formatMeso(
+            monthly * 12
+        );
+
+
+    const details =
+        document.getElementById(
+            "blackMageMonthlyDetails"
+        );
+
+
+    const boss =
+        getBoss(
+            "blackmage"
+        );
+
+
+    let html = "";
+
+
+    state.characters.forEach(
+        character => {
+
+            const selections =
+                character.current
+                    .filter(
+                        item =>
+                            item.bossId ===
+                            "blackmage"
+                    );
+
+
+            if (!selections.length) {
+                return;
+            }
+
+
+            selections.forEach(
+                item => {
+
+                    const difficulty =
+                        getDifficulty(
+                            "blackmage",
+                            item.difficulty
+                        );
+
+
+                    if (!difficulty) {
+                        return;
+                    }
+
+
+                    html += `
+
+                        <div class="current-boss">
+
+                            <span>
+                                ${escapeHtml(
+                                    character.name
+                                )}
+                                -
+                                ${escapeHtml(
+                                    item.difficulty
+                                )}
+                            </span>
+
+                            <strong>
+                                ${formatMeso(
+                                    difficulty.value /
+                                    getPartySize(
+                                        boss.id,
+                                        item.difficulty
+                                    )
+                                )}
+                            </strong>
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+        }
+    );
+
+
+    if (!html) {
+
+        html = `
+            <div
+                style="
+                    color:#777f8d;
+                    font-size:12px;
+                "
+            >
+                No Black Mage selections.
+            </div>
+        `;
+
+    }
+
+
+    details.innerHTML =
+        html;
+}
+
+
+/* =========================
+   RENDER ALL
+========================= */
+
+function renderAll() {
+
+    renderCharacters();
+    renderBossConfig();
+    renderDashboard();
+    renderResults();
+    renderComparison();
+    renderMonthly();
+}
+
+
+/* =========================
+   EXAMPLE DATA
+========================= */
+
+function loadExampleData() {
+
+    if (
+        !state.characters.length
+    ) {
+        createInitialCharacter();
+    }
+
+
+    state.characters =
+        [
+            {
+                id: generateId(),
+                name: "Character 1",
+                current: [
+                    {
+                        bossId: "lotus",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "damien",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "slime",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "lucid",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "will",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "dusk",
+                        difficulty: "N"
+                    }
+                ]
+            },
+
+            {
+                id: generateId(),
+                name: "Character 2",
+                current: [
+                    {
+                        bossId: "heretic",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "djunkel",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "seren",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "kalos",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "adversary",
+                        difficulty: "N"
+                    },
+                    {
+                        bossId: "radiant",
+                        difficulty: "N"
+                    }
+                ]
+            }
+        ];
+
+
+    state.optimized = {};
+
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        "Example data loaded."
+    );
+}
+
+
+/* =========================
+   PARTY SIZE RESET
+========================= */
+
+function setAllPartySizes(
+    value
+) {
+
+    defaultBosses.forEach(
+        boss => {
+
+            boss.difficulties.forEach(
+                difficulty => {
+
+                    if (
+                        difficulty.value === null
+                    ) {
+                        return;
+                    }
+
+                    const key =
+                        boss.id +
+                        ":" +
+                        difficulty.name;
+
+                    state.partySizes[key] =
+                        Number(value);
+
+                }
+            );
+
+        }
+    );
+
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        `All party sizes set to ${value}-man.`
+    );
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+function resetOptimizer() {
+
+    const confirmed =
+        confirm(
+            "Reset all Optimizer characters, party sizes and results?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+
+    state = {
+        characters: [],
+        partySizes: {},
+        optimized: {}
+    };
+
+
+    createInitialCharacter();
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        "Optimizer has been reset."
+    );
+}
+
+
+/* =========================
+   SAVE / LOAD
+========================= */
+
+function saveState() {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(state)
+    );
+}
+
+
+function loadState() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+
+        if (!saved) {
+            return;
+        }
+
+
+        const parsed =
+            JSON.parse(
+                saved
+            );
+
+
+        if (
+            !parsed ||
+            typeof parsed !== "object"
+        ) {
+            return;
+        }
+
+
+        state = {
+
+            characters:
+                Array.isArray(
+                    parsed.characters
+                )
+                    ? parsed.characters
+                    : [],
+
+            partySizes:
+                parsed.partySizes &&
+                typeof parsed.partySizes === "object"
+                    ? parsed.partySizes
+                    : {},
+
+            optimized:
+                parsed.optimized &&
+                typeof parsed.optimized === "object"
+                    ? parsed.optimized
+                    : {}
+
+        };
+
+
+        state.characters.forEach(
+            character => {
+
+                if (
+                    !Array.isArray(
+                        character.current
+                    )
+                ) {
+                    character.current = [];
+                }
+
+            }
+        );
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Failed to load Optimizer data:",
+            error
+        );
+
+        state = {
+            characters: [],
+            partySizes: {},
+            optimized: {}
+        };
+
+    }
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer = null;
+
+
+function showToast(
+    message
+) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2500
+        );
+
+}
+
+
+/* =========================
+   HTML ESCAPING
+========================= */
+
+function escapeHtml(
+    value
+) {
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+init();
+
+</script>
+
+</body>
+</html>
