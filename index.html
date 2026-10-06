@@ -98,6 +98,45 @@
     }
 
     /* =========================
+       MONTHLY / ANNUAL DASHBOARD
+    ========================= */
+
+    .monthly-dashboard {
+        background: #171a22;
+        border: 1px solid #292e3a;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+
+    .monthly-dashboard-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid #292e3a;
+    }
+
+    .monthly-dashboard-title {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .monthly-dashboard-subtitle {
+        color: #777f8d;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .monthly-dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .monthly-dashboard .card {
+        margin: 0;
+    }
+
+    /* =========================
        SECTIONS
     ========================= */
 
@@ -541,6 +580,10 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
+        .monthly-dashboard-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
         .boss-row {
             grid-template-columns: 1fr;
             gap: 8px;
@@ -569,6 +612,10 @@
 
         .dashboard {
             grid-template-columns: 1fr 1fr;
+        }
+
+        .monthly-dashboard-grid {
+            grid-template-columns: 1fr;
         }
 
         .account-top,
@@ -701,6 +748,113 @@
 
 
     <!-- =========================
+         MONTHLY / ANNUAL DASHBOARD
+    ========================= -->
+
+    <section class="monthly-dashboard">
+
+        <div class="monthly-dashboard-header">
+
+            <div class="monthly-dashboard-title">
+                Monthly / Annual Income
+            </div>
+
+            <div class="monthly-dashboard-subtitle">
+                Black Mage monthly income × 12 months ·
+                Weekly income × 52 weeks
+            </div>
+
+        </div>
+
+        <div class="monthly-dashboard-grid">
+
+            <div class="card">
+
+                <div class="card-label">
+                    Black Mage Monthly
+                </div>
+
+                <div
+                    class="card-value"
+                    id="blackMageMonthlyIncome">
+                    0
+                </div>
+
+                <div
+                    class="card-sub"
+                    id="blackMageMonthlySub">
+                    0 characters selected
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-label">
+                    Black Mage Annual
+                </div>
+
+                <div
+                    class="card-value"
+                    id="blackMageAnnualIncome">
+                    0
+                </div>
+
+                <div class="card-sub">
+                    Monthly × 12 months
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-label">
+                    Weekly Annual
+                </div>
+
+                <div
+                    class="card-value"
+                    id="weeklyAnnualIncome">
+                    0
+                </div>
+
+                <div
+                    class="card-sub"
+                    id="weeklyAnnualSub">
+                    0 / 90 weekly crystals × 52 weeks
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-label">
+                    Estimated Total Annual
+                </div>
+
+                <div
+                    class="card-value"
+                    id="totalAnnualIncome">
+                    0
+                </div>
+
+                <div class="card-sub">
+                    Weekly annual + Black Mage annual
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+
+    <!-- =========================
          ACCOUNTS
     ========================= -->
 
@@ -822,6 +976,37 @@
                 Reset All
             </button>
 
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         MONTHLY BOSSES
+    ========================= -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-title">
+                    Monthly Bosses
+                </div>
+
+                <div class="section-subtitle">
+                    Monthly bosses do not consume weekly Boss Crystal limits
+                    · Each boss can be cleared up to 2 times
+                </div>
+
+            </div>
+
+        </div>
+
+        <div
+            class="boss-list"
+            id="monthlyBosses">
         </div>
 
     </section>
@@ -1992,6 +2177,17 @@ function getCharacterTotal(
     ).forEach(
         bossId => {
 
+            const boss =
+                getBoss(bossId);
+
+            if (
+                !boss ||
+                boss.type !== "Weekly"
+            ) {
+                return;
+            }
+
+
             const selections =
                 getBossSelections(
                     character,
@@ -2065,6 +2261,176 @@ function getAccountTotal() {
             ),
         0
     );
+
+}
+
+
+/* =========================================================
+   MONTHLY / ANNUAL CALCULATIONS
+========================================================= */
+
+function getCharacterBlackMageMonthlyTotal(
+    character
+) {
+
+    if (!character) {
+        return 0;
+    }
+
+
+    const boss =
+        getBoss("blackmage");
+
+
+    if (!boss) {
+        return 0;
+    }
+
+
+    const selections =
+        getBossSelections(
+            character,
+            boss.id
+        );
+
+
+    let total = 0;
+
+
+    selections.forEach(
+        difficultyName => {
+
+            const difficulty =
+                getDifficulty(
+                    boss.id,
+                    difficultyName
+                );
+
+
+            if (
+                !difficulty ||
+                difficulty.value === null
+            ) {
+                return;
+            }
+
+
+            const partySize =
+                getPartySize(
+                    boss.id,
+                    character.id,
+                    difficultyName
+                );
+
+
+            total +=
+                difficulty.value /
+                partySize;
+
+        }
+    );
+
+
+    return total;
+
+}
+
+
+function getAccountBlackMageMonthlyTotal() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return 0;
+    }
+
+
+    return account.characters.reduce(
+        (
+            total,
+            character
+        ) =>
+            total +
+            getCharacterBlackMageMonthlyTotal(
+                character
+            ),
+        0
+    );
+
+}
+
+
+function getAccountBlackMageCharacterCount() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return 0;
+    }
+
+
+    return account.characters.filter(
+        character =>
+            getCharacterBlackMageMonthlyTotal(
+                character
+            ) > 0
+    ).length;
+
+}
+
+
+function getAccountBlackMageClearCount() {
+
+    const account =
+        getActiveAccount();
+
+
+    if (!account) {
+        return 0;
+    }
+
+
+    return account.characters.reduce(
+        (
+            total,
+            character
+        ) =>
+            total +
+            getBossSelections(
+                character,
+                "blackmage"
+            ).length,
+        0
+    );
+
+}
+
+
+function getAnnualWeeklyIncome() {
+
+    return getAccountTotal() * 52;
+
+}
+
+
+function getAnnualBlackMageIncome() {
+
+    return
+        getAccountBlackMageMonthlyTotal() *
+        12;
+
+}
+
+
+function getAnnualTotalIncome() {
+
+    return
+        getAnnualWeeklyIncome() +
+        getAnnualBlackMageIncome();
 
 }
 
@@ -2165,6 +2531,7 @@ function selectDifficulty(
 
 
         const accountFull =
+            !isMonthlyBoss(boss) &&
             accountCount >=
             MAX_ACCOUNT_CRYSTALS;
 
@@ -2224,6 +2591,7 @@ function selectDifficulty(
 
 
         if (
+            !isMonthlyBoss(boss) &&
             accountCount >=
             MAX_ACCOUNT_CRYSTALS
         ) {
@@ -2295,6 +2663,8 @@ function renderAll() {
     renderCharacters();
 
     renderDashboard();
+
+    renderMonthlyDashboard();
 
     renderBosses();
 
@@ -2573,15 +2943,115 @@ function renderDashboard() {
 
 
 /* =========================================================
+   MONTHLY / ANNUAL DASHBOARD
+========================================================= */
+
+function renderMonthlyDashboard() {
+
+    const monthly =
+        getAccountBlackMageMonthlyTotal();
+
+
+    const monthlyAnnual =
+        monthly * 12;
+
+
+    const weeklyAnnual =
+        getAnnualWeeklyIncome();
+
+
+    const totalAnnual =
+        weeklyAnnual +
+        monthlyAnnual;
+
+
+    const characterCount =
+        getAccountBlackMageCharacterCount();
+
+
+    const clearCount =
+        getAccountBlackMageClearCount();
+
+
+    const weeklyCrystals =
+        getAccountCrystalCount();
+
+
+    document.getElementById(
+        "blackMageMonthlyIncome"
+    ).textContent =
+        formatMeso(monthly);
+
+
+    document.getElementById(
+        "blackMageMonthlySub"
+    ).textContent =
+        `${characterCount} character${characterCount === 1 ? "" : "s"} selected · ${clearCount} clear${clearCount === 1 ? "" : "s"}`;
+
+
+    document.getElementById(
+        "blackMageAnnualIncome"
+    ).textContent =
+        formatMeso(monthlyAnnual);
+
+
+    document.getElementById(
+        "weeklyAnnualIncome"
+    ).textContent =
+        formatMeso(weeklyAnnual);
+
+
+    document.getElementById(
+        "weeklyAnnualSub"
+    ).textContent =
+        `${weeklyCrystals} / ${MAX_ACCOUNT_CRYSTALS} weekly crystals × 52 weeks`;
+
+
+    document.getElementById(
+        "totalAnnualIncome"
+    ).textContent =
+        formatMeso(totalAnnual);
+
+}
+
+
+/* =========================================================
    BOSS LIST
 ========================================================= */
 
 function renderBosses() {
 
+    renderBossList(
+        "weeklyBosses",
+        "Weekly",
+        "No weekly bosses found."
+    );
+
+
+    renderBossList(
+        "monthlyBosses",
+        "Monthly",
+        "No monthly bosses found."
+    );
+
+}
+
+
+function renderBossList(
+    containerId,
+    bossType,
+    emptyMessage
+) {
+
     const container =
         document.getElementById(
-            "weeklyBosses"
+            containerId
         );
+
+
+    if (!container) {
+        return;
+    }
 
 
     container.innerHTML = "";
@@ -2615,7 +3085,14 @@ function renderBosses() {
         getAccountCrystalCount();
 
 
-    defaultBosses.forEach(
+    const bosses =
+        defaultBosses.filter(
+            boss =>
+                boss.type === bossType
+        );
+
+
+    bosses.forEach(
         boss => {
 
             if (
@@ -2659,7 +3136,8 @@ function renderBosses() {
                         (
                             difficultyCounts[
                                 difficultyName
-                            ] || 0
+                            ] ||
+                            0
                         ) + 1;
 
                 }
@@ -2670,13 +3148,18 @@ function renderBosses() {
                 selections.length;
 
 
+            const isMonthly =
+                isMonthlyBoss(boss);
+
+
             const characterLimitReached =
-                !isMonthlyBoss(boss) &&
+                !isMonthly &&
                 characterCount >=
                 MAX_BOSSES_PER_CHARACTER;
 
 
             const accountLimitReached =
+                !isMonthly &&
                 accountCount >=
                 MAX_ACCOUNT_CRYSTALS;
 
@@ -2697,9 +3180,12 @@ function renderBosses() {
                         Existing selections are NEVER
                         disabled.
 
-                        This means when 12/12 or 90/90,
-                        you can still click an existing
-                        difficulty to remove it.
+                        This allows x1/x2 selections to
+                        always be clicked and removed,
+                        even at 12/12 or 90/90.
+
+                        Monthly bosses ignore weekly
+                        character/account limits.
                     */
 
                     const disabled =
@@ -2909,7 +3395,9 @@ function renderBosses() {
                         )}
 
                         <span class="boss-type">
-                            Weekly
+                            ${escapeHtml(
+                                boss.type
+                            )}
                         </span>
 
                     </div>
@@ -2947,7 +3435,7 @@ function renderBosses() {
         container.innerHTML = `
 
             <div class="empty">
-                No weekly bosses found.
+                ${escapeHtml(emptyMessage)}
             </div>
 
         `;
@@ -2955,7 +3443,6 @@ function renderBosses() {
     }
 
 }
-
 
 /* =========================================================
    DIFFICULTY CLICK
