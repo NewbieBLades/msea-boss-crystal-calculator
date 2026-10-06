@@ -4,1705 +4,456 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MSEA Bossing Planner</title>
-
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: #0f1117;
-        color: #f1f3f5;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-        font: inherit;
-    }
-
-    .container {
-        width: min(1400px, calc(100% - 30px));
-        margin: 0 auto;
-        padding: 24px 0 50px;
-    }
-
-    header {
-        margin-bottom: 24px;
-    }
-
-    header h1 {
-        margin: 0 0 6px;
-        font-size: 30px;
-    }
-
-    header p {
-        margin: 0;
-        color: #9aa1ad;
-        font-size: 14px;
-    }
-
-    /* =========================
-       DASHBOARD
-    ========================= */
-
-    .dashboard {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin-bottom: 18px;
-    }
-
-    .card {
-        background: #171a22;
-        border: 1px solid #292e3a;
-        border-radius: 12px;
-        padding: 16px;
-    }
-
-    .card-label {
-        color: #9aa1ad;
-        font-size: 13px;
-        margin-bottom: 8px;
-    }
-
-    .card-value {
-        font-size: 25px;
-        font-weight: 700;
-    }
-
-    .card-sub {
-        color: #777f8d;
-        font-size: 12px;
-        margin-top: 5px;
-    }
-
-    .progress-wrap {
-        margin-top: 10px;
-    }
-
-    .progress {
-        height: 7px;
-        background: #272c36;
-        border-radius: 999px;
-        overflow: hidden;
-    }
-
-    .progress-bar {
-        height: 100%;
-        width: 0%;
-        background: #7c5cff;
-        transition: width 0.2s ease;
-    }
-
-    /* =========================
-       SECTIONS
-    ========================= */
-
-    .section {
-        background: #171a22;
-        border: 1px solid #292e3a;
-        border-radius: 12px;
-        margin-bottom: 16px;
-        overflow: hidden;
-    }
-
-    .section-header {
-        padding: 14px 16px;
-        border-bottom: 1px solid #292e3a;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .section-title {
-        font-size: 16px;
-        font-weight: 700;
-    }
-
-    .section-subtitle {
-        color: #777f8d;
-        font-size: 12px;
-        margin-top: 3px;
-    }
-
-    /* =========================
-       ACCOUNT
-    ========================= */
-
-    .account-section {
-        margin-bottom: 16px;
-    }
-
-    .account-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 10px;
-    }
-
-    .account-tabs {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        flex: 1;
-    }
-
-    .account-actions {
-        display: flex;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-
-    .account-tab {
-        background: #171a22;
-        color: #aeb5c2;
-        border: 1px solid #292e3a;
-        border-radius: 9px;
-        padding: 9px 12px;
-        cursor: pointer;
-        transition: 0.15s;
-    }
-
-    .account-tab:hover {
-        border-color: #464d5c;
-        color: #fff;
-    }
-
-    .account-tab.active {
-        background: #242033;
-        border-color: #7c5cff;
-        color: #fff;
-    }
-
-    .account-tab-name {
-        font-weight: 700;
-    }
-
-    .account-tab-count {
-        margin-left: 5px;
-        color: #858c99;
-        font-size: 12px;
-    }
-
-    /* =========================
-       CHARACTER
-    ========================= */
-
-    .character-section {
-        margin-bottom: 16px;
-    }
-
-    .character-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .character-tabs {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        flex: 1;
-    }
-
-    .character-actions {
-        display: flex;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-
-    .character-tab {
-        background: #171a22;
-        color: #aeb5c2;
-        border: 1px solid #292e3a;
-        border-radius: 9px;
-        padding: 9px 12px;
-        cursor: pointer;
-        transition: 0.15s;
-    }
-
-    .character-tab:hover {
-        border-color: #464d5c;
-        color: #fff;
-    }
-
-    .character-tab.active {
-        background: #242033;
-        border-color: #7c5cff;
-        color: #fff;
-    }
-
-    .character-tab-name {
-        font-weight: 700;
-    }
-
-    .character-tab-count {
-        margin-left: 5px;
-        color: #858c99;
-        font-size: 12px;
-    }
-
-    /* =========================
-       TOOLBAR
-    ========================= */
-
-    .toolbar {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        padding: 14px 16px;
-        background: #14171e;
-        border-bottom: 1px solid #292e3a;
-    }
-
-    .search {
-        flex: 1;
-        min-width: 220px;
-    }
-
-    .input,
-    .search input {
-        width: 100%;
-        background: #0f1117;
-        border: 1px solid #303642;
-        color: #fff;
-        border-radius: 8px;
-        padding: 10px 12px;
-        outline: none;
-    }
-
-    .input:focus,
-    .search input:focus {
-        border-color: #7c5cff;
-    }
-
-    .btn {
-        background: #242934;
-        color: #fff;
-        border: 1px solid #373e4c;
-        border-radius: 8px;
-        padding: 9px 12px;
-        cursor: pointer;
-        transition: 0.15s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        white-space: nowrap;
-    }
-
-    .btn:hover {
-        background: #2c3240;
-    }
-
-    .btn.primary {
-        background: #6650d9;
-        border-color: #7c5cff;
-    }
-
-    .btn.primary:hover {
-        background: #7560e8;
-    }
-
-    .btn.danger {
-        color: #ff9d9d;
-    }
-
-    /* =========================
-       SYNC NOTICE
-    ========================= */
-
-    .sync-notice {
-        padding: 12px 16px;
-        background: #14171e;
-        border-bottom: 1px solid #292e3a;
-        color: #9aa1ad;
-        font-size: 12px;
-    }
-
-    .sync-notice strong {
-        color: #fff;
-    }
-
-    .sync-status {
-        color: #7c5cff;
-        font-weight: 700;
-    }
-
-    /* =========================
-       BOSS LIST
-    ========================= */
-
-    .boss-list {
-        padding: 8px 16px 16px;
-    }
-
-    .boss-row {
-        display: grid;
-        grid-template-columns:
-            minmax(220px, 1fr)
-            minmax(250px, 2fr)
-            150px
-            170px
-            minmax(180px, 1.2fr);
-        align-items: center;
-        gap: 12px;
-        padding: 13px 0;
-        border-bottom: 1px solid #242934;
-    }
-
-    .boss-row:last-child {
-        border-bottom: none;
-    }
-
-    .boss-name {
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 0;
-    }
-
-    .boss-icon {
-        width: 48px;
-        height: 48px;
-        object-fit: contain;
-        border-radius: 7px;
-        flex-shrink: 0;
-        background: #11141a;
-        border: 1px solid #303642;
-    }
-
-    .boss-name-text {
-        min-width: 0;
-    }
-
-    .boss-type {
-        display: inline-block;
-        margin-left: 7px;
-        padding: 2px 6px;
-        border-radius: 5px;
-        font-size: 10px;
-        color: #9da4b1;
-        background: #242934;
-        vertical-align: middle;
-    }
-
-    .difficulty-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px;
-    }
-
-    .difficulty-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        min-width: 48px;
-        padding: 7px 9px;
-        background: #332a5d;
-        border: 1px solid #7c5cff;
-        color: #fff;
-        border-radius: 7px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .difficulty-badge.not-cleared {
-        background: #11141a;
-        border-color: #303642;
-        color: #777f8d;
-    }
-
-    .difficulty-count {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 18px;
-        height: 18px;
-        padding: 0 5px;
-        border-radius: 999px;
-        background: #7c5cff;
-        color: #fff;
-        font-size: 10px;
-        line-height: 1;
-    }
-
-    .party-info {
-        color: #aeb5c2;
-        font-size: 12px;
-    }
-
-    .party-info strong {
-        color: #fff;
-    }
-
-    .status {
-        text-align: right;
-        font-weight: 700;
-    }
-
-    .status-cleared {
-        color: #b7ffcf;
-    }
-
-    .status-not-cleared {
-        color: #777f8d;
-    }
-
-    .status small {
-        display: block;
-        color: #777f8d;
-        font-weight: 400;
-        font-size: 11px;
-        margin-top: 3px;
-    }
-
-    /* =========================
-       NOTES
-    ========================= */
-
-    .boss-note {
-        width: 100%;
-        min-height: 40px;
-        height: 40px;
-        resize: vertical;
-        background: #0f1117;
-        border: 1px solid #303642;
-        color: #fff;
-        border-radius: 7px;
-        padding: 8px 9px;
-        outline: none;
-        font-size: 12px;
-        line-height: 1.35;
-    }
-
-    .boss-note::placeholder {
-        color: #626a78;
-    }
-
-    .boss-note:focus {
-        border-color: #7c5cff;
-        box-shadow: 0 0 0 1px rgba(124, 92, 255, 0.15);
-    }
-
-    .note-label {
-        color: #777f8d;
-        font-size: 10px;
-        margin-bottom: 4px;
-    }
-
-    /* =========================
-       EMPTY
-    ========================= */
-
-    .empty {
-        padding: 35px 15px;
-        text-align: center;
-        color: #777f8d;
-    }
-
-    /* =========================
-       FOOTER INFO
-    ========================= */
-
-    .info-box {
-        background: #171a22;
-        border: 1px solid #292e3a;
-        border-radius: 12px;
-        padding: 16px;
-        margin-top: 16px;
-        color: #9aa1ad;
-        font-size: 12px;
-        line-height: 1.6;
-    }
-
-    .info-box strong {
-        color: #fff;
-    }
-
-    /* =========================
-       TOAST
-    ========================= */
-
-    .toast {
-        position: fixed;
-        right: 20px;
-        bottom: 20px;
-        background: #242934;
-        border: 1px solid #424958;
-        color: #fff;
-        padding: 12px 15px;
-        border-radius: 9px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-        opacity: 0;
-        transform: translateY(10px);
-        pointer-events: none;
-        transition: 0.2s;
-        z-index: 1000;
-    }
-
-    .toast.show {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* =========================
-       MODAL
-    ========================= */
-
-    .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.65);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-    }
-
-    .modal-overlay.show {
-        display: flex;
-    }
-
-    .modal {
-        width: min(420px, calc(100% - 30px));
-        background: #171a22;
-        border: 1px solid #303642;
-        border-radius: 12px;
-        padding: 18px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    }
-
-    .modal h3 {
-        margin: 0 0 12px;
-    }
-
-    .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-        margin-top: 15px;
-    }
-
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media (max-width: 1150px) {
-
-        .boss-row {
-            grid-template-columns:
-                minmax(200px, 1fr)
-                minmax(220px, 1.5fr)
-                130px
-                150px
-                minmax(160px, 1fr);
-        }
-
-    }
-
-    @media (max-width: 1000px) {
-
-        .dashboard {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .boss-row {
-            grid-template-columns: 1fr;
-            gap: 8px;
-        }
-
-        .status {
-            text-align: left;
-        }
-
-        .boss-note {
-            max-width: 500px;
-        }
-
-    }
-
-    @media (max-width: 650px) {
-
-        .container {
-            width: min(100% - 20px, 1400px);
-            padding-top: 15px;
-        }
-
-        header h1 {
-            font-size: 24px;
-        }
-
-        .dashboard {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .account-top,
-        .character-top {
-            align-items: stretch;
-            flex-direction: column;
-        }
-
-        .account-actions,
-        .character-actions {
-            width: 100%;
-        }
-
-        .account-actions .btn,
-        .character-actions .btn {
-            flex: 1;
-        }
-
-        .toolbar {
-            flex-direction: column;
-        }
-
-        .search {
-            min-width: 0;
-        }
-
-        .boss-icon {
-            width: 42px;
-            height: 42px;
-        }
-
-        .boss-note {
-            max-width: none;
-        }
-
-    }
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0f1117;color:#f1f3f5}
+button,input,select,textarea{font:inherit}
+.container{width:min(1400px,calc(100% - 30px));margin:0 auto;padding:24px 0 50px}
+header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{margin:0;color:#9aa1ad;font-size:14px}
+.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.card{background:#171a22;border:1px solid #292e3a;border-radius:12px;padding:16px}
+.card-label{color:#9aa1ad;font-size:13px;margin-bottom:8px}.card-value{font-size:25px;font-weight:700}.card-sub{color:#777f8d;font-size:12px;margin-top:5px}
+.progress-wrap{margin-top:10px}.progress{height:7px;background:#272c36;border-radius:999px;overflow:hidden}.progress-bar{height:100%;width:0%;background:#7c5cff;transition:width .2s ease}
+.section{background:#171a22;border:1px solid #292e3a;border-radius:12px;margin-bottom:16px;overflow:hidden}
+.section-header{padding:14px 16px;border-bottom:1px solid #292e3a;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.section-title{font-size:16px;font-weight:700}.section-subtitle{color:#777f8d;font-size:12px;margin-top:3px}
+.account-section,.character-section{margin-bottom:16px}.account-top,.character-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.account-tabs,.character-tabs{display:flex;gap:8px;flex-wrap:wrap;flex:1}.account-actions,.character-actions{display:flex;gap:8px;flex-shrink:0}
+.account-tab,.character-tab{background:#171a22;color:#aeb5c2;border:1px solid #292e3a;border-radius:9px;padding:9px 12px;cursor:pointer;transition:.15s}
+.account-tab:hover,.character-tab:hover{border-color:#464d5c;color:#fff}.account-tab.active,.character-tab.active{background:#242033;border-color:#7c5cff;color:#fff}
+.account-tab-name,.character-tab-name{font-weight:700}.account-tab-count,.character-tab-count{margin-left:5px;color:#858c99;font-size:12px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px;background:#14171e;border-bottom:1px solid #292e3a}
+.search{flex:1;min-width:220px}.input,.search input{width:100%;background:#0f1117;border:1px solid #303642;color:#fff;border-radius:8px;padding:10px 12px;outline:none}
+.input:focus,.search input:focus{border-color:#7c5cff}.btn{background:#242934;color:#fff;border:1px solid #373e4c;border-radius:8px;padding:9px 12px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+.btn:hover{background:#2c3240}.btn.primary{background:#6650d9;border-color:#7c5cff}.btn.primary:hover{background:#7560e8}.btn.danger{color:#ff9d9d}
+.reset-notice,.sync-notice{padding:12px 16px;background:#14171e;border-bottom:1px solid #292e3a;color:#9aa1ad;font-size:12px}
+.reset-notice strong,.sync-notice strong{color:#fff}.reset-weekly{color:#7c5cff;font-weight:700}.reset-monthly{color:#b78cff;font-weight:700}.sync-status{color:#7c5cff;font-weight:700}
+.boss-list{padding:8px 16px 16px}.boss-row{display:grid;grid-template-columns:minmax(220px,1fr) minmax(250px,2fr) 150px 170px minmax(180px,1.2fr);align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #242934}
+.boss-row:last-child{border-bottom:none}.boss-name{font-weight:700;display:flex;align-items:center;gap:10px;min-width:0}.boss-icon{width:48px;height:48px;object-fit:contain;border-radius:7px;flex-shrink:0;background:#11141a;border:1px solid #303642}
+.boss-name-text{min-width:0}.boss-type{display:inline-block;margin-left:7px;padding:2px 6px;border-radius:5px;font-size:10px;color:#9da4b1;background:#242934;vertical-align:middle}
+.difficulty-list{display:flex;flex-wrap:wrap;gap:7px}.difficulty-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:48px;padding:7px 9px;background:#332a5d;border:1px solid #7c5cff;color:#fff;border-radius:7px;font-size:12px;font-weight:700}
+.difficulty-badge.not-cleared{background:#11141a;border-color:#303642;color:#777f8d}.difficulty-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#7c5cff;color:#fff;font-size:10px;line-height:1}
+.party-info{color:#aeb5c2;font-size:12px}.party-info strong{color:#fff}.status{text-align:right;font-weight:700}.status-cleared{color:#b7ffcf}.status-not-cleared{color:#777f8d}
+.status small{display:block;color:#777f8d;font-weight:400;font-size:11px;margin-top:3px}.boss-note{width:100%;min-height:40px;height:40px;resize:vertical;background:#0f1117;border:1px solid #303642;color:#fff;border-radius:7px;padding:8px 9px;outline:none;font-size:12px;line-height:1.35}
+.boss-note::placeholder{color:#626a78}.boss-note:focus{border-color:#7c5cff;box-shadow:0 0 0 1px rgba(124,92,255,.15)}.note-label{color:#777f8d;font-size:10px;margin-bottom:4px}
+.empty{padding:35px 15px;text-align:center;color:#777f8d}.info-box{background:#171a22;border:1px solid #292e3a;border-radius:12px;padding:16px;margin-top:16px;color:#9aa1ad;font-size:12px;line-height:1.6}.info-box strong{color:#fff}
+.toast{position:fixed;right:20px;bottom:20px;background:#242934;border:1px solid #424958;color:#fff;padding:12px 15px;border-radius:9px;box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:1000}.toast.show{opacity:1;transform:translateY(0)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:2000}.modal-overlay.show{display:flex}
+.modal{width:min(420px,calc(100% - 30px));background:#171a22;border:1px solid #303642;border-radius:12px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.modal h3{margin:0 0 12px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
+@media(max-width:1150px){.boss-row{grid-template-columns:minmax(200px,1fr) minmax(220px,1.5fr) 130px 150px minmax(160px,1fr)}}
+@media(max-width:1000px){.dashboard{grid-template-columns:repeat(2,1fr)}.boss-row{grid-template-columns:1fr;gap:8px}.status{text-align:left}.boss-note{max-width:500px}}
+@media(max-width:650px){.container{width:min(100% - 20px,1400px);padding-top:15px}header h1{font-size:24px}.dashboard{grid-template-columns:1fr 1fr}.account-top,.character-top{align-items:stretch;flex-direction:column}.account-actions,.character-actions{width:100%}.account-actions .btn,.character-actions .btn{flex:1}.toolbar{flex-direction:column}.search{min-width:0}.boss-icon{width:42px;height:42px}.boss-note{max-width:none}}
 </style>
 </head>
-
 <body>
-
 <div class="container">
 
-    <!-- =========================
-         HEADER
-    ========================= -->
+<header>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+        <h1 style="margin:0">MSEA Bossing Planner</h1>
+        <a class="btn" href="../">↗ Crystal Calculator</a>
+    </div>
+    <p>Plan your weekly and monthly Boss Crystals using the same characters, bosses, icons, difficulties, clear status, party sizes and personal notes as your Calculator.</p>
+</header>
 
-    <header>
+<section class="dashboard">
+    <div class="card"><div class="card-label">Weekly Clears</div><div class="card-value" id="weeklyClears">0</div><div class="card-sub">Maximum 12 Boss Crystals</div></div>
+    <div class="card"><div class="card-label">Remaining</div><div class="card-value" id="remainingClears">12</div><div class="card-sub">Weekly slots available</div></div>
+    <div class="card"><div class="card-label">Character</div><div class="card-value" id="characterName">Character 1</div><div class="card-sub">Active character</div></div>
+    <div class="card"><div class="card-label">Account Weekly Clears</div><div class="card-value" id="accountClears">0</div><div class="card-sub">Unlimited account selections</div><div class="progress-wrap"><div class="progress"><div class="progress-bar" id="accountProgress"></div></div></div></div>
+</section>
 
-        <div style="
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 6px;
-        ">
-
-            <h1 style="margin: 0;">
-                MSEA Bossing Planner
-            </h1>
-
-            <a
-                class="btn"
-                href="../">
-                ↗ Crystal Calculator
-            </a>
-
+<section class="account-section">
+    <div class="account-top">
+        <div class="account-tabs" id="accountTabs"></div>
+        <div class="account-actions">
+            <button class="btn primary" type="button" onclick="addAccount()">+ Add Account</button>
+            <button class="btn" type="button" onclick="renameAccount()">Rename Account</button>
+            <button class="btn danger" type="button" onclick="deleteAccount()">Delete Account</button>
         </div>
+    </div>
+</section>
 
-        <p>
-            Plan your weekly and monthly Boss Crystals using the same
-            characters, bosses, icons, difficulties, clear status,
-            party sizes and personal notes as your Calculator.
-        </p>
-
-    </header>
-
-
-    <!-- =========================
-         DASHBOARD
-    ========================= -->
-
-    <section class="dashboard">
-
-        <div class="card">
-
-            <div class="card-label">
-                Weekly Clears
-            </div>
-
-            <div
-                class="card-value"
-                id="weeklyClears">
-                0
-            </div>
-
-            <div class="card-sub">
-                Maximum 12 Boss Crystals
-            </div>
-
+<section class="character-section">
+    <div class="character-top">
+        <div class="character-tabs" id="characterTabs"></div>
+        <div class="character-actions">
+            <button class="btn primary" type="button" onclick="addCharacter()">+ Add Character</button>
+            <button class="btn" type="button" onclick="renameCharacter()">Rename Character</button>
+            <button class="btn danger" type="button" onclick="deleteCharacter()">Delete Character</button>
         </div>
-
-
-        <div class="card">
-
-            <div class="card-label">
-                Remaining
-            </div>
-
-            <div
-                class="card-value"
-                id="remainingClears">
-                12
-            </div>
-
-            <div class="card-sub">
-                Weekly slots available
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="card-label">
-                Character
-            </div>
-
-            <div
-                class="card-value"
-                id="characterName">
-                Character 1
-            </div>
-
-            <div class="card-sub">
-                Active character
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="card-label">
-                Account Weekly Clears
-            </div>
-
-            <div
-                class="card-value"
-                id="accountClears">
-                0
-            </div>
-
-            <div class="card-sub">
-                Unlimited account selections
-            </div>
-
-            <div class="progress-wrap">
-
-                <div class="progress">
-
-                    <div
-                        class="progress-bar"
-                        id="accountProgress">
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         ACCOUNTS
-    ========================= -->
-
-    <section class="account-section">
-
-        <div class="account-top">
-
-            <div
-                class="account-tabs"
-                id="accountTabs">
-            </div>
-
-
-            <div class="account-actions">
-
-                <button
-                    class="btn primary"
-                    type="button"
-                    onclick="addAccount()">
-                    + Add Account
-                </button>
-
-                <button
-                    class="btn"
-                    type="button"
-                    onclick="renameAccount()">
-                    Rename Account
-                </button>
-
-                <button
-                    class="btn danger"
-                    type="button"
-                    onclick="deleteAccount()">
-                    Delete Account
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         CHARACTERS
-    ========================= -->
-
-    <section class="character-section">
-
-        <div class="character-top">
-
-            <div
-                class="character-tabs"
-                id="characterTabs">
-            </div>
-
-
-            <div class="character-actions">
-
-                <button
-                    class="btn primary"
-                    type="button"
-                    onclick="addCharacter()">
-                    + Add Character
-                </button>
-
-                <button
-                    class="btn"
-                    type="button"
-                    onclick="renameCharacter()">
-                    Rename Character
-                </button>
-
-                <button
-                    class="btn danger"
-                    type="button"
-                    onclick="deleteCharacter()">
-                    Delete Character
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         TOOLBAR
-    ========================= -->
-
-    <section class="section">
-
-        <div class="toolbar">
-
-            <div class="search">
-
-                <input
-                    id="searchInput"
-                    type="text"
-                    placeholder="Search boss..."
-                    oninput="renderBosses()">
-
-            </div>
-
-
-            <button
-                class="btn primary"
-                type="button"
-                onclick="syncFromCalculator()">
-                ↻ Sync from Calculator
-            </button>
-
-        </div>
-
-
-        <div class="sync-notice">
-
-            <strong>Calculator Sync:</strong>
-
-            Boss names, icons, difficulties, clear status
-            and party sizes are read directly from the
-            Calculator.
-
-            <br>
-
-            <strong>Notes:</strong>
-
-            Your personal boss notes are saved separately
-            in the Planner and can be edited freely.
-
-            <span
-                class="sync-status"
-                id="syncStatus">
-                Synced
-            </span>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         MONTHLY BOSSES
-    ========================= -->
-
-    <section class="section">
-
-        <div class="section-header">
-
-            <div>
-
-                <div class="section-title">
-                    Monthly Boss Planner
-                </div>
-
-                <div class="section-subtitle">
-                    Monthly bosses do not use the weekly 12-crystal limit.
-                    Add your party IGN or any personal reminder in the Note box.
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div
-            class="boss-list"
-            id="monthlyBosses">
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         WEEKLY BOSSES
-    ========================= -->
-
-    <section class="section">
-
-        <div class="section-header">
-
-            <div>
-
-                <div class="section-title">
-                    Weekly Boss Planner
-                </div>
-
-                <div class="section-subtitle">
-                    This list is automatically generated from
-                    the Calculator's Weekly Boss list.
-                    Only selected weekly clears are shown as cleared.
-                    Use the Note box to manually record party IGN,
-                    carry information, or anything else.
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div
-            class="boss-list"
-            id="weeklyBosses">
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         INFO
-    ========================= -->
-
-    <div class="info-box">
-
-        <strong>How synchronization works:</strong><br>
-
-        The MSEA Boss Crystal Calculator is the master source
-        for boss information and clear status.
-
-        If you select or deselect a boss in the Calculator,
-        this Planner will reflect that selection.
-
-        Changing the party size in the Calculator will also
-        update here.
-
-        <br><br>
-
-        <strong>Weekly selection limits:</strong><br>
-
-        Each character can have a maximum of
-        <strong>12 weekly Boss Crystals</strong>.
-
-        There is <strong>no account-wide selection limit</strong>
-        in the Planner.
-
-        You can therefore have, for example:
-
-        <br>
-
-        • Character 1 — 12 weekly clears<br>
-        • Character 2 — 12 weekly clears<br>
-        • Character 3 — 12 weekly clears<br>
-        • Character 4 — 12 weekly clears<br>
-        • Character 5 — 12 weekly clears<br>
-        • Character 6 — 12 weekly clears<br>
-        • Character 7 — 12 weekly clears<br>
-        • Character 8 — 12 weekly clears<br>
-        • Character 9 — 12 weekly clears<br>
-        • Character 10 — 12 weekly clears<br>
-
-        <br>
-
-        All selected clears remain visible and synchronized.
-
-        <br><br>
-
-        <strong>Important:</strong><br>
-
-        The Planner does not apply the 90-crystal selling limit.
-        The separate Optimizer can use the 90-crystal limit when
-        calculating which selected weekly Boss Crystals should be sold.
-
-        <br><br>
-
-        <strong>How Notes work:</strong><br>
-
-        Each boss has its own personal Note box.
-
-        You can type anything you want, such as:
-
-        <br>
-
-        • Party IGN<br>
-        • Carry IGN<br>
-        • Duo partner<br>
-        • Party size reminder<br>
-        • "Ask guild"<br>
-        • "Need to clear before reset"<br>
-        • Any other personal reminder
-
-        <br>
-
-        Notes are saved automatically in your browser and
-        are separate for each account, character and boss.
-
+    </div>
+</section>
+
+<section class="section">
+    <div class="toolbar">
+        <div class="search"><input id="searchInput" type="text" placeholder="Search boss..." oninput="renderBosses()"></div>
+        <button class="btn primary" type="button" onclick="syncFromCalculator()">↻ Sync from Calculator</button>
     </div>
 
+    <div class="reset-notice">
+        <strong>Automatic Reset:</strong>
+        Weekly selections reset every <span class="reset-weekly">Thursday 00:00 GMT+8</span>.
+        Monthly selections reset every <span class="reset-monthly">1st of the month 00:00 GMT+8</span>.
+        <br>
+        <strong>Last reset check:</strong> <span id="resetStatus">Checking...</span>
+    </div>
+
+    <div class="sync-notice">
+        <strong>Calculator Sync:</strong> Boss names, icons, difficulties, clear status and party sizes are read directly from the Calculator.
+        <br>
+        <strong>Notes:</strong> Your personal boss notes are saved separately in the Planner and can be edited freely.
+        <span class="sync-status" id="syncStatus">Synced</span>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <div>
+            <div class="section-title">Monthly Boss Planner</div>
+            <div class="section-subtitle">Monthly bosses do not use the weekly 12-crystal limit. Monthly selections automatically reset on the 1st of every month at 00:00 GMT+8.</div>
+        </div>
+    </div>
+    <div class="boss-list" id="monthlyBosses"></div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <div>
+            <div class="section-title">Weekly Boss Planner</div>
+            <div class="section-subtitle">This list is automatically generated from the Calculator's Weekly Boss list. Weekly selections automatically reset every Thursday at 00:00 GMT+8.</div>
+        </div>
+    </div>
+    <div class="boss-list" id="weeklyBosses"></div>
+</section>
+
+<div class="info-box">
+    <strong>How synchronization works:</strong><br>
+    The MSEA Boss Crystal Calculator is the master source for boss information and clear status.
+    If you select or deselect a boss in the Calculator, this Planner will reflect that selection.
+    Changing the party size in the Calculator will also update here.
+    <br><br>
+
+    <strong>Automatic reset system:</strong><br>
+    <strong>Weekly:</strong> All Weekly Boss selections are automatically cleared every Thursday at 00:00 GMT+8.
+    <br>
+    <strong>Monthly:</strong> All Monthly Boss selections are automatically cleared on the 1st of every month at 00:00 GMT+8.
+    <br><br>
+
+    Resetting selections does <strong>not</strong> delete:
+    <br>
+    • Accounts<br>
+    • Characters<br>
+    • Character names<br>
+    • Party sizes<br>
+    • Personal boss notes<br>
+    • Boss data
+    <br><br>
+
+    The reset only removes the corresponding Weekly or Monthly boss clear selections.
+    <br><br>
+
+    <strong>Weekly selection limits:</strong><br>
+    Each character can have a maximum of <strong>12 weekly Boss Crystals</strong>.
+    There is <strong>no account-wide selection limit</strong> in the Planner.
+    <br><br>
+
+    <strong>Important:</strong><br>
+    The Planner does not apply the 90-crystal selling limit.
+    The separate Optimizer can use the 90-crystal limit when calculating which selected weekly Boss Crystals should be sold.
+    <br><br>
+
+    <strong>How Notes work:</strong><br>
+    Each boss has its own personal Note box.
+    <br><br>
+    • Party IGN<br>
+    • Carry IGN<br>
+    • Duo partner<br>
+    • Party size reminder<br>
+    • "Ask guild"<br>
+    • "Need to clear before reset"<br>
+    • Any other personal reminder
+    <br><br>
+    Notes are saved automatically in your browser and are separate for each account, character and boss.
+</div>
 </div>
 
+<div class="toast" id="toast"></div>
 
-<!-- =========================
-     TOAST
-========================= -->
-
-<div
-    class="toast"
-    id="toast">
-</div>
-
-
-<!-- =========================
-     MODAL
-========================= -->
-
-<div
-    class="modal-overlay"
-    id="modalOverlay">
-
+<div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-
-        <h3 id="modalTitle">
-            Rename
-        </h3>
-
-        <input
-            class="input"
-            id="modalInput"
-            type="text"
-            maxlength="30"
-            autocomplete="off">
-
-
+        <h3 id="modalTitle">Rename</h3>
+        <input class="input" id="modalInput" type="text" maxlength="30" autocomplete="off">
         <div class="modal-actions">
-
-            <button
-                class="btn"
-                type="button"
-                onclick="closeModal()">
-                Cancel
-            </button>
-
-
-            <button
-                class="btn primary"
-                type="button"
-                onclick="confirmModal()">
-                Confirm
-            </button>
-
+            <button class="btn" type="button" onclick="closeModal()">Cancel</button>
+            <button class="btn primary" type="button" onclick="confirmModal()">Confirm</button>
         </div>
-
     </div>
-
 </div>
-
 
 <script>
-
 /* =========================================================
    SETTINGS
 ========================================================= */
 
-const CALCULATOR_STORAGE_KEY =
-    "msea_boss_crystal_calculator_v11";
-
-const PLANNER_NOTES_STORAGE_KEY =
-    "msea_bossing_planner_notes_v1";
-
-const PLANNER_VIEW_STORAGE_KEY =
-    "msea_bossing_planner_v2";
-
+const CALCULATOR_STORAGE_KEY = "msea_boss_crystal_calculator_v11";
+const PLANNER_NOTES_STORAGE_KEY = "msea_bossing_planner_notes_v1";
+const PLANNER_VIEW_STORAGE_KEY = "msea_bossing_planner_v2";
+const PLANNER_RESET_STORAGE_KEY = "msea_bossing_planner_reset_v1";
 const MAX_BOSSES_PER_CHARACTER = 12;
-
-const CALCULATOR_URL =
-    "../";
-
+const CALCULATOR_URL = "../";
 
 /* =========================================================
-   PLANNER STATE
+   STATE
 ========================================================= */
 
 let state = {
-
     activeAccountId: null,
-
     activeCharacterId: null,
-
     notes: {}
-
 };
 
 let calculatorState = null;
-
 let modalAction = null;
-
 let toastTimer = null;
-
 
 /* =========================================================
    INITIALIZATION
 ========================================================= */
 
 function init() {
-
     loadCalculatorState();
-
     loadPlannerViewState();
-
     loadPlannerNotes();
-
     ensureActiveAccount();
-
     ensureActiveCharacter();
 
+    runAutomaticResets();
+
     renderAll();
-
+    startResetWatcher();
 }
-
 
 /* =========================================================
    CALCULATOR STATE
 ========================================================= */
 
 function loadCalculatorState() {
-
     try {
-
-        const saved =
-            localStorage.getItem(
-                CALCULATOR_STORAGE_KEY
-            );
-
+        const saved = localStorage.getItem(CALCULATOR_STORAGE_KEY);
 
         if (!saved) {
-
             calculatorState = null;
-
             return;
-
         }
 
+        const parsed = JSON.parse(saved);
 
-        const parsed =
-            JSON.parse(saved);
-
-
-        if (
-            !parsed ||
-            !Array.isArray(
-                parsed.accounts
-            )
-        ) {
-
+        if (!parsed || !Array.isArray(parsed.accounts)) {
             calculatorState = null;
-
             return;
-
         }
-
 
         calculatorState = parsed;
-
     }
-
     catch (error) {
-
-        console.error(
-            "Failed to load Calculator state:",
-            error
-        );
-
+        console.error("Failed to load Calculator state:", error);
         calculatorState = null;
-
     }
-
 }
-
 
 /* =========================================================
    PLANNER VIEW STATE
 ========================================================= */
 
 function loadPlannerViewState() {
-
     try {
+        const saved = localStorage.getItem(PLANNER_VIEW_STORAGE_KEY);
 
-        const saved =
-            localStorage.getItem(
-                PLANNER_VIEW_STORAGE_KEY
-            );
+        if (!saved) return;
 
+        const parsed = JSON.parse(saved);
 
-        if (!saved) {
-            return;
+        if (parsed && typeof parsed === "object") {
+            state.activeAccountId = parsed.activeAccountId || null;
+            state.activeCharacterId = parsed.activeCharacterId || null;
         }
-
-
-        const parsed =
-            JSON.parse(saved);
-
-
-        if (
-            parsed &&
-            typeof parsed === "object"
-        ) {
-
-            state.activeAccountId =
-                parsed.activeAccountId ||
-                null;
-
-            state.activeCharacterId =
-                parsed.activeCharacterId ||
-                null;
-
-        }
-
     }
-
     catch (error) {
-
-        console.error(
-            "Failed to load Planner view state:",
-            error
-        );
-
+        console.error("Failed to load Planner view state:", error);
     }
-
 }
-
-
-/* =========================================================
-   SAVE PLANNER VIEW STATE
-========================================================= */
 
 function savePlannerViewState() {
-
     localStorage.setItem(
-
         PLANNER_VIEW_STORAGE_KEY,
-
         JSON.stringify({
-
-            activeAccountId:
-                state.activeAccountId,
-
-            activeCharacterId:
-                state.activeCharacterId
-
+            activeAccountId: state.activeAccountId,
+            activeCharacterId: state.activeCharacterId
         })
-
     );
-
 }
-
 
 /* =========================================================
    PLANNER NOTES
 ========================================================= */
 
 function loadPlannerNotes() {
-
     try {
-
-        const saved =
-            localStorage.getItem(
-                PLANNER_NOTES_STORAGE_KEY
-            );
-
+        const saved = localStorage.getItem(PLANNER_NOTES_STORAGE_KEY);
 
         if (!saved) {
-
             state.notes = {};
-
             return;
-
         }
 
+        const parsed = JSON.parse(saved);
 
-        const parsed =
-            JSON.parse(saved);
-
-
-        if (
-            parsed &&
-            typeof parsed === "object"
-        ) {
-
-            state.notes = parsed;
-
-        }
-
-        else {
-
-            state.notes = {};
-
-        }
-
+        state.notes =
+            parsed && typeof parsed === "object"
+                ? parsed
+                : {};
     }
-
     catch (error) {
-
-        console.error(
-            "Failed to load Planner notes:",
-            error
-        );
-
+        console.error("Failed to load Planner notes:", error);
         state.notes = {};
-
     }
-
 }
-
 
 function savePlannerNotes() {
-
     localStorage.setItem(
-
         PLANNER_NOTES_STORAGE_KEY,
-
-        JSON.stringify(
-            state.notes
-        )
-
+        JSON.stringify(state.notes)
     );
-
 }
 
-
-function getNoteKey(
-    characterId,
-    bossId
-) {
-
-    return (
-        characterId +
-        ":" +
-        bossId
-    );
-
+function getNoteKey(characterId, bossId) {
+    return characterId + ":" + bossId;
 }
 
-
-function getBossNote(
-    characterId,
-    bossId
-) {
-
-    const key =
-        getNoteKey(
-            characterId,
-            bossId
-        );
-
-
-    return (
-        state.notes[key] ||
-        ""
-    );
-
+function getBossNote(characterId, bossId) {
+    return state.notes[getNoteKey(characterId, bossId)] || "";
 }
 
-
-function saveBossNote(
-    characterId,
-    bossId,
-    value
-) {
-
-    const key =
-        getNoteKey(
-            characterId,
-            bossId
-        );
-
-
-    state.notes[key] =
-        value;
-
-
+function saveBossNote(characterId, bossId, value) {
+    state.notes[getNoteKey(characterId, bossId)] = value;
     savePlannerNotes();
-
 }
-
 
 /* =========================================================
    CALCULATOR SAVE
 ========================================================= */
 
 function saveCalculatorState() {
-
-    if (!calculatorState) {
-        return;
-    }
-
+    if (!calculatorState) return;
 
     localStorage.setItem(
-
         CALCULATOR_STORAGE_KEY,
-
-        JSON.stringify(
-            calculatorState
-        )
-
+        JSON.stringify(calculatorState)
     );
-
 }
-
 
 /* =========================================================
    ID
 ========================================================= */
 
 function generateId() {
-
     return (
-
         Date.now().toString(36) +
-
-        Math.random()
-            .toString(36)
-            .slice(2)
-
+        Math.random().toString(36).slice(2)
     );
-
 }
-
 
 /* =========================================================
    ACCOUNT HELPERS
 ========================================================= */
 
 function getAccounts() {
-
     if (
         !calculatorState ||
-        !Array.isArray(
-            calculatorState.accounts
-        )
+        !Array.isArray(calculatorState.accounts)
     ) {
-
         return [];
-
     }
-
 
     return calculatorState.accounts;
-
 }
-
 
 function getActiveAccount() {
-
     return getAccounts().find(
-
-        account =>
-            account.id ===
-            state.activeAccountId
-
+        account => account.id === state.activeAccountId
     );
-
-
 }
-
 
 function getActiveCharacter() {
+    const account = getActiveAccount();
 
-    const account =
-        getActiveAccount();
+    if (!account) return null;
 
-
-    if (!account) {
-        return null;
+    if (!Array.isArray(account.characters)) {
+        account.characters = [];
     }
 
-
     return account.characters.find(
-
-        character =>
-            character.id ===
-            state.activeCharacterId
-
+        character => character.id === state.activeCharacterId
     );
-
 }
-
 
 /* =========================================================
    ACTIVE ACCOUNT / CHARACTER
 ========================================================= */
 
 function ensureActiveAccount() {
-
-    const accounts =
-        getAccounts();
-
+    const accounts = getAccounts();
 
     if (!accounts.length) {
-
         state.activeAccountId = null;
-
         state.activeCharacterId = null;
-
         savePlannerViewState();
-
         return;
-
     }
 
-
-    const accountExists =
-        accounts.some(
-
-            account =>
-                account.id ===
-                state.activeAccountId
-
-        );
-
+    const accountExists = accounts.some(
+        account => account.id === state.activeAccountId
+    );
 
     if (!accountExists) {
-
-        state.activeAccountId =
-            accounts[0].id;
-
+        state.activeAccountId = accounts[0].id;
     }
-
 }
-
 
 function ensureActiveCharacter() {
-
-    const account =
-        getActiveAccount();
-
+    const account = getActiveAccount();
 
     if (!account) {
-
         state.activeCharacterId = null;
-
         savePlannerViewState();
-
         return;
-
     }
 
-
-    if (
-        !Array.isArray(
-            account.characters
-        )
-    ) {
-
+    if (!Array.isArray(account.characters)) {
         account.characters = [];
-
     }
 
-
-    const characterExists =
-        account.characters.some(
-
-            character =>
-                character.id ===
-                state.activeCharacterId
-
-        );
-
+    const characterExists = account.characters.some(
+        character => character.id === state.activeCharacterId
+    );
 
     if (!characterExists) {
-
         state.activeCharacterId =
-
             account.characters.length
-
                 ? account.characters[0].id
-
                 : null;
-
     }
 
-
     savePlannerViewState();
-
 }
-
 
 /* =========================================================
    BOSS DATA
 ========================================================= */
 
 const bossDefinitions = [
-
     {
         id: "blackmage",
         name: "Black Mage",
@@ -1713,7 +464,6 @@ const bossDefinitions = [
             { name: "EX", value: 9080 }
         ]
     },
-
     {
         id: "lotus",
         name: "Lotus",
@@ -1725,7 +475,6 @@ const bossDefinitions = [
             { name: "EX", value: 588 }
         ]
     },
-
     {
         id: "damien",
         name: "Damien",
@@ -1736,7 +485,6 @@ const bossDefinitions = [
             { name: "H", value: 67.5 }
         ]
     },
-
     {
         id: "slime",
         name: "Slime",
@@ -1747,7 +495,6 @@ const bossDefinitions = [
             { name: "C", value: 99.9 }
         ]
     },
-
     {
         id: "lucid",
         name: "Lucid",
@@ -1759,7 +506,6 @@ const bossDefinitions = [
             { name: "H", value: 85 }
         ]
     },
-
     {
         id: "will",
         name: "Will",
@@ -1771,7 +517,6 @@ const bossDefinitions = [
             { name: "H", value: 104.4 }
         ]
     },
-
     {
         id: "dusk",
         name: "Dusk",
@@ -1782,7 +527,6 @@ const bossDefinitions = [
             { name: "H", value: 94.5 }
         ]
     },
-
     {
         id: "heretic",
         name: "Heretic",
@@ -1793,7 +537,6 @@ const bossDefinitions = [
             { name: "H", value: 139.7 }
         ]
     },
-
     {
         id: "djunkel",
         name: "Djunkel",
@@ -1804,7 +547,6 @@ const bossDefinitions = [
             { name: "H", value: 124.2 }
         ]
     },
-
     {
         id: "seren",
         name: "Seren",
@@ -1816,7 +558,6 @@ const bossDefinitions = [
             { name: "EX", value: 2280 }
         ]
     },
-
     {
         id: "kalos",
         name: "Kalos",
@@ -1829,7 +570,6 @@ const bossDefinitions = [
             { name: "EX", value: 2565 }
         ]
     },
-
     {
         id: "adversary",
         name: "Adversary",
@@ -1842,7 +582,6 @@ const bossDefinitions = [
             { name: "EX", value: 2920 }
         ]
     },
-
     {
         id: "radiant",
         name: "Radiant",
@@ -1853,7 +592,6 @@ const bossDefinitions = [
             { name: "H", value: 2256 }
         ]
     },
-
     {
         id: "carling",
         name: "Carling",
@@ -1866,7 +604,6 @@ const bossDefinitions = [
             { name: "EX", value: 3040 }
         ]
     },
-
     {
         id: "bellona",
         name: "Bellona",
@@ -1878,7 +615,6 @@ const bossDefinitions = [
             { name: "H", value: null }
         ]
     },
-
     {
         id: "limbo",
         name: "Limbo",
@@ -1889,7 +625,6 @@ const bossDefinitions = [
             { name: "H", value: 1930 }
         ]
     },
-
     {
         id: "baldrix",
         name: "Baldrix",
@@ -1900,7 +635,6 @@ const bossDefinitions = [
             { name: "H", value: 2160 }
         ]
     },
-
     {
         id: "jupiter",
         name: "Jupiter",
@@ -1911,92 +645,41 @@ const bossDefinitions = [
             { name: "H", value: 3000 }
         ]
     }
-
 ];
-
 
 /* =========================================================
    BOSS HELPERS
 ========================================================= */
 
 function getBoss(bossId) {
-
     return bossDefinitions.find(
-
-        boss =>
-            boss.id === bossId
-
+        boss => boss.id === bossId
     );
-
 }
 
-
-function getBossSelections(
-    character,
-    bossId
-) {
-
-    if (
-        !character ||
-        !character.selected
-    ) {
-
+function getBossSelections(character, bossId) {
+    if (!character || !character.selected) {
         return [];
-
     }
 
+    const value = character.selected[bossId];
 
-    const value =
-        character.selected[bossId];
-
-
-    if (
-        Array.isArray(value)
-    ) {
-
-        return value;
-
-    }
-
-
-    if (
-        typeof value === "string"
-    ) {
-
-        return [value];
-
-    }
-
+    if (Array.isArray(value)) return value;
+    if (typeof value === "string") return [value];
 
     return [];
-
 }
 
-
-function getPartySize(
-    bossId,
-    characterId,
-    difficulty
-) {
-
+function getPartySize(bossId, characterId, difficulty) {
     if (
         !calculatorState ||
         !calculatorState.partySizes
     ) {
-
         return 1;
-
     }
 
-
     const exactKey =
-
-        characterId +
-        ":" +
-        bossId +
-        ":" +
-        difficulty;
-
+        characterId + ":" + bossId + ":" + difficulty;
 
     if (
         Object.prototype.hasOwnProperty.call(
@@ -2004,89 +687,431 @@ function getPartySize(
             exactKey
         )
     ) {
-
         return Number(
             calculatorState.partySizes[exactKey]
         ) || 1;
-
     }
 
-
     const oldKey =
-
-        characterId +
-        ":" +
-        bossId;
-
+        characterId + ":" + bossId;
 
     return Number(
         calculatorState.partySizes[oldKey]
     ) || 1;
-
 }
 
+/* =========================================================
+   AUTOMATIC RESET SYSTEM
+========================================================= */
+
+/*
+   All reset calculations use GMT+8.
+
+   Weekly reset:
+   Thursday 00:00 GMT+8
+
+   Monthly reset:
+   1st day of each month 00:00 GMT+8
+*/
+
+function getGMT8Date() {
+    const now = new Date();
+
+    const utcMs =
+        now.getTime() +
+        (now.getTimezoneOffset() * 60000);
+
+    return new Date(
+        utcMs + (8 * 60 * 60 * 1000)
+    );
+}
+
+function formatGMT8Date(date) {
+    return (
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(date.getDate()).padStart(2, "0")
+    );
+}
+
+function getMonthlyResetPeriod(date) {
+    return (
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1).padStart(2, "0")
+    );
+}
+
+function getWeeklyResetPeriod(date) {
+    const day = date.getDay();
+
+    /*
+       Sunday = 0
+       Monday = 1
+       Tuesday = 2
+       Wednesday = 3
+       Thursday = 4
+       Friday = 5
+       Saturday = 6
+    */
+
+    const daysSinceThursday =
+        (day - 4 + 7) % 7;
+
+    const resetDate = new Date(date);
+
+    resetDate.setDate(
+        resetDate.getDate() -
+        daysSinceThursday
+    );
+
+    resetDate.setHours(0, 0, 0, 0);
+
+    return formatGMT8Date(resetDate);
+}
+
+function loadResetState() {
+    try {
+        const saved =
+            localStorage.getItem(
+                PLANNER_RESET_STORAGE_KEY
+            );
+
+        if (!saved) {
+            return {
+                weeklyPeriod: null,
+                monthlyPeriod: null
+            };
+        }
+
+        const parsed = JSON.parse(saved);
+
+        return {
+            weeklyPeriod:
+                parsed.weeklyPeriod || null,
+            monthlyPeriod:
+                parsed.monthlyPeriod || null
+        };
+    }
+    catch (error) {
+        console.error(
+            "Failed to load reset state:",
+            error
+        );
+
+        return {
+            weeklyPeriod: null,
+            monthlyPeriod: null
+        };
+    }
+}
+
+function saveResetState(resetState) {
+    localStorage.setItem(
+        PLANNER_RESET_STORAGE_KEY,
+        JSON.stringify(resetState)
+    );
+}
+
+/*
+   Clears only selected boss data.
+
+   Weekly reset:
+   Removes every Weekly boss selection.
+
+   Monthly reset:
+   Removes every Monthly boss selection.
+
+   Party sizes are intentionally preserved.
+*/
+
+function clearBossSelectionsByType(type) {
+    if (!calculatorState) {
+        return false;
+    }
+
+    let changed = false;
+
+    const accounts =
+        Array.isArray(calculatorState.accounts)
+            ? calculatorState.accounts
+            : [];
+
+    accounts.forEach(account => {
+
+        if (!Array.isArray(account.characters)) {
+            return;
+        }
+
+        account.characters.forEach(character => {
+
+            if (!character.selected) {
+                character.selected = {};
+            }
+
+            bossDefinitions.forEach(boss => {
+
+                if (boss.type !== type) {
+                    return;
+                }
+
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        character.selected,
+                        boss.id
+                    )
+                ) {
+
+                    /*
+                       Delete the selection entirely.
+                       This is compatible with the Calculator
+                       data structure used by the Planner.
+                    */
+
+                    delete character.selected[boss.id];
+
+                    changed = true;
+                }
+
+            });
+
+        });
+
+    });
+
+    return changed;
+}
+
+function runAutomaticResets() {
+
+    if (!calculatorState) {
+        updateResetStatus();
+        return;
+    }
+
+    const now =
+        getGMT8Date();
+
+    const currentWeeklyPeriod =
+        getWeeklyResetPeriod(now);
+
+    const currentMonthlyPeriod =
+        getMonthlyResetPeriod(now);
+
+    const resetState =
+        loadResetState();
+
+    let weeklyResetPerformed = false;
+    let monthlyResetPerformed = false;
+    let calculatorChanged = false;
+
+    /*
+       First visit with no stored reset period:
+       We establish the current period WITHOUT wiping
+       existing selections.
+
+       This prevents installing the new Planner version
+       from unexpectedly deleting the user's current clears.
+    */
+
+    if (!resetState.weeklyPeriod) {
+
+        resetState.weeklyPeriod =
+            currentWeeklyPeriod;
+
+    }
+    else if (
+        resetState.weeklyPeriod !==
+        currentWeeklyPeriod
+    ) {
+
+        calculatorChanged =
+            clearBossSelectionsByType(
+                "Weekly"
+            ) ||
+            calculatorChanged;
+
+        resetState.weeklyPeriod =
+            currentWeeklyPeriod;
+
+        weeklyResetPerformed = true;
+    }
+
+    if (!resetState.monthlyPeriod) {
+
+        resetState.monthlyPeriod =
+            currentMonthlyPeriod;
+
+    }
+    else if (
+        resetState.monthlyPeriod !==
+        currentMonthlyPeriod
+    ) {
+
+        calculatorChanged =
+            clearBossSelectionsByType(
+                "Monthly"
+            ) ||
+            calculatorChanged;
+
+        resetState.monthlyPeriod =
+            currentMonthlyPeriod;
+
+        monthlyResetPerformed = true;
+    }
+
+    if (calculatorChanged) {
+        saveCalculatorState();
+    }
+
+    saveResetState(resetState);
+
+    if (
+        weeklyResetPerformed &&
+        monthlyResetPerformed
+    ) {
+
+        showToast(
+            "Weekly and monthly boss selections reset."
+        );
+
+    }
+    else if (weeklyResetPerformed) {
+
+        showToast(
+            "Weekly boss selections reset."
+        );
+
+    }
+    else if (monthlyResetPerformed) {
+
+        showToast(
+            "Monthly boss selections reset."
+        );
+    }
+
+    updateResetStatus();
+}
+
+function updateResetStatus() {
+
+    const element =
+        document.getElementById(
+            "resetStatus"
+        );
+
+    if (!element) {
+        return;
+    }
+
+    const now =
+        getGMT8Date();
+
+    const weekly =
+        getWeeklyResetPeriod(now);
+
+    const monthly =
+        getMonthlyResetPeriod(now);
+
+    element.textContent =
+        "GMT+8 • Weekly period " +
+        weekly +
+        " • Monthly period " +
+        monthly;
+}
+
+/*
+   Check periodically while the page remains open.
+
+   Every 30 seconds is enough for this purpose.
+*/
+function startResetWatcher() {
+
+    setInterval(
+        () => {
+
+            const previous =
+                loadResetState();
+
+            const now =
+                getGMT8Date();
+
+            const weekly =
+                getWeeklyResetPeriod(now);
+
+            const monthly =
+                getMonthlyResetPeriod(now);
+
+            if (
+                previous.weeklyPeriod !== weekly ||
+                previous.monthlyPeriod !== monthly
+            ) {
+
+                loadCalculatorState();
+
+                runAutomaticResets();
+
+                ensureActiveAccount();
+
+                ensureActiveCharacter();
+
+                renderAll();
+
+                updateSyncStatus();
+            }
+
+            else {
+
+                updateResetStatus();
+            }
+
+        },
+        30000
+    );
+}
 
 /* =========================================================
    WEEKLY CLEAR COUNT
 ========================================================= */
 
-function getCharacterWeeklyClearCount(
-    character
-) {
+function getCharacterWeeklyClearCount(character) {
 
     if (
         !character ||
         !character.selected
     ) {
-
         return 0;
-
     }
-
 
     let total = 0;
 
-
     Object.keys(
         character.selected
-    ).forEach(
+    ).forEach(bossId => {
 
-        bossId => {
+        const boss =
+            getBoss(bossId);
 
-            const boss =
-                getBoss(bossId);
-
-
-            if (
-                !boss ||
-                boss.type !== "Weekly"
-            ) {
-
-                return;
-
-            }
-
-
-            total +=
-
-                getBossSelections(
-                    character,
-                    bossId
-                ).length;
-
+        if (
+            !boss ||
+            boss.type !== "Weekly"
+        ) {
+            return;
         }
 
-    );
-
+        total +=
+            getBossSelections(
+                character,
+                bossId
+            ).length;
+    });
 
     return total;
-
 }
 
-
-function getAccountWeeklyClearCount(
-    account
-) {
+function getAccountWeeklyClearCount(account) {
 
     if (
         !account ||
@@ -2094,47 +1119,29 @@ function getAccountWeeklyClearCount(
             account.characters
         )
     ) {
-
         return 0;
-
     }
 
-
     return account.characters.reduce(
-
-        (
-            total,
-            character
-        ) =>
-
+        (total, character) =>
             total +
             getCharacterWeeklyClearCount(
                 character
             ),
-
         0
-
     );
-
 }
-
 
 /* =========================================================
    RENDER ALL
 ========================================================= */
 
 function renderAll() {
-
     renderAccounts();
-
     renderCharacters();
-
     renderDashboard();
-
     renderBosses();
-
 }
-
 
 /* =========================================================
    ACCOUNT RENDER
@@ -2147,115 +1154,70 @@ function renderAccounts() {
             "accountTabs"
         );
 
-
     container.innerHTML = "";
-
 
     const accounts =
         getAccounts();
 
-
     if (!accounts.length) {
 
-        container.innerHTML = `
-
-            <div class="empty">
-                No Calculator accounts found.
-            </div>
-
-        `;
+        container.innerHTML =
+            `<div class="empty">No Calculator accounts found.</div>`;
 
         return;
-
     }
 
+    accounts.forEach(account => {
 
-    accounts.forEach(
-
-        account => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.type = "button";
-
-            button.className =
-
-                "account-tab" +
-
-                (
-
-                    account.id ===
-                    state.activeAccountId
-
-                        ? " active"
-
-                        : ""
-
-                );
-
-
-            const crystalCount =
-                getAccountWeeklyClearCount(
-                    account
-                );
-
-
-            button.innerHTML = `
-
-                <span class="account-tab-name">
-
-                    ${escapeHtml(
-                        account.name
-                    )}
-
-                </span>
-
-                <span class="account-tab-count">
-
-                    ${crystalCount} selected
-
-                </span>
-
-            `;
-
-
-            button.onclick = () => {
-
-                state.activeAccountId =
-                    account.id;
-
-
-                state.activeCharacterId =
-
-                    account.characters &&
-                    account.characters.length
-
-                        ? account.characters[0].id
-
-                        : null;
-
-
-                savePlannerViewState();
-
-                renderAll();
-
-            };
-
-
-            container.appendChild(
-                button
+        const button =
+            document.createElement(
+                "button"
             );
 
-        }
+        button.type = "button";
 
-    );
+        button.className =
+            "account-tab" +
+            (
+                account.id ===
+                state.activeAccountId
+                    ? " active"
+                    : ""
+            );
 
+        const crystalCount =
+            getAccountWeeklyClearCount(
+                account
+            );
+
+        button.innerHTML = `
+            <span class="account-tab-name">
+                ${escapeHtml(account.name)}
+            </span>
+            <span class="account-tab-count">
+                ${crystalCount} selected
+            </span>
+        `;
+
+        button.onclick = () => {
+
+            state.activeAccountId =
+                account.id;
+
+            state.activeCharacterId =
+                account.characters &&
+                account.characters.length
+                    ? account.characters[0].id
+                    : null;
+
+            savePlannerViewState();
+
+            renderAll();
+        };
+
+        container.appendChild(button);
+    });
 }
-
 
 /* =========================================================
    CHARACTER RENDER
@@ -2268,20 +1230,14 @@ function renderCharacters() {
             "characterTabs"
         );
 
-
     container.innerHTML = "";
-
 
     const account =
         getActiveAccount();
 
-
     if (!account) {
-
         return;
-
     }
-
 
     if (
         !Array.isArray(
@@ -2290,95 +1246,57 @@ function renderCharacters() {
         !account.characters.length
     ) {
 
-        container.innerHTML = `
-
-            <div class="empty">
-                No characters in this account.
-            </div>
-
-        `;
+        container.innerHTML =
+            `<div class="empty">No characters in this account.</div>`;
 
         return;
-
     }
 
+    account.characters.forEach(character => {
 
-    account.characters.forEach(
-
-        character => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.type = "button";
-
-            button.className =
-
-                "character-tab" +
-
-                (
-
-                    character.id ===
-                    state.activeCharacterId
-
-                        ? " active"
-
-                        : ""
-
-                );
-
-
-            const count =
-                getCharacterWeeklyClearCount(
-                    character
-                );
-
-
-            button.innerHTML = `
-
-                <span class="character-tab-name">
-
-                    ${escapeHtml(
-                        character.name
-                    )}
-
-                </span>
-
-                <span class="character-tab-count">
-
-                    ${count}/${MAX_BOSSES_PER_CHARACTER}
-
-                </span>
-
-            `;
-
-
-            button.onclick = () => {
-
-                state.activeCharacterId =
-                    character.id;
-
-
-                savePlannerViewState();
-
-                renderAll();
-
-            };
-
-
-            container.appendChild(
-                button
+        const button =
+            document.createElement(
+                "button"
             );
 
-        }
+        button.type = "button";
 
-    );
+        button.className =
+            "character-tab" +
+            (
+                character.id ===
+                state.activeCharacterId
+                    ? " active"
+                    : ""
+            );
 
+        const count =
+            getCharacterWeeklyClearCount(
+                character
+            );
+
+        button.innerHTML = `
+            <span class="character-tab-name">
+                ${escapeHtml(character.name)}
+            </span>
+            <span class="character-tab-count">
+                ${count}/${MAX_BOSSES_PER_CHARACTER}
+            </span>
+        `;
+
+        button.onclick = () => {
+
+            state.activeCharacterId =
+                character.id;
+
+            savePlannerViewState();
+
+            renderAll();
+        };
+
+        container.appendChild(button);
+    });
 }
-
 
 /* =========================================================
    DASHBOARD
@@ -2389,80 +1307,53 @@ function renderDashboard() {
     const character =
         getActiveCharacter();
 
-
     const account =
         getActiveAccount();
-
 
     const characterClears =
         getCharacterWeeklyClearCount(
             character
         );
 
-
     const remaining =
         Math.max(
-
             0,
-
             MAX_BOSSES_PER_CHARACTER -
             characterClears
-
         );
-
 
     const accountClears =
         getAccountWeeklyClearCount(
             account
         );
 
-
     document.getElementById(
         "weeklyClears"
     ).textContent =
         characterClears;
-
 
     document.getElementById(
         "remainingClears"
     ).textContent =
         remaining;
 
-
     document.getElementById(
         "characterName"
     ).textContent =
-
         character
             ? character.name
             : "—";
-
 
     document.getElementById(
         "accountClears"
     ).textContent =
         accountClears;
 
-
-    /*
-       Account selection is unlimited.
-
-       The progress bar is therefore only a visual
-       indicator rather than a 90-crystal limit meter.
-       It uses a soft scale so large accounts still
-       display a useful bar.
-    */
-
     const percentage =
-
         accountClears <= 0
-
             ? 0
-
             : Math.min(
-
                 100,
-
                 (
                     accountClears /
                     Math.max(
@@ -2470,26 +1361,19 @@ function renderDashboard() {
                         accountClears
                     )
                 ) * 100
-
             );
-
 
     document.getElementById(
         "accountProgress"
     ).style.width =
         percentage + "%";
-
 }
 
-
 /* =========================================================
-   BOSS ROW CREATOR
+   BOSS ROW
 ========================================================= */
 
-function createBossRow(
-    boss,
-    character
-) {
+function createBossRow(boss, character) {
 
     const selections =
         getBossSelections(
@@ -2497,226 +1381,126 @@ function createBossRow(
             boss.id
         );
 
-
     const row =
         document.createElement(
             "div"
         );
 
-
-    row.className =
-        "boss-row";
-
-
-    /* =====================
-       NAME
-    ===================== */
+    row.className = "boss-row";
 
     const nameDiv =
         document.createElement(
             "div"
         );
 
-
     nameDiv.className =
         "boss-name";
 
-
     nameDiv.innerHTML = `
-
         <img
             class="boss-icon"
-            src="${escapeHtml(
-                boss.icon
-            )}"
-            alt="${escapeHtml(
-                boss.name
-            )}"
+            src="${escapeHtml(boss.icon)}"
+            alt="${escapeHtml(boss.name)}"
             loading="lazy"
         >
-
         <div class="boss-name-text">
-
-            ${escapeHtml(
-                boss.name
-            )}
-
+            ${escapeHtml(boss.name)}
             <span class="boss-type">
-                ${escapeHtml(
-                    boss.type
-                )}
+                ${escapeHtml(boss.type)}
             </span>
-
         </div>
-
     `;
-
-
-    /* =====================
-       DIFFICULTIES
-    ===================== */
 
     const difficultyDiv =
         document.createElement(
             "div"
         );
 
-
     difficultyDiv.className =
         "difficulty-list";
-
 
     if (!selections.length) {
 
         difficultyDiv.innerHTML = `
-
-            <span
-                class="difficulty-badge not-cleared">
+            <span class="difficulty-badge not-cleared">
                 Not cleared
             </span>
-
         `;
 
-    }
-
-    else {
+    } else {
 
         const counts = {};
 
+        selections.forEach(difficulty => {
+            counts[difficulty] =
+                (counts[difficulty] || 0) + 1;
+        });
 
-        selections.forEach(
+        Object.keys(counts).forEach(difficulty => {
 
-            difficulty => {
-
-                counts[difficulty] =
-
-                    (
-                        counts[difficulty] ||
-                        0
-                    ) + 1;
-
-            }
-
-        );
-
-
-        Object.keys(counts).forEach(
-
-            difficulty => {
-
-                const badge =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                badge.className =
-                    "difficulty-badge";
-
-
-                badge.innerHTML = `
-
-                    ${escapeHtml(
-                        difficulty
-                    )}
-
-                    <span
-                        class="difficulty-count">
-                        ${counts[difficulty]}
-                    </span>
-
-                `;
-
-
-                difficultyDiv.appendChild(
-                    badge
+            const badge =
+                document.createElement(
+                    "span"
                 );
 
-            }
+            badge.className =
+                "difficulty-badge";
 
-        );
+            badge.innerHTML = `
+                ${escapeHtml(difficulty)}
+                <span class="difficulty-count">
+                    ${counts[difficulty]}
+                </span>
+            `;
 
+            difficultyDiv.appendChild(
+                badge
+            );
+        });
     }
-
-
-    /* =====================
-       PARTY SIZE
-    ===================== */
 
     const partyDiv =
         document.createElement(
             "div"
         );
 
-
     partyDiv.className =
         "party-info";
-
 
     if (!selections.length) {
 
         partyDiv.innerHTML =
             "No active clear";
 
-    }
-
-    else {
+    } else {
 
         const partyParts = [];
 
+        selections.forEach(difficulty => {
 
-        selections.forEach(
-
-            difficulty => {
-
-                const partySize =
-                    getPartySize(
-
-                        boss.id,
-
-                        character.id,
-
-                        difficulty
-
-                    );
-
-
-                partyParts.push(
-
-                    `${escapeHtml(
-                        difficulty
-                    )}: Party <strong>${
-                        partySize
-                    }</strong>`
-
+            const partySize =
+                getPartySize(
+                    boss.id,
+                    character.id,
+                    difficulty
                 );
 
-            }
-
-        );
-
+            partyParts.push(
+                `${escapeHtml(difficulty)}: Party <strong>${partySize}</strong>`
+            );
+        });
 
         partyDiv.innerHTML =
-            partyParts.join(
-                " · "
-            );
-
+            partyParts.join(" · ");
     }
-
-
-    /* =====================
-       STATUS
-    ===================== */
 
     const statusDiv =
         document.createElement(
             "div"
         );
 
-
     statusDiv.className =
         "status";
-
 
     if (selections.length) {
 
@@ -2724,77 +1508,52 @@ function createBossRow(
             "status-cleared"
         );
 
-
         statusDiv.innerHTML = `
-
             ✓ Cleared
-
             <small>
                 ${selections.length}
                 clear${selections.length === 1 ? "" : "s"}
             </small>
-
         `;
 
-    }
-
-    else {
+    } else {
 
         statusDiv.classList.add(
             "status-not-cleared"
         );
 
-
         statusDiv.innerHTML = `
-
             Not Cleared
-
-            <small>
-                0 clears
-            </small>
-
+            <small>0 clears</small>
         `;
-
     }
-
-
-    /* =====================
-       NOTE
-    ===================== */
 
     const noteWrapper =
         document.createElement(
             "div"
         );
 
-
     const noteLabel =
         document.createElement(
             "div"
         );
 
-
     noteLabel.className =
         "note-label";
 
-
     noteLabel.textContent =
         "Personal Note";
-
 
     const note =
         document.createElement(
             "textarea"
         );
 
-
     note.className =
         "boss-note";
 
-
     note.placeholder =
         "Party IGN / reminder...";
-
 
     note.value =
         getBossNote(
@@ -2802,25 +1561,16 @@ function createBossRow(
             boss.id
         );
 
-
-    note.maxLength =
-        500;
-
+    note.maxLength = 500;
 
     note.oninput = () => {
 
         saveBossNote(
-
             character.id,
-
             boss.id,
-
             note.value
-
         );
-
     };
-
 
     noteWrapper.appendChild(
         noteLabel
@@ -2830,36 +1580,14 @@ function createBossRow(
         note
     );
 
-
-    /* =====================
-       APPEND
-    ===================== */
-
-    row.appendChild(
-        nameDiv
-    );
-
-    row.appendChild(
-        difficultyDiv
-    );
-
-    row.appendChild(
-        partyDiv
-    );
-
-    row.appendChild(
-        statusDiv
-    );
-
-    row.appendChild(
-        noteWrapper
-    );
-
+    row.appendChild(nameDiv);
+    row.appendChild(difficultyDiv);
+    row.appendChild(partyDiv);
+    row.appendChild(statusDiv);
+    row.appendChild(noteWrapper);
 
     return row;
-
 }
-
 
 /* =========================================================
    BOSS RENDER
@@ -2872,46 +1600,29 @@ function renderBosses() {
             "weeklyBosses"
         );
 
-
     const monthlyContainer =
         document.getElementById(
             "monthlyBosses"
         );
 
-
     weeklyContainer.innerHTML = "";
-
     monthlyContainer.innerHTML = "";
-
 
     const character =
         getActiveCharacter();
 
-
     if (!character) {
 
-        weeklyContainer.innerHTML = `
+        weeklyContainer.innerHTML =
+            `<div class="empty">No active character found.</div>`;
 
-            <div class="empty">
-                No active character found.
-            </div>
-
-        `;
-
-        monthlyContainer.innerHTML = `
-
-            <div class="empty">
-                No active character found.
-            </div>
-
-        `;
+        monthlyContainer.innerHTML =
+            `<div class="empty">No active character found.</div>`;
 
         updateSyncStatus();
 
         return;
-
     }
-
 
     const search =
         document.getElementById(
@@ -2921,133 +1632,66 @@ function renderBosses() {
         .trim()
         .toLowerCase();
 
-
     const monthlyBosses =
         bossDefinitions.filter(
-
-            boss =>
-                boss.type === "Monthly"
-
+            boss => boss.type === "Monthly"
         );
-
 
     const weeklyBosses =
         bossDefinitions.filter(
-
-            boss =>
-                boss.type === "Weekly"
-
+            boss => boss.type === "Weekly"
         );
 
+    monthlyBosses.forEach(boss => {
 
-    /* =====================
-       MONTHLY
-    ===================== */
-
-    monthlyBosses.forEach(
-
-        boss => {
-
-            if (
-
-                search &&
-
-                !boss.name
-                    .toLowerCase()
-                    .includes(search)
-
-            ) {
-
-                return;
-
-            }
-
-
-            monthlyContainer.appendChild(
-
-                createBossRow(
-                    boss,
-                    character
-                )
-
-            );
-
+        if (
+            search &&
+            !boss.name
+                .toLowerCase()
+                .includes(search)
+        ) {
+            return;
         }
 
-    );
+        monthlyContainer.appendChild(
+            createBossRow(
+                boss,
+                character
+            )
+        );
+    });
 
+    weeklyBosses.forEach(boss => {
 
-    /* =====================
-       WEEKLY
-    ===================== */
-
-    weeklyBosses.forEach(
-
-        boss => {
-
-            if (
-
-                search &&
-
-                !boss.name
-                    .toLowerCase()
-                    .includes(search)
-
-            ) {
-
-                return;
-
-            }
-
-
-            weeklyContainer.appendChild(
-
-                createBossRow(
-                    boss,
-                    character
-                )
-
-            );
-
+        if (
+            search &&
+            !boss.name
+                .toLowerCase()
+                .includes(search)
+        ) {
+            return;
         }
 
-    );
+        weeklyContainer.appendChild(
+            createBossRow(
+                boss,
+                character
+            )
+        );
+    });
 
-
-    if (
-        !monthlyContainer.children.length
-    ) {
-
-        monthlyContainer.innerHTML = `
-
-            <div class="empty">
-                No monthly bosses found.
-            </div>
-
-        `;
-
+    if (!monthlyContainer.children.length) {
+        monthlyContainer.innerHTML =
+            `<div class="empty">No monthly bosses found.</div>`;
     }
 
-
-    if (
-        !weeklyContainer.children.length
-    ) {
-
-        weeklyContainer.innerHTML = `
-
-            <div class="empty">
-                No weekly bosses found.
-            </div>
-
-        `;
-
+    if (!weeklyContainer.children.length) {
+        weeklyContainer.innerHTML =
+            `<div class="empty">No weekly bosses found.</div>`;
     }
-
 
     updateSyncStatus();
-
 }
-
 
 /* =========================================================
    SYNC
@@ -3057,20 +1701,21 @@ function syncFromCalculator() {
 
     loadCalculatorState();
 
-    ensureActiveAccount();
+    /*
+       Check reset again when manually syncing.
+    */
+    runAutomaticResets();
 
+    ensureActiveAccount();
     ensureActiveCharacter();
 
     renderAll();
-
     updateSyncStatus();
 
     showToast(
         "Planner synced with Calculator."
     );
-
 }
-
 
 function updateSyncStatus() {
 
@@ -3079,11 +1724,7 @@ function updateSyncStatus() {
             "syncStatus"
         );
 
-
-    if (!status) {
-        return;
-    }
-
+    if (!status) return;
 
     if (!calculatorState) {
 
@@ -3094,18 +1735,14 @@ function updateSyncStatus() {
             "#ff9d9d";
 
         return;
-
     }
-
 
     status.textContent =
         "Synced with Calculator";
 
     status.style.color =
         "#7c5cff";
-
 }
-
 
 /* =========================================================
    ACCOUNT MANAGEMENT
@@ -3120,9 +1757,7 @@ function addAccount() {
         );
 
         return;
-
     }
-
 
     if (
         !Array.isArray(
@@ -3131,98 +1766,66 @@ function addAccount() {
     ) {
 
         calculatorState.accounts = [];
-
     }
-
 
     let number =
         calculatorState.accounts.length + 1;
 
-
     let name =
         `Account ${number}`;
 
-
     while (
-
         calculatorState.accounts.some(
-
-            account =>
-                account.name === name
-
+            account => account.name === name
         )
-
     ) {
 
         number++;
 
         name =
             `Account ${number}`;
-
     }
 
-
     const account = {
-
         id: generateId(),
-
         name: name,
-
         characters: []
-
     };
-
 
     const character = {
-
         id: generateId(),
-
         name: "Character 1",
-
         selected: {}
-
     };
-
 
     account.characters.push(
         character
     );
 
-
     calculatorState.accounts.push(
         account
     );
 
-
     calculatorState.activeAccountId =
         account.id;
-
 
     calculatorState.activeCharacterId =
         character.id;
 
-
     state.activeAccountId =
         account.id;
-
 
     state.activeCharacterId =
         character.id;
 
-
     saveCalculatorState();
-
     savePlannerViewState();
-
     renderAll();
-
 
     showToast(
         `${name} added to Calculator and Planner.`
     );
-
 }
-
 
 /* =========================================================
    RENAME ACCOUNT
@@ -3233,23 +1836,15 @@ function renameAccount() {
     const account =
         getActiveAccount();
 
-
-    if (!account) {
-        return;
-    }
-
+    if (!account) return;
 
     openModal(
-
         "Rename Account",
-
         account.name,
-
         value => {
 
             const trimmed =
                 value.trim();
-
 
             if (!trimmed) {
 
@@ -3258,29 +1853,20 @@ function renameAccount() {
                 );
 
                 return;
-
             }
-
 
             account.name =
                 trimmed;
 
-
             saveCalculatorState();
-
             renderAll();
-
 
             showToast(
                 "Account renamed."
             );
-
         }
-
     );
-
 }
-
 
 /* =========================================================
    DELETE ACCOUNT
@@ -3288,106 +1874,43 @@ function renameAccount() {
 
 function deleteAccount() {
 
-    if (!calculatorState) {
-        return;
-    }
-
+    if (!calculatorState) return;
 
     const accounts =
         getAccounts();
 
-
-    if (
-        accounts.length <= 1
-    ) {
+    if (accounts.length <= 1) {
 
         showToast(
             "You must keep at least one account."
         );
 
         return;
-
     }
-
 
     const account =
         getActiveAccount();
 
-
-    if (!account) {
-        return;
-    }
-
+    if (!account) return;
 
     const confirmed =
         confirm(
-
             `Delete "${account.name}" and all of its characters?`
-
         );
 
-
-    if (!confirmed) {
-        return;
-    }
-
+    if (!confirmed) return;
 
     const deletedAccountId =
         account.id;
 
-
-    /* Remove old calculator party-size data */
-
-    if (
-        calculatorState.partySizes
-    ) {
+    if (calculatorState.partySizes) {
 
         account.characters.forEach(
-
             character => {
 
                 Object.keys(
                     calculatorState.partySizes
-                ).forEach(
-
-                    key => {
-
-                        if (
-
-                            key.startsWith(
-                                character.id + ":"
-                            )
-
-                        ) {
-
-                            delete
-                                calculatorState
-                                    .partySizes[key];
-
-                        }
-
-                    }
-
-                );
-
-            }
-
-        );
-
-    }
-
-
-    /* Remove planner notes */
-
-    account.characters.forEach(
-
-        character => {
-
-            Object.keys(
-                state.notes
-            ).forEach(
-
-                key => {
+                ).forEach(key => {
 
                     if (
                         key.startsWith(
@@ -3396,71 +1919,67 @@ function deleteAccount() {
                     ) {
 
                         delete
-                            state.notes[key];
-
+                            calculatorState.partySizes[key];
                     }
+                });
+            }
+        );
+    }
 
+    account.characters.forEach(
+        character => {
+
+            Object.keys(
+                state.notes
+            ).forEach(key => {
+
+                if (
+                    key.startsWith(
+                        character.id + ":"
+                    )
+                ) {
+
+                    delete
+                        state.notes[key];
                 }
-
-            );
-
+            });
         }
-
     );
-
 
     savePlannerNotes();
 
-
     calculatorState.accounts =
-
         accounts.filter(
-
             item =>
                 item.id !==
                 deletedAccountId
-
         );
-
 
     const nextAccount =
         calculatorState.accounts[0];
 
-
     state.activeAccountId =
         nextAccount.id;
 
-
     state.activeCharacterId =
-
         nextAccount.characters.length
-
             ? nextAccount.characters[0].id
-
             : null;
-
 
     calculatorState.activeAccountId =
         state.activeAccountId;
 
-
     calculatorState.activeCharacterId =
         state.activeCharacterId;
 
-
     saveCalculatorState();
-
     savePlannerViewState();
-
     renderAll();
-
 
     showToast(
         `${account.name} deleted.`
     );
-
 }
-
 
 /* =========================================================
    CHARACTER MANAGEMENT
@@ -3471,7 +1990,6 @@ function addCharacter() {
     const account =
         getActiveAccount();
 
-
     if (!account) {
 
         showToast(
@@ -3479,9 +1997,7 @@ function addCharacter() {
         );
 
         return;
-
     }
-
 
     if (
         !Array.isArray(
@@ -3490,78 +2006,54 @@ function addCharacter() {
     ) {
 
         account.characters = [];
-
     }
-
 
     let number =
         account.characters.length + 1;
 
-
     let name =
         `Character ${number}`;
 
-
     while (
-
         account.characters.some(
-
             character =>
                 character.name === name
-
         )
-
     ) {
 
         number++;
 
         name =
             `Character ${number}`;
-
     }
 
-
     const character = {
-
         id: generateId(),
-
         name: name,
-
         selected: {}
-
     };
-
 
     account.characters.push(
         character
     );
 
-
     state.activeCharacterId =
         character.id;
-
 
     calculatorState.activeAccountId =
         account.id;
 
-
     calculatorState.activeCharacterId =
         character.id;
 
-
     saveCalculatorState();
-
     savePlannerViewState();
-
     renderAll();
-
 
     showToast(
         `${name} added to Calculator and Planner.`
     );
-
 }
-
 
 /* =========================================================
    RENAME CHARACTER
@@ -3572,23 +2064,15 @@ function renameCharacter() {
     const character =
         getActiveCharacter();
 
-
-    if (!character) {
-        return;
-    }
-
+    if (!character) return;
 
     openModal(
-
         "Rename Character",
-
         character.name,
-
         value => {
 
             const trimmed =
                 value.trim();
-
 
             if (!trimmed) {
 
@@ -3597,29 +2081,20 @@ function renameCharacter() {
                 );
 
                 return;
-
             }
-
 
             character.name =
                 trimmed;
 
-
             saveCalculatorState();
-
             renderAll();
-
 
             showToast(
                 "Character renamed."
             );
-
         }
-
     );
-
 }
-
 
 /* =========================================================
    DELETE CHARACTER
@@ -3630,11 +2105,7 @@ function deleteCharacter() {
     const account =
         getActiveAccount();
 
-
-    if (!account) {
-        return;
-    }
-
+    if (!account) return;
 
     if (
         account.characters.length <= 1
@@ -3645,74 +2116,28 @@ function deleteCharacter() {
         );
 
         return;
-
     }
-
 
     const character =
         getActiveCharacter();
 
-
-    if (!character) {
-        return;
-    }
-
+    if (!character) return;
 
     const confirmed =
         confirm(
             `Delete "${character.name}"?`
         );
 
-
-    if (!confirmed) {
-        return;
-    }
-
+    if (!confirmed) return;
 
     const deletedCharacterId =
         character.id;
 
-
-    /* Remove calculator party-size data */
-
-    if (
-        calculatorState.partySizes
-    ) {
+    if (calculatorState.partySizes) {
 
         Object.keys(
             calculatorState.partySizes
-        ).forEach(
-
-            key => {
-
-                if (
-
-                    key.startsWith(
-                        deletedCharacterId + ":"
-                    )
-
-                ) {
-
-                    delete
-                        calculatorState
-                            .partySizes[key];
-
-                }
-
-            }
-
-        );
-
-    }
-
-
-    /* Remove planner notes */
-
-    Object.keys(
-        state.notes
-    ).forEach(
-
-        key => {
+        ).forEach(key => {
 
             if (
                 key.startsWith(
@@ -3721,54 +2146,53 @@ function deleteCharacter() {
             ) {
 
                 delete
-                    state.notes[key];
-
+                    calculatorState
+                        .partySizes[key];
             }
+        });
+    }
 
+    Object.keys(
+        state.notes
+    ).forEach(key => {
+
+        if (
+            key.startsWith(
+                deletedCharacterId + ":"
+            )
+        ) {
+
+            delete
+                state.notes[key];
         }
-
-    );
-
+    });
 
     savePlannerNotes();
 
-
     account.characters =
-
         account.characters.filter(
-
             item =>
                 item.id !==
                 deletedCharacterId
-
         );
-
 
     state.activeCharacterId =
         account.characters[0].id;
 
-
     calculatorState.activeAccountId =
         account.id;
-
 
     calculatorState.activeCharacterId =
         state.activeCharacterId;
 
-
     saveCalculatorState();
-
     savePlannerViewState();
-
     renderAll();
-
 
     showToast(
         `${character.name} deleted.`
     );
-
 }
-
 
 /* =========================================================
    MODAL
@@ -3783,18 +2207,15 @@ function openModal(
     modalAction =
         callback;
 
-
     document.getElementById(
         "modalTitle"
     ).textContent =
         title;
 
-
     document.getElementById(
         "modalInput"
     ).value =
         value;
-
 
     document.getElementById(
         "modalOverlay"
@@ -3802,9 +2223,7 @@ function openModal(
         "show"
     );
 
-
     setTimeout(
-
         () => {
 
             const input =
@@ -3812,33 +2231,24 @@ function openModal(
                     "modalInput"
                 );
 
-
             input.focus();
-
             input.select();
 
         },
-
         50
-
     );
-
 }
-
 
 function closeModal() {
 
     modalAction = null;
-
 
     document.getElementById(
         "modalOverlay"
     ).classList.remove(
         "show"
     );
-
 }
-
 
 function confirmModal() {
 
@@ -3847,56 +2257,34 @@ function confirmModal() {
             "modalInput"
         );
 
-
     const value =
         input.value;
-
 
     const callback =
         modalAction;
 
-
     closeModal();
 
-
     if (callback) {
-
         callback(value);
-
     }
-
 }
-
 
 document.getElementById(
     "modalInput"
 ).addEventListener(
-
     "keydown",
-
     event => {
 
-        if (
-            event.key === "Enter"
-        ) {
-
+        if (event.key === "Enter") {
             confirmModal();
-
         }
 
-
-        if (
-            event.key === "Escape"
-        ) {
-
+        if (event.key === "Escape") {
             closeModal();
-
         }
-
     }
-
 );
-
 
 /* =========================================================
    TOAST
@@ -3909,38 +2297,27 @@ function showToast(message) {
             "toast"
         );
 
-
     toast.textContent =
         message;
-
 
     toast.classList.add(
         "show"
     );
 
-
     clearTimeout(
         toastTimer
     );
 
-
     toastTimer =
         setTimeout(
-
             () => {
-
                 toast.classList.remove(
                     "show"
                 );
-
             },
-
             2500
-
         );
-
 }
-
 
 /* =========================================================
    HTML ESCAPING
@@ -3949,43 +2326,19 @@ function showToast(message) {
 function escapeHtml(value) {
 
     return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
-
 
 /* =========================================================
    CROSS-TAB SYNC
 ========================================================= */
 
 window.addEventListener(
-
     "storage",
-
     event => {
 
         if (
@@ -3995,16 +2348,14 @@ window.addEventListener(
 
             loadCalculatorState();
 
-            ensureActiveAccount();
+            runAutomaticResets();
 
+            ensureActiveAccount();
             ensureActiveCharacter();
 
             renderAll();
-
             updateSyncStatus();
-
         }
-
 
         if (
             event.key ===
@@ -4014,22 +2365,17 @@ window.addEventListener(
             loadPlannerNotes();
 
             renderBosses();
-
         }
 
     }
-
 );
-
 
 /* =========================================================
    VISIBILITY SYNC
 ========================================================= */
 
 document.addEventListener(
-
     "visibilitychange",
-
     () => {
 
         if (
@@ -4038,23 +2384,19 @@ document.addEventListener(
         ) {
 
             loadCalculatorState();
-
             loadPlannerNotes();
 
-            ensureActiveAccount();
+            runAutomaticResets();
 
+            ensureActiveAccount();
             ensureActiveCharacter();
 
             renderAll();
-
             updateSyncStatus();
-
         }
 
     }
-
 );
-
 
 /* =========================================================
    START
@@ -4063,6 +2405,5 @@ document.addEventListener(
 init();
 
 </script>
-
 </body>
 </html>
