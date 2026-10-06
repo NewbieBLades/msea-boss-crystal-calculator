@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -799,7 +800,7 @@
             </div>
 
             <div class="card-sub">
-                Maximum 90 account crystals
+                Unlimited account selections
             </div>
 
             <div class="progress-wrap">
@@ -1049,6 +1050,43 @@
 
         <br><br>
 
+        <strong>Weekly selection limits:</strong><br>
+
+        Each character can have a maximum of
+        <strong>12 weekly Boss Crystals</strong>.
+
+        There is <strong>no account-wide selection limit</strong>
+        in the Planner.
+
+        You can therefore have, for example:
+
+        <br>
+
+        • Character 1 — 12 weekly clears<br>
+        • Character 2 — 12 weekly clears<br>
+        • Character 3 — 12 weekly clears<br>
+        • Character 4 — 12 weekly clears<br>
+        • Character 5 — 12 weekly clears<br>
+        • Character 6 — 12 weekly clears<br>
+        • Character 7 — 12 weekly clears<br>
+        • Character 8 — 12 weekly clears<br>
+        • Character 9 — 12 weekly clears<br>
+        • Character 10 — 12 weekly clears<br>
+
+        <br>
+
+        All selected clears remain visible and synchronized.
+
+        <br><br>
+
+        <strong>Important:</strong><br>
+
+        The Planner does not apply the 90-crystal selling limit.
+        The separate Optimizer can use the 90-crystal limit when
+        calculating which selected weekly Boss Crystals should be sold.
+
+        <br><br>
+
         <strong>How Notes work:</strong><br>
 
         Each boss has its own personal Note box.
@@ -1147,8 +1185,6 @@ const PLANNER_VIEW_STORAGE_KEY =
     "msea_bossing_planner_v2";
 
 const MAX_BOSSES_PER_CHARACTER = 12;
-
-const MAX_ACCOUNT_CRYSTALS = 90;
 
 const CALCULATOR_URL =
     "../";
@@ -1536,6 +1572,7 @@ function getActiveAccount() {
             state.activeAccountId
 
     );
+
 
 }
 
@@ -2180,7 +2217,7 @@ function renderAccounts() {
 
                 <span class="account-tab-count">
 
-                    ${crystalCount}/${MAX_ACCOUNT_CRYSTALS}
+                    ${crystalCount} selected
 
                 </span>
 
@@ -2408,18 +2445,34 @@ function renderDashboard() {
         accountClears;
 
 
+    /*
+       Account selection is unlimited.
+
+       The progress bar is therefore only a visual
+       indicator rather than a 90-crystal limit meter.
+       It uses a soft scale so large accounts still
+       display a useful bar.
+    */
+
     const percentage =
 
-        Math.min(
+        accountClears <= 0
 
-            100,
+            ? 0
 
-            (
-                accountClears /
-                MAX_ACCOUNT_CRYSTALS
-            ) * 100
+            : Math.min(
 
-        );
+                100,
+
+                (
+                    accountClears /
+                    Math.max(
+                        12,
+                        accountClears
+                    )
+                ) * 100
+
+            );
 
 
     document.getElementById(
@@ -4014,3 +4067,4 @@ init();
 
 </body>
 </html>
+```
