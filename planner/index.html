@@ -18,7 +18,8 @@
     }
 
     button,
-    input {
+    input,
+    select {
         font: inherit;
     }
 
@@ -109,6 +110,55 @@
         background: #242a35;
     }
 
+    .success {
+        background: #347d59;
+    }
+
+    .calculator-link {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: white;
+        background: #242a35;
+    }
+
+    .calculator-link:hover {
+        filter: brightness(1.15);
+    }
+
+    .section-title {
+        font-size: 15px;
+        color: #9da5b4;
+        margin-bottom: 10px;
+    }
+
+    .account-tabs {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        margin-bottom: 14px;
+    }
+
+    .account-tab {
+        flex: 0 0 auto;
+        background: #11141b;
+        border: 1px solid #303643;
+        color: #c7ccd6;
+        padding: 10px 14px;
+        border-radius: 9px;
+        cursor: pointer;
+    }
+
+    .account-tab.active {
+        background: #5865f2;
+        border-color: #5865f2;
+        color: white;
+    }
+
     .character-tabs {
         display: flex;
         gap: 8px;
@@ -144,6 +194,12 @@
     .character-name {
         font-size: 24px;
         font-weight: bold;
+    }
+
+    .account-name-display {
+        color: #8f97a6;
+        font-size: 13px;
+        margin-top: 4px;
     }
 
     .character-actions {
@@ -238,6 +294,23 @@
         text-align: center;
         padding: 40px 15px;
         color: #8d95a3;
+    }
+
+    .empty h3 {
+        margin-bottom: 8px;
+        color: #c7ccd6;
+    }
+
+    .sync-note {
+        color: #737b8a;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    .sync-status {
+        color: #7fce9d;
+        font-size: 12px;
+        margin-top: 8px;
     }
 
     .footer-note {
@@ -365,6 +438,7 @@
     </div>
 
     <div class="summary">
+
         <div class="summary-box">
             <div class="summary-label">Current Character</div>
             <div class="summary-value" id="currentCharacterName">-</div>
@@ -384,85 +458,170 @@
             <div class="summary-label">Total Characters</div>
             <div class="summary-value" id="characterCount">0</div>
         </div>
+
     </div>
 
     <div class="card">
 
         <div class="toolbar">
+
             <button class="primary" id="addCharacterBtn">
                 + Add Character
             </button>
+
+            <button class="secondary" id="syncBtn">
+                ↻ Sync from Calculator
+            </button>
+
+            <a
+                class="calculator-link"
+                href="/msea-boss-crystal-calculator/"
+            >
+                ↗ Crystal Calculator
+            </a>
 
             <button class="secondary" id="exampleBtn">
                 Example Data
             </button>
 
             <button class="danger" id="resetAllBtn">
-                Reset All
+                Reset Planner Progress
             </button>
+
+        </div>
+
+        <div class="section-title">
+            Accounts
+        </div>
+
+        <div class="account-tabs" id="accountTabs"></div>
+
+        <div class="section-title">
+            Characters
         </div>
 
         <div class="character-tabs" id="characterTabs"></div>
+
+        <div class="sync-note">
+            Accounts and characters are synchronized with the MSEA Boss Crystal Calculator.
+            Planner boss-clear progress is stored separately.
+        </div>
+
+        <div class="sync-status" id="syncStatus">
+            Connected to Calculator data
+        </div>
 
     </div>
 
     <div class="card" id="plannerCard">
 
         <div id="emptyState" class="empty">
+
             <h3>No characters yet</h3>
-            <p>Click <strong>+ Add Character</strong> to create your first character.</p>
+
+            <p>
+                Add a character here and it will also be created in the Crystal Calculator.
+            </p>
+
         </div>
 
         <div id="plannerContent" style="display:none;">
 
             <div class="character-header">
+
                 <div>
-                    <div class="character-name" id="plannerCharacterName">
+
+                    <div
+                        class="character-name"
+                        id="plannerCharacterName"
+                    >
                         Character 1
                     </div>
+
+                    <div
+                        class="account-name-display"
+                        id="plannerAccountName"
+                    >
+                        Account 1
+                    </div>
+
                 </div>
 
                 <div class="character-actions">
-                    <button class="secondary" id="renameBtn">
+
+                    <button
+                        class="secondary"
+                        id="renameBtn"
+                    >
                         Rename
                     </button>
 
-                    <button class="secondary" id="clearCharacterBtn">
+                    <button
+                        class="secondary"
+                        id="clearCharacterBtn"
+                    >
                         Clear Clears
                     </button>
 
-                    <button class="danger" id="deleteCharacterBtn">
+                    <button
+                        class="danger"
+                        id="deleteCharacterBtn"
+                    >
                         Delete
                     </button>
+
                 </div>
+
             </div>
 
             <div class="progress-section">
 
                 <div class="progress-info">
-                    <span>Weekly Boss Clear Progress</span>
-                    <span id="progressText">0 / 12</span>
+
+                    <span>
+                        Weekly Boss Clear Progress
+                    </span>
+
+                    <span id="progressText">
+                        0 / 12
+                    </span>
+
                 </div>
 
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+
+                    <div
+                        class="progress-fill"
+                        id="progressFill"
+                    ></div>
+
                 </div>
 
             </div>
 
-            <div class="boss-grid" id="bossGrid"></div>
+            <div
+                class="boss-grid"
+                id="bossGrid"
+            ></div>
 
         </div>
 
     </div>
 
     <div class="footer-note">
-        Your planner is saved automatically in this browser.
+        Account and character presets sync with the Crystal Calculator.
+        Planner progress is saved automatically in this browser.
     </div>
 
 </div>
 
-<div class="modal-overlay" id="renameModal">
+
+<!-- Rename Modal -->
+
+<div
+    class="modal-overlay"
+    id="renameModal"
+>
 
     <div class="modal">
 
@@ -476,32 +635,63 @@
         >
 
         <div class="modal-actions">
-            <button class="secondary" id="cancelRenameBtn">
+
+            <button
+                class="secondary"
+                id="cancelRenameBtn"
+            >
                 Cancel
             </button>
 
-            <button class="primary" id="saveRenameBtn">
+            <button
+                class="primary"
+                id="saveRenameBtn"
+            >
                 Save
             </button>
+
         </div>
 
     </div>
 
 </div>
 
+
 <script>
 (function () {
 
     "use strict";
 
-    const STORAGE_KEY = "msea_bossing_planner_v1";
+
+    /*
+     * ============================================================
+     * STORAGE
+     * ============================================================
+     *
+     * Calculator storage:
+     * msea_boss_crystal_calculator_v11
+     *
+     * Planner storage:
+     * msea_bossing_planner_v2
+     *
+     * Calculator accounts/characters are the MASTER preset.
+     * Planner only stores its own boss-clear checklist.
+     */
+
+    const CALCULATOR_STORAGE_KEY =
+        "msea_boss_crystal_calculator_v11";
+
+    const PLANNER_STORAGE_KEY =
+        "msea_bossing_planner_v2";
+
 
     const MAX_SLOTS = 12;
 
+
     /*
-     * You can change these boss names anytime.
-     * The planner only tracks CLEAR / HAVEN'T CLEARED.
+     * These are the 12 weekly boss slots used by the planner.
      */
+
     const BOSS_NAMES = [
         "Lotus",
         "Damien",
@@ -517,10 +707,38 @@
         "Carling"
     ];
 
+
+    /*
+     * ============================================================
+     * PLANNER STATE
+     * ============================================================
+     *
+     * Planner state does NOT contain its own account/character
+     * list anymore.
+     *
+     * It only stores:
+     *
+     * {
+     *     activeAccountId,
+     *     activeCharacterId,
+     *     clears: {
+     *         characterId: [true,false,...]
+     *     }
+     * }
+     */
+
     let state = {
-        characters: [],
-        activeCharacterId: null
+        activeAccountId: null,
+        activeCharacterId: null,
+        clears: {}
     };
+
+
+    /*
+     * ============================================================
+     * DOM
+     * ============================================================
+     */
 
     const currentCharacterName =
         document.getElementById("currentCharacterName");
@@ -534,6 +752,9 @@
     const characterCount =
         document.getElementById("characterCount");
 
+    const accountTabs =
+        document.getElementById("accountTabs");
+
     const characterTabs =
         document.getElementById("characterTabs");
 
@@ -546,6 +767,9 @@
     const plannerCharacterName =
         document.getElementById("plannerCharacterName");
 
+    const plannerAccountName =
+        document.getElementById("plannerAccountName");
+
     const progressText =
         document.getElementById("progressText");
 
@@ -557,6 +781,9 @@
 
     const addCharacterBtn =
         document.getElementById("addCharacterBtn");
+
+    const syncBtn =
+        document.getElementById("syncBtn");
 
     const exampleBtn =
         document.getElementById("exampleBtn");
@@ -585,95 +812,87 @@
     const saveRenameBtn =
         document.getElementById("saveRenameBtn");
 
+    const syncStatus =
+        document.getElementById("syncStatus");
+
+
+    /*
+     * ============================================================
+     * ID
+     * ============================================================
+     */
 
     function generateId() {
+
         return Date.now().toString(36) +
             Math.random().toString(36).slice(2);
-    }
-
-
-    function createCharacter(name) {
-
-        return {
-            id: generateId(),
-
-            name: name || "Character 1",
-
-            clears: Array(MAX_SLOTS).fill(false)
-        };
 
     }
 
 
-    function saveState() {
+    /*
+     * ============================================================
+     * CALCULATOR DATA
+     * ============================================================
+     */
 
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(state)
-        );
-
-    }
-
-
-    function loadState() {
+    function getCalculatorState() {
 
         try {
 
             const saved =
-                localStorage.getItem(STORAGE_KEY);
+                localStorage.getItem(
+                    CALCULATOR_STORAGE_KEY
+                );
 
             if (!saved) {
-                return;
+                return null;
             }
 
             const parsed =
                 JSON.parse(saved);
 
-            if (!parsed ||
-                !Array.isArray(parsed.characters)) {
-                return;
-            }
-
-            state = parsed;
-
-            state.characters =
-                state.characters.map(character => {
-
-                    const clears =
-                        Array.isArray(character.clears)
-                            ? character.clears.slice(0, MAX_SLOTS)
-                            : [];
-
-                    while (clears.length < MAX_SLOTS) {
-                        clears.push(false);
-                    }
-
-                    return {
-                        id: character.id || generateId(),
-                        name: character.name || "Character",
-                        clears: clears.map(Boolean)
-                    };
-
-                });
-
             if (
-                !state.activeCharacterId ||
-                !state.characters.some(
-                    c => c.id === state.activeCharacterId
-                )
+                !parsed ||
+                !Array.isArray(parsed.accounts)
             ) {
-
-                state.activeCharacterId =
-                    state.characters.length
-                        ? state.characters[0].id
-                        : null;
-
+                return null;
             }
+
+            return parsed;
 
         } catch (error) {
 
             console.error(
-                "Unable to load planner data:",
+                "Unable to read Calculator data:",
+                error
+            );
+
+            return null;
+        }
+
+    }
+
+
+    /*
+     * ============================================================
+     * SAVE PLANNER
+     * ============================================================
+     */
+
+    function savePlannerState() {
+
+        try {
+
+            localStorage.setItem(
+                PLANNER_STORAGE_KEY,
+                JSON.stringify(state)
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Unable to save Planner data:",
                 error
             );
 
@@ -682,80 +901,973 @@
     }
 
 
-    function getActiveCharacter() {
+    /*
+     * ============================================================
+     * LOAD PLANNER
+     * ============================================================
+     */
 
-        return state.characters.find(
-            character =>
-                character.id === state.activeCharacterId
+    function loadPlannerState() {
+
+        try {
+
+            const saved =
+                localStorage.getItem(
+                    PLANNER_STORAGE_KEY
+                );
+
+            if (!saved) {
+                return;
+            }
+
+            const parsed =
+                JSON.parse(saved);
+
+            if (!parsed) {
+                return;
+            }
+
+            state = {
+
+                activeAccountId:
+                    parsed.activeAccountId || null,
+
+                activeCharacterId:
+                    parsed.activeCharacterId || null,
+
+                clears:
+                    parsed.clears &&
+                    typeof parsed.clears === "object"
+                        ? parsed.clears
+                        : {}
+
+            };
+
+        } catch (error) {
+
+            console.error(
+                "Unable to load Planner data:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+     * ============================================================
+     * FIND ACCOUNT / CHARACTER
+     * ============================================================
+     */
+
+    function getActiveAccount() {
+
+        const calculator =
+            getCalculatorState();
+
+        if (!calculator) {
+            return null;
+        }
+
+        return calculator.accounts.find(
+            account =>
+                account.id === state.activeAccountId
         ) || null;
 
     }
 
 
-    function getClearedCount(character) {
+    function getAllCharacters() {
 
-        if (!character) {
-            return 0;
+        const calculator =
+            getCalculatorState();
+
+        if (!calculator) {
+            return [];
         }
 
-        return character.clears.filter(Boolean).length;
+        const result = [];
+
+        calculator.accounts.forEach(
+            account => {
+
+                if (!Array.isArray(account.characters)) {
+                    return;
+                }
+
+                account.characters.forEach(
+                    character => {
+
+                        result.push({
+
+                            accountId:
+                                account.id,
+
+                            accountName:
+                                account.name,
+
+                            characterId:
+                                character.id,
+
+                            characterName:
+                                character.name
+
+                        });
+
+                    }
+                );
+
+            }
+        );
+
+        return result;
 
     }
 
+
+    function getActiveCharacterInfo() {
+
+        const allCharacters =
+            getAllCharacters();
+
+        return allCharacters.find(
+            character =>
+                character.characterId ===
+                state.activeCharacterId
+        ) || null;
+
+    }
+
+
+    /*
+     * ============================================================
+     * NORMALIZE PLANNER CLEAR DATA
+     * ============================================================
+     */
+
+    function getCharacterClears(characterId) {
+
+        if (!state.clears[characterId]) {
+
+            state.clears[characterId] =
+                Array(MAX_SLOTS).fill(false);
+
+        }
+
+        let clears =
+            state.clears[characterId];
+
+        if (!Array.isArray(clears)) {
+
+            clears =
+                Array(MAX_SLOTS).fill(false);
+
+        }
+
+        clears =
+            clears
+                .slice(0, MAX_SLOTS)
+                .map(Boolean);
+
+        while (clears.length < MAX_SLOTS) {
+            clears.push(false);
+        }
+
+        state.clears[characterId] =
+            clears;
+
+        return clears;
+
+    }
+
+
+    /*
+     * ============================================================
+     * SYNC
+     * ============================================================
+     */
+
+    function syncFromCalculator() {
+
+        const calculator =
+            getCalculatorState();
+
+        if (!calculator) {
+
+            syncStatus.textContent =
+                "Calculator data not found yet.";
+
+            syncStatus.style.color =
+                "#d9a45f";
+
+            return false;
+
+        }
+
+
+        const allCharacters =
+            getAllCharacters();
+
+
+        /*
+         * Remove Planner clear data belonging to characters
+         * that no longer exist in the Calculator.
+         */
+
+        const validCharacterIds =
+            new Set(
+                allCharacters.map(
+                    character =>
+                        character.characterId
+                )
+            );
+
+        Object.keys(state.clears).forEach(
+            characterId => {
+
+                if (!validCharacterIds.has(characterId)) {
+
+                    delete state.clears[characterId];
+
+                }
+
+            }
+        );
+
+
+        /*
+         * Make sure every Calculator character has
+         * Planner clear data.
+         */
+
+        allCharacters.forEach(
+            character => {
+
+                getCharacterClears(
+                    character.characterId
+                );
+
+            }
+        );
+
+
+        /*
+         * Restore active account if possible.
+         */
+
+        const accountExists =
+            calculator.accounts.some(
+                account =>
+                    account.id ===
+                    state.activeAccountId
+            );
+
+        if (!accountExists) {
+
+            state.activeAccountId =
+                calculator.accounts.length
+                    ? calculator.accounts[0].id
+                    : null;
+
+        }
+
+
+        /*
+         * Restore active character if possible.
+         */
+
+        const activeCharacterExists =
+            allCharacters.some(
+                character =>
+                    character.characterId ===
+                    state.activeCharacterId
+            );
+
+
+        if (!activeCharacterExists) {
+
+            const activeAccount =
+                calculator.accounts.find(
+                    account =>
+                        account.id ===
+                        state.activeAccountId
+                );
+
+
+            if (
+                activeAccount &&
+                Array.isArray(activeAccount.characters) &&
+                activeAccount.characters.length
+            ) {
+
+                state.activeCharacterId =
+                    activeAccount.characters[0].id;
+
+            } else {
+
+                const firstCharacter =
+                    allCharacters[0];
+
+                state.activeCharacterId =
+                    firstCharacter
+                        ? firstCharacter.characterId
+                        : null;
+
+            }
+
+        }
+
+
+        savePlannerState();
+
+
+        syncStatus.textContent =
+            "✓ Synced with Crystal Calculator";
+
+        syncStatus.style.color =
+            "#7fce9d";
+
+
+        return true;
+
+    }
+
+
+    /*
+     * ============================================================
+     * ADD CHARACTER
+     * ============================================================
+     *
+     * IMPORTANT:
+     * This creates the character inside the Calculator's
+     * active account.
+     */
+
+    function addCharacter() {
+
+        const calculator =
+            getCalculatorState();
+
+
+        if (!calculator) {
+
+            alert(
+                "Calculator data was not found. Please open the Crystal Calculator first."
+            );
+
+            return;
+
+        }
+
+
+        if (!calculator.accounts.length) {
+
+            alert(
+                "No account exists in the Crystal Calculator. Please create an account there first."
+            );
+
+            return;
+
+        }
+
+
+        let account =
+            calculator.accounts.find(
+                currentAccount =>
+                    currentAccount.id ===
+                    state.activeAccountId
+            );
+
+
+        if (!account) {
+
+            account =
+                calculator.accounts[0];
+
+            state.activeAccountId =
+                account.id;
+
+        }
+
+
+        if (!Array.isArray(account.characters)) {
+
+            account.characters = [];
+
+        }
+
+
+        const character =
+            {
+
+                id: generateId(),
+
+                name:
+                    "Character " +
+                    (account.characters.length + 1),
+
+                selected: {}
+
+            };
+
+
+        account.characters.push(character);
+
+
+        /*
+         * Save directly into Calculator storage.
+         */
+
+        localStorage.setItem(
+            CALCULATOR_STORAGE_KEY,
+            JSON.stringify(calculator)
+        );
+
+
+        /*
+         * Create Planner clear data for the new character.
+         */
+
+        state.clears[character.id] =
+            Array(MAX_SLOTS).fill(false);
+
+        state.activeAccountId =
+            account.id;
+
+        state.activeCharacterId =
+            character.id;
+
+
+        savePlannerState();
+
+        syncFromCalculator();
+
+        render();
+
+    }
+
+
+    /*
+     * ============================================================
+     * RENAME CHARACTER
+     * ============================================================
+     *
+     * This changes the name inside the Calculator too.
+     */
+
+    function saveRename() {
+
+        const characterInfo =
+            getActiveCharacterInfo();
+
+        if (!characterInfo) {
+            return;
+        }
+
+
+        const newName =
+            renameInput.value.trim();
+
+
+        if (!newName) {
+            return;
+        }
+
+
+        const calculator =
+            getCalculatorState();
+
+        if (!calculator) {
+            return;
+        }
+
+
+        const account =
+            calculator.accounts.find(
+                currentAccount =>
+                    currentAccount.id ===
+                    characterInfo.accountId
+            );
+
+
+        if (!account) {
+            return;
+        }
+
+
+        const character =
+            account.characters.find(
+                currentCharacter =>
+                    currentCharacter.id ===
+                    characterInfo.characterId
+            );
+
+
+        if (!character) {
+            return;
+        }
+
+
+        character.name =
+            newName.slice(0, 30);
+
+
+        localStorage.setItem(
+            CALCULATOR_STORAGE_KEY,
+            JSON.stringify(calculator)
+        );
+
+
+        closeRenameModal();
+
+        syncFromCalculator();
+
+        render();
+
+    }
+
+
+    /*
+     * ============================================================
+     * DELETE CHARACTER
+     * ============================================================
+     *
+     * This deletes the character from Calculator as well.
+     */
+
+    function deleteCurrentCharacter() {
+
+        const characterInfo =
+            getActiveCharacterInfo();
+
+        if (!characterInfo) {
+            return;
+        }
+
+
+        const confirmed =
+            confirm(
+                "Delete " +
+                characterInfo.characterName +
+                " from the Calculator and Planner?"
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        const calculator =
+            getCalculatorState();
+
+        if (!calculator) {
+            return;
+        }
+
+
+        const account =
+            calculator.accounts.find(
+                currentAccount =>
+                    currentAccount.id ===
+                    characterInfo.accountId
+            );
+
+
+        if (!account) {
+            return;
+        }
+
+
+        const index =
+            account.characters.findIndex(
+                character =>
+                    character.id ===
+                    characterInfo.characterId
+            );
+
+
+        if (index === -1) {
+            return;
+        }
+
+
+        /*
+         * Remove from Calculator.
+         */
+
+        account.characters.splice(
+            index,
+            1
+        );
+
+
+        localStorage.setItem(
+            CALCULATOR_STORAGE_KEY,
+            JSON.stringify(calculator)
+        );
+
+
+        /*
+         * Remove Planner progress.
+         */
+
+        delete state.clears[
+            characterInfo.characterId
+        ];
+
+
+        /*
+         * Select another character.
+         */
+
+        if (account.characters.length) {
+
+            const nextIndex =
+                Math.min(
+                    index,
+                    account.characters.length - 1
+                );
+
+            state.activeCharacterId =
+                account.characters[nextIndex].id;
+
+        } else {
+
+            /*
+             * If this account has no characters,
+             * try another account.
+             */
+
+            const nextAccount =
+                calculator.accounts.find(
+                    currentAccount =>
+                        Array.isArray(
+                            currentAccount.characters
+                        ) &&
+                        currentAccount.characters.length
+                );
+
+
+            if (nextAccount) {
+
+                state.activeAccountId =
+                    nextAccount.id;
+
+                state.activeCharacterId =
+                    nextAccount.characters[0].id;
+
+            } else {
+
+                state.activeCharacterId =
+                    null;
+
+            }
+
+        }
+
+
+        savePlannerState();
+
+        syncFromCalculator();
+
+        render();
+
+    }
+
+
+    /*
+     * ============================================================
+     * ACCOUNT SELECTION
+     * ============================================================
+     */
+
+    function selectAccount(accountId) {
+
+        const calculator =
+            getCalculatorState();
+
+        if (!calculator) {
+            return;
+        }
+
+
+        const account =
+            calculator.accounts.find(
+                currentAccount =>
+                    currentAccount.id ===
+                    accountId
+            );
+
+
+        if (!account) {
+            return;
+        }
+
+
+        state.activeAccountId =
+            account.id;
+
+
+        if (
+            Array.isArray(account.characters) &&
+            account.characters.length
+        ) {
+
+            const currentCharacterStillExists =
+                account.characters.some(
+                    character =>
+                        character.id ===
+                        state.activeCharacterId
+                );
+
+
+            if (!currentCharacterStillExists) {
+
+                state.activeCharacterId =
+                    account.characters[0].id;
+
+            }
+
+        } else {
+
+            state.activeCharacterId =
+                null;
+
+        }
+
+
+        savePlannerState();
+
+        render();
+
+    }
+
+
+    /*
+     * ============================================================
+     * CHARACTER SELECTION
+     * ============================================================
+     */
+
+    function selectCharacter(
+        accountId,
+        characterId
+    ) {
+
+        state.activeAccountId =
+            accountId;
+
+        state.activeCharacterId =
+            characterId;
+
+        savePlannerState();
+
+        render();
+
+    }
+
+
+    /*
+     * ============================================================
+     * COUNT CLEARS
+     * ============================================================
+     */
+
+    function getClearedCount(characterId) {
+
+        const clears =
+            getCharacterClears(
+                characterId
+            );
+
+        return clears.filter(Boolean).length;
+
+    }
+
+
+    /*
+     * ============================================================
+     * RENDER ACCOUNT TABS
+     * ============================================================
+     */
+
+    function renderAccountTabs() {
+
+        accountTabs.innerHTML = "";
+
+
+        const calculator =
+            getCalculatorState();
+
+
+        if (
+            !calculator ||
+            !Array.isArray(calculator.accounts)
+        ) {
+            return;
+        }
+
+
+        calculator.accounts.forEach(
+            account => {
+
+                const button =
+                    document.createElement("button");
+
+
+                button.type =
+                    "button";
+
+
+                button.className =
+                    "account-tab" +
+                    (
+                        account.id ===
+                        state.activeAccountId
+                            ? " active"
+                            : ""
+                    );
+
+
+                const characterTotal =
+                    Array.isArray(account.characters)
+                        ? account.characters.length
+                        : 0;
+
+
+                button.textContent =
+                    account.name +
+                    " (" +
+                    characterTotal +
+                    ")";
+
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        selectAccount(
+                            account.id
+                        );
+
+                    }
+                );
+
+
+                accountTabs.appendChild(
+                    button
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ============================================================
+     * RENDER CHARACTER TABS
+     * ============================================================
+     */
 
     function renderCharacterTabs() {
 
         characterTabs.innerHTML = "";
 
-        state.characters.forEach(character => {
 
-            const button =
-                document.createElement("button");
+        const account =
+            getActiveAccount();
 
-            button.type = "button";
 
-            button.className =
-                "character-tab" +
-                (
-                    character.id === state.activeCharacterId
-                        ? " active"
-                        : ""
+        if (!account) {
+            return;
+        }
+
+
+        if (!Array.isArray(account.characters)) {
+            return;
+        }
+
+
+        account.characters.forEach(
+            character => {
+
+                const button =
+                    document.createElement("button");
+
+
+                button.type =
+                    "button";
+
+
+                button.className =
+                    "character-tab" +
+                    (
+                        character.id ===
+                        state.activeCharacterId
+                            ? " active"
+                            : ""
+                    );
+
+
+                const count =
+                    getClearedCount(
+                        character.id
+                    );
+
+
+                button.textContent =
+                    character.name +
+                    " (" +
+                    count +
+                    "/" +
+                    MAX_SLOTS +
+                    ")";
+
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        selectCharacter(
+                            account.id,
+                            character.id
+                        );
+
+                    }
                 );
 
-            const count =
-                getClearedCount(character);
 
-            button.textContent =
-                character.name +
-                " (" +
-                count +
-                "/" +
-                MAX_SLOTS +
-                ")";
+                characterTabs.appendChild(
+                    button
+                );
 
-            button.addEventListener(
-                "click",
-                function () {
-
-                    state.activeCharacterId =
-                        character.id;
-
-                    saveState();
-                    render();
-
-                }
-            );
-
-            characterTabs.appendChild(button);
-
-        });
+            }
+        );
 
     }
 
 
-    function renderBossSlots(character) {
+    /*
+     * ============================================================
+     * RENDER BOSS SLOTS
+     * ============================================================
+     */
+
+    function renderBossSlots(
+        characterId
+    ) {
 
         bossGrid.innerHTML = "";
+
+
+        const clears =
+            getCharacterClears(
+                characterId
+            );
+
 
         for (
             let index = 0;
@@ -763,76 +1875,112 @@
             index++
         ) {
 
+
             const cleared =
-                Boolean(character.clears[index]);
+                Boolean(
+                    clears[index]
+                );
+
 
             const slot =
                 document.createElement("div");
 
+
             slot.className =
                 "boss-slot" +
-                (cleared ? " cleared" : "");
+                (
+                    cleared
+                        ? " cleared"
+                        : ""
+                );
+
 
             const number =
                 document.createElement("div");
 
+
             number.className =
                 "boss-number";
 
+
             number.textContent =
-                "Boss Slot " + (index + 1);
+                "Boss Slot " +
+                (index + 1);
+
 
             const name =
                 document.createElement("div");
 
+
             name.className =
                 "boss-name";
 
+
             name.textContent =
                 BOSS_NAMES[index] ||
-                "Boss " + (index + 1);
+                "Boss " +
+                (index + 1);
+
 
             const status =
                 document.createElement("div");
 
+
             status.className =
                 "status";
+
 
             status.textContent =
                 cleared
                     ? "✓ Cleared"
                     : "○ Haven't Cleared";
 
+
             const button =
                 document.createElement("button");
 
-            button.type = "button";
+
+            button.type =
+                "button";
+
 
             button.className =
                 "clear-button";
+
 
             button.textContent =
                 cleared
                     ? "Mark Haven't Cleared"
                     : "Mark Cleared";
 
+
             button.addEventListener(
                 "click",
                 function () {
 
-                    character.clears[index] =
-                        !character.clears[index];
+                    const currentClears =
+                        getCharacterClears(
+                            characterId
+                        );
 
-                    saveState();
+
+                    currentClears[index] =
+                        !currentClears[index];
+
+
+                    savePlannerState();
+
                     render();
 
                 }
             );
 
+
             slot.appendChild(number);
             slot.appendChild(name);
             slot.appendChild(status);
             slot.appendChild(button);
+
 
             bossGrid.appendChild(slot);
 
@@ -841,385 +1989,531 @@
     }
 
 
+    /*
+     * ============================================================
+     * MAIN RENDER
+     * ============================================================
+     */
+
     function render() {
+
+        /*
+         * Always re-read Calculator data first.
+         * This makes changes made in Calculator visible
+         * when Planner renders.
+         */
+
+        syncFromCalculator();
+
+
+        renderAccountTabs();
 
         renderCharacterTabs();
 
+
+        const allCharacters =
+            getAllCharacters();
+
+
         characterCount.textContent =
-            state.characters.length;
+            allCharacters.length;
 
-        const character =
-            getActiveCharacter();
 
-        if (!character) {
+        const characterInfo =
+            getActiveCharacterInfo();
+
+
+        if (!characterInfo) {
 
             emptyState.style.display =
                 "block";
 
+
             plannerContent.style.display =
                 "none";
+
 
             currentCharacterName.textContent =
                 "-";
 
+
             clearedCount.textContent =
-                "0 / " + MAX_SLOTS;
+                "0 / " +
+                MAX_SLOTS;
+
 
             remainingCount.textContent =
                 MAX_SLOTS;
 
+
             progressText.textContent =
-                "0 / " + MAX_SLOTS;
+                "0 / " +
+                MAX_SLOTS;
+
 
             progressFill.style.width =
                 "0%";
 
+
             return;
 
         }
+
 
         emptyState.style.display =
             "none";
 
+
         plannerContent.style.display =
             "block";
 
+
         plannerCharacterName.textContent =
-            character.name;
+            characterInfo.characterName;
+
+
+        plannerAccountName.textContent =
+            characterInfo.accountName;
+
 
         currentCharacterName.textContent =
-            character.name;
+            characterInfo.characterName;
+
 
         const cleared =
-            getClearedCount(character);
+            getClearedCount(
+                characterInfo.characterId
+            );
+
 
         const remaining =
-            MAX_SLOTS - cleared;
+            MAX_SLOTS -
+            cleared;
+
 
         const percentage =
-            (cleared / MAX_SLOTS) * 100;
+            (cleared / MAX_SLOTS) *
+            100;
+
 
         clearedCount.textContent =
-            cleared + " / " + MAX_SLOTS;
+            cleared +
+            " / " +
+            MAX_SLOTS;
+
 
         remainingCount.textContent =
             remaining;
 
+
         progressText.textContent =
-            cleared + " / " + MAX_SLOTS;
+            cleared +
+            " / " +
+            MAX_SLOTS;
+
 
         progressFill.style.width =
-            percentage + "%";
-
-        renderBossSlots(character);
-
-    }
+            percentage +
+            "%";
 
 
-    function addCharacter() {
-
-        const number =
-            state.characters.length + 1;
-
-        const character =
-            createCharacter(
-                "Character " + number
-            );
-
-        state.characters.push(character);
-
-        state.activeCharacterId =
-            character.id;
-
-        saveState();
-        render();
+        renderBossSlots(
+            characterInfo.characterId
+        );
 
     }
 
+
+    /*
+     * ============================================================
+     * RENAME MODAL
+     * ============================================================
+     */
 
     function openRenameModal() {
 
-        const character =
-            getActiveCharacter();
+        const characterInfo =
+            getActiveCharacterInfo();
 
-        if (!character) {
+
+        if (!characterInfo) {
             return;
         }
 
+
         renameInput.value =
-            character.name;
+            characterInfo.characterName;
 
-        renameModal.classList.add("show");
 
-        setTimeout(function () {
-            renameInput.focus();
-            renameInput.select();
-        }, 50);
+        renameModal.classList.add(
+            "show"
+        );
+
+
+        setTimeout(
+            function () {
+
+                renameInput.focus();
+                renameInput.select();
+
+            },
+            50
+        );
 
     }
 
 
     function closeRenameModal() {
 
-        renameModal.classList.remove("show");
+        renameModal.classList.remove(
+            "show"
+        );
 
     }
 
 
-    function saveRename() {
-
-        const character =
-            getActiveCharacter();
-
-        if (!character) {
-            return;
-        }
-
-        const newName =
-            renameInput.value.trim();
-
-        if (!newName) {
-            return;
-        }
-
-        character.name =
-            newName.slice(0, 30);
-
-        saveState();
-        closeRenameModal();
-        render();
-
-    }
-
+    /*
+     * ============================================================
+     * CLEAR CURRENT CHARACTER
+     * ============================================================
+     */
 
     function clearCurrentCharacter() {
 
-        const character =
-            getActiveCharacter();
+        const characterInfo =
+            getActiveCharacterInfo();
 
-        if (!character) {
+
+        if (!characterInfo) {
             return;
         }
+
 
         const confirmed =
             confirm(
                 "Clear all 12 boss slots for " +
-                character.name +
+                characterInfo.characterName +
                 "?"
             );
+
 
         if (!confirmed) {
             return;
         }
 
-        character.clears =
+
+        state.clears[
+            characterInfo.characterId
+        ] =
             Array(MAX_SLOTS).fill(false);
 
-        saveState();
+
+        savePlannerState();
+
         render();
 
     }
 
 
-    function deleteCurrentCharacter() {
-
-        const character =
-            getActiveCharacter();
-
-        if (!character) {
-            return;
-        }
-
-        const confirmed =
-            confirm(
-                "Delete " +
-                character.name +
-                "?"
-            );
-
-        if (!confirmed) {
-            return;
-        }
-
-        const index =
-            state.characters.findIndex(
-                c => c.id === character.id
-            );
-
-        state.characters =
-            state.characters.filter(
-                c => c.id !== character.id
-            );
-
-        if (state.characters.length === 0) {
-
-            state.activeCharacterId =
-                null;
-
-        } else {
-
-            const nextIndex =
-                Math.min(
-                    index,
-                    state.characters.length - 1
-                );
-
-            state.activeCharacterId =
-                state.characters[nextIndex].id;
-
-        }
-
-        saveState();
-        render();
-
-    }
-
+    /*
+     * ============================================================
+     * EXAMPLE DATA
+     * ============================================================
+     *
+     * Example Data creates characters in the Calculator too.
+     * This is intentionally different from the old Planner:
+     * there is now only ONE account/character list.
+     */
 
     function loadExampleData() {
 
+        const calculator =
+            getCalculatorState();
+
+
+        if (!calculator) {
+
+            alert(
+                "Calculator data was not found. Please open the Crystal Calculator first."
+            );
+
+            return;
+
+        }
+
+
         const confirmed =
             confirm(
-                "Replace the current planner data with example characters?"
+                "Add example characters to the current Calculator account?"
             );
+
 
         if (!confirmed) {
             return;
         }
 
-        const character1 =
-            createCharacter("Blade Master");
 
-        character1.clears =
-            [
-                true,
-                true,
-                true,
-                true,
-                true,
-                false,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false
-            ];
+        if (!calculator.accounts.length) {
 
-        const character2 =
-            createCharacter("Zero");
+            alert(
+                "Please create an account in the Crystal Calculator first."
+            );
 
-        character2.clears =
-            [
-                true,
-                true,
-                false,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false
-            ];
+            return;
 
-        const character3 =
-            createCharacter("Kanna");
+        }
 
-        character3.clears =
-            [
-                true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false
-            ];
 
-        state.characters =
-            [
-                character1,
-                character2,
-                character3
-            ];
+        let account =
+            calculator.accounts.find(
+                currentAccount =>
+                    currentAccount.id ===
+                    state.activeAccountId
+            );
 
-        state.activeCharacterId =
-            character1.id;
 
-        saveState();
+        if (!account) {
+
+            account =
+                calculator.accounts[0];
+
+            state.activeAccountId =
+                account.id;
+
+        }
+
+
+        if (!Array.isArray(account.characters)) {
+
+            account.characters = [];
+
+        }
+
+
+        const examples = [
+            {
+                name: "Blade Master",
+                clears: [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            },
+            {
+                name: "Zero",
+                clears: [
+                    true,
+                    true,
+                    false,
+                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            },
+            {
+                name: "Kanna",
+                clears: [
+                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
+        ];
+
+
+        let lastCharacterId =
+            null;
+
+
+        examples.forEach(
+            example => {
+
+                const character =
+                    {
+                        id: generateId(),
+                        name: example.name,
+                        selected: {}
+                    };
+
+
+                account.characters.push(
+                    character
+                );
+
+
+                state.clears[
+                    character.id
+                ] =
+                    example.clears.slice();
+
+
+                lastCharacterId =
+                    character.id;
+
+            }
+        );
+
+
+        localStorage.setItem(
+            CALCULATOR_STORAGE_KEY,
+            JSON.stringify(calculator)
+        );
+
+
+        if (lastCharacterId) {
+
+            state.activeCharacterId =
+                lastCharacterId;
+
+        }
+
+
+        savePlannerState();
+
+        syncFromCalculator();
+
         render();
 
     }
 
+
+    /*
+     * ============================================================
+     * RESET PLANNER PROGRESS
+     * ============================================================
+     *
+     * IMPORTANT:
+     * This does NOT delete Calculator accounts or characters.
+     */
 
     function resetEverything() {
 
         const confirmed =
             confirm(
-                "Delete ALL characters and bossing progress?"
+                "Reset ALL Planner boss-clear progress for every character?\n\nYour Calculator accounts and characters will NOT be deleted."
             );
+
 
         if (!confirmed) {
             return;
         }
 
-        state = {
-            characters: [],
-            activeCharacterId: null
-        };
 
-        saveState();
+        const allCharacters =
+            getAllCharacters();
+
+
+        state.clears = {};
+
+
+        allCharacters.forEach(
+            character => {
+
+                state.clears[
+                    character.characterId
+                ] =
+                    Array(MAX_SLOTS).fill(false);
+
+            }
+        );
+
+
+        savePlannerState();
+
         render();
 
     }
 
+
+    /*
+     * ============================================================
+     * BUTTON EVENTS
+     * ============================================================
+     */
 
     addCharacterBtn.addEventListener(
         "click",
         addCharacter
     );
 
+
+    syncBtn.addEventListener(
+        "click",
+        function () {
+
+            syncFromCalculator();
+
+            render();
+
+        }
+    );
+
+
     exampleBtn.addEventListener(
         "click",
         loadExampleData
     );
+
 
     resetAllBtn.addEventListener(
         "click",
         resetEverything
     );
 
+
     renameBtn.addEventListener(
         "click",
         openRenameModal
     );
+
 
     clearCharacterBtn.addEventListener(
         "click",
         clearCurrentCharacter
     );
 
+
     deleteCharacterBtn.addEventListener(
         "click",
         deleteCurrentCharacter
     );
+
 
     cancelRenameBtn.addEventListener(
         "click",
         closeRenameModal
     );
 
+
     saveRenameBtn.addEventListener(
         "click",
         saveRename
     );
+
 
     renameInput.addEventListener(
         "keydown",
@@ -1229,12 +2523,14 @@
                 saveRename();
             }
 
+
             if (event.key === "Escape") {
                 closeRenameModal();
             }
 
         }
     );
+
 
     renameModal.addEventListener(
         "click",
@@ -1248,8 +2544,69 @@
     );
 
 
-    loadState();
+    /*
+     * ============================================================
+     * CROSS-TAB SYNC
+     * ============================================================
+     *
+     * If Calculator is open in another browser tab and its
+     * localStorage changes, Planner automatically updates.
+     */
+
+    window.addEventListener(
+        "storage",
+        function (event) {
+
+            if (
+                event.key ===
+                CALCULATOR_STORAGE_KEY
+            ) {
+
+                syncFromCalculator();
+
+                render();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Also re-sync when the Planner tab becomes active.
+     */
+
+    document.addEventListener(
+        "visibilitychange",
+        function () {
+
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+
+                syncFromCalculator();
+
+                render();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * ============================================================
+     * INITIALIZE
+     * ============================================================
+     */
+
+    loadPlannerState();
+
+    syncFromCalculator();
+
     render();
+
 
 })();
 </script>
