@@ -684,12 +684,12 @@
                         The Optimizer will choose the highest-value crystals
                         <strong>only from the bosses and difficulties currently selected in your Calculator</strong>.
                         It will never add a boss that is not in your Calculator list.
-                        Maximum: 12 weekly Boss Crystals per character.
+                        Maximum: 90 weekly Boss Crystals per account. A character may contribute any of the crystals selected in the Calculator.
                     </div>
                 </div>
 
                 <button class="btn primary" onclick="optimizeAllCharacters()">
-                    Optimize All Characters
+                    Optimize All Accounts
                 </button>
 
             </div>
@@ -753,9 +753,9 @@
             and they are not selected in the Calculator, they will not appear as optimization candidates
             even if their crystal values are higher.<br><br>
 
-            <strong>3. Maximum 12 Weekly Crystals</strong><br>
-            For each character, the Optimizer ranks the crystals you actually selected
-            and chooses the best 12 based on their meso value after party splitting.<br><br>
+            <strong>3. Best 90 Weekly Crystals Per Account</strong><br>
+            Across each account, the Optimizer ranks all weekly crystals actually selected in the Calculator
+            and chooses the best 90 based on their meso value after party splitting.<br><br>
 
             <strong>4. Party Size</strong><br>
             Crystal value is divided by the party size configured in the Calculator.<br><br>
@@ -790,7 +790,7 @@ const CALCULATOR_STORAGE_KEY =
 const OPTIMIZER_STORAGE_KEY =
     "msea_boss_crystal_optimizer_v2";
 
-const MAX_BOSSES_PER_CHARACTER = 12;
+const MAX_ACCOUNT_CRYSTALS = 90;
 const MAX_CLEARS_PER_BOSS = 2;
 
 
@@ -2086,203 +2086,98 @@ function readCalculatorState() {
 
 function syncFromCalculator(showMessage = false) {
 
-    const calculator =
-        readCalculatorState();
-
+    const calculator = readCalculatorState();
 
     if (!calculator) {
-
         state.calculatorFound = false;
         state.characters = [];
         state.partySizes = {};
         state.optimized = {};
         state.syncSignature = "";
-
         saveOptimizerState();
         renderAll();
         updateSyncStatus();
+        if (showMessage) showToast("Calculator data was not found.");
+        return false;
+    }
 
-        if (showMessage) {
+    const accounts = getAccounts(calculator);
+    const syncedCharacters = [];
+    const partySizes = {};
 
-            showToast(
-                "Calculator data was not found."
-            );
+    function lookupPartySize(characterId, bossId, difficulty) {
+        const sources = [
+            calculator?.partySizes,
+            calculator?.settings?.partySizes,
+            calculator?.config?.partySizes
+        ];
 
+        for (const source of sources) {
+            if (!source || typeof source !== "object") continue;
+            const exact = source[`${characterId}:${bossId}:${difficulty}`];
+            if (exact !== undefined) return clampPartySize(exact);
+            const old = source[`${characterId}:${bossId}`];
+            if (old !== undefined) return clampPartySize(old);
         }
 
-        return false;
-
+        return 1;
     }
-
-
-    const accounts =
-        getAccounts(calculator);
-
-
-    const partySizes =
-        collectPartySizes(
-            calculator,
-            accounts
-        );
-
-
-    const syncedCharacters = [];
-
 
     accounts.forEach((account, accountIndex) => {
-
-        const accountId =
-            String(
-                account?.id ??
-                account?.accountId ??
-                `account-${accountIndex + 1}`
-            );
-
-
-        const accountName =
-            account?.name ??
-            account?.accountName ??
-            `Account ${accountIndex + 1}`;
-
-
-        const characters =
-            getCharacterArray(account);
-
+        const accountId = String(account?.id ?? account?.accountId ?? `account-${accountIndex + 1}`);
+        const accountName = String(account?.name ?? account?.accountName ?? `Account ${accountIndex + 1}`);
+        const characters = getCharacterArray(account);
 
         characters.forEach((character, characterIndex) => {
+            const characterId = String(character?.id ?? character?.characterId ?? `character-${characterIndex + 1}`);
+            const selectionMap = extractCharacterSelections(character);
+            const characterPartySizes = {};
 
-            const characterId =
-                String(
-                    character?.id ??
-                    character?.characterId ??
-                    `character-${characterIndex + 1}`
-                );
+            for (const key of Object.keys(selectionMap)) {
+                const parsed = parseSelectionKey(key);
+                if (!parsed) continue;
+                const boss = findBossFromKey(parsed.bossId);
+                if (!boss || boss.monthly) continue;
+                const diff = findDifficulty(boss, parsed.difficulty);
+                if (!diff) continue;
+                characterPartySizes[`${boss.id}:${diff.name}`] = lookupPartySize(characterId, boss.id, diff.name);
+            }
 
-
-            const selectionMap =
-                extractCharacterSelections(
-                    character
-                );
-
-
-            /*
-             * IMPORTANT:
-             *
-             * selectionMap contains ONLY the boss
-             * clears selected in Calculator.
-             *
-             * The optimizer will later build candidates
-             * from this map only.
-             */
+            partySizes[characterId] = characterPartySizes;
 
             syncedCharacters.push({
-
-                id:
-                    `calc:${accountId}:${characterId}`,
-
-                calculatorId:
-                    characterId,
-
+                id: `calc:${accountId}:${characterId}`,
+                calculatorId: characterId,
                 accountId,
-
-                accountName:
-
-                    String(accountName),
-
-                name:
-
-                    String(
-                        character?.name ??
-                        character?.characterName ??
-                        `Character ${characterIndex + 1}`
-                    ),
-
-                current:
-                    selectionMap
-
+                accountName,
+                name: String(character?.name ?? character?.characterName ?? `Character ${characterIndex + 1}`),
+                current: selectionMap,
+                partySizes: characterPartySizes
             });
-
         });
-
     });
 
+    const syncData = { characters: syncedCharacters, partySizes };
+    const newSignature = JSON.stringify(syncData);
+    const changed = newSignature !== state.syncSignature;
 
-    const syncData = {
+    state.characters = syncedCharacters;
+    state.partySizes = partySizes;
+    state.calculatorFound = true;
+    state.lastSyncAt = Date.now();
 
-        characters:
-            syncedCharacters,
-
-        partySizes
-
-    };
-
-
-    const newSignature =
-        JSON.stringify(syncData);
-
-
-    const changed =
-        newSignature !==
-        state.syncSignature;
-
-
-    state.characters =
-        syncedCharacters;
-
-    state.partySizes =
-        partySizes;
-
-    state.calculatorFound =
-        true;
-
-    state.lastSyncAt =
-        Date.now();
-
-
-    /*
-     * If Calculator selections or party sizes changed,
-     * previous optimization is no longer valid.
-     */
-
-    if (changed) {
-
-        state.optimized = {};
-
-    }
-
-
-    state.syncSignature =
-        newSignature;
-
+    if (changed) state.optimized = {};
+    state.syncSignature = newSignature;
 
     saveOptimizerState();
     renderAll();
     updateSyncStatus();
 
-
     if (showMessage) {
-
-        if (changed) {
-
-            showToast(
-                "Optimizer synced with Calculator."
-            );
-
-        }
-
-        else {
-
-            showToast(
-                "Already synced with Calculator."
-            );
-
-        }
-
+        showToast(changed ? "Optimizer synced with Calculator." : "Already synced with Calculator.");
     }
 
-
     return true;
-
 }
 
 
@@ -2455,123 +2350,48 @@ function updateSyncStatus() {
 function getEligibleCrystals(character) {
 
     const candidates = [];
-
-
-    const selected =
-        character.current || {};
-
+    const selected = character.current || {};
+    const characterPartySizes = character.partySizes || {};
 
     for (const [key, count] of Object.entries(selected)) {
 
-        const parts =
-            key.split(":");
+        const parsed = parseSelectionKey(key);
+        if (!parsed) continue;
 
+        const boss = findBossFromKey(parsed.bossId);
+        if (!boss || boss.monthly) continue;
 
-        if (parts.length !== 2) {
-            continue;
-        }
+        const diff = findDifficulty(boss, parsed.difficulty);
+        if (!diff || diff.value === null || diff.value === undefined) continue;
 
+        const crystalCount = Math.min(
+            MAX_CLEARS_PER_BOSS,
+            Math.max(0, Number(count) || 0)
+        );
 
-        const bossId =
-            parts[0];
+        const partySize = clampPartySize(
+            characterPartySizes[`${boss.id}:${diff.name}`] ?? 1
+        );
 
-        const difficulty =
-            parts[1];
-
-
-        const boss =
-            findBossFromKey(bossId);
-
-
-        if (!boss) {
-            continue;
-        }
-
-
-        const diff =
-            findDifficulty(
-                boss,
-                difficulty
-            );
-
-
-        if (!diff) {
-            continue;
-        }
-
-
-        if (
-            diff.value === null ||
-            diff.value === undefined
-        ) {
-            continue;
-        }
-
-
-        const crystalCount =
-            Math.min(
-                MAX_CLEARS_PER_BOSS,
-                Math.max(
-                    0,
-                    Number(count) || 0
-                )
-            );
-
-
-        /*
-         * Only create the number of crystals
-         * that the Calculator says are selected.
-         */
-
-        for (
-            let i = 0;
-            i < crystalCount;
-            i++
-        ) {
-
-            const partySize =
-                clampPartySize(
-                    state.partySizes[
-                        `${boss.id}:${diff.name}`
-                    ] ?? 1
-                );
-
-
-            const dividedValue =
-                Number(diff.value) /
-                partySize;
-
-
+        for (let i = 0; i < crystalCount; i++) {
             candidates.push({
-
-                bossId:
-                    boss.id,
-
-                bossName:
-                    boss.name,
-
-                difficulty:
-                    diff.name,
-
-                value:
-                    Number(diff.value),
-
+                id: `${character.id}:${boss.id}:${diff.name}:${i}`,
+                accountId: character.accountId,
+                accountName: character.accountName,
+                characterId: character.id,
+                characterName: character.name,
+                bossId: boss.id,
+                bossName: boss.name,
+                difficulty: diff.name,
+                value: Number(diff.value),
                 partySize,
-
-                dividedValue,
-
-                icon:
-                    boss.icon
-
+                dividedValue: Number(diff.value) / partySize,
+                icon: boss.icon
             });
-
         }
-
     }
 
-
     return candidates;
-
 }
 
 
@@ -2603,42 +2423,20 @@ function calculateCurrentIncome(character) {
    OPTIMIZE CHARACTER
 ========================================================= */
 
-function optimizeCharacter(character) {
+function optimizeAccount(accountCharacters) {
 
-    /*
-     * IMPORTANT:
-     *
-     * getEligibleCrystals() ONLY returns crystals
-     * already selected in Calculator.
-     *
-     * Therefore bosses the player cannot clear
-     * are automatically excluded.
-     */
-
-    const candidates =
-        getEligibleCrystals(character);
-
-
-    /*
-     * Sort highest mesos first.
-     */
-
-    candidates.sort(
-        (a, b) =>
-            b.dividedValue -
-            a.dividedValue
+    const candidates = accountCharacters.flatMap(character =>
+        getEligibleCrystals(character)
     );
 
+    candidates.sort((a, b) => {
+        if (b.dividedValue !== a.dividedValue) {
+            return b.dividedValue - a.dividedValue;
+        }
+        return a.characterName.localeCompare(b.characterName);
+    });
 
-    /*
-     * Maximum 12 weekly crystals.
-     */
-
-    return candidates.slice(
-        0,
-        MAX_BOSSES_PER_CHARACTER
-    );
-
+    return candidates.slice(0, MAX_ACCOUNT_CRYSTALS);
 }
 
 
@@ -2649,39 +2447,27 @@ function optimizeCharacter(character) {
 function optimizeAllCharacters() {
 
     if (!state.calculatorFound) {
-
-        showToast(
-            "Calculator data was not found."
-        );
-
+        showToast("Calculator data was not found.");
         return;
-
     }
-
 
     state.optimized = {};
 
-
+    const accounts = {};
     for (const character of state.characters) {
-
-        state.optimized[
-            character.id
-        ] =
-            optimizeCharacter(
-                character
-            );
-
+        if (!accounts[character.accountId]) {
+            accounts[character.accountId] = [];
+        }
+        accounts[character.accountId].push(character);
     }
 
+    for (const [accountId, characters] of Object.entries(accounts)) {
+        state.optimized[accountId] = optimizeAccount(characters);
+    }
 
     saveOptimizerState();
     renderAll();
-
-
-    showToast(
-        "Optimization completed using only Calculator-selected crystals."
-    );
-
+    showToast("Optimization completed: best 90 selected crystals per account.");
 }
 
 
@@ -2787,8 +2573,7 @@ function renderCharacters() {
                             <div class="character-info">
 
                                 <span class="pill">
-                                    ${count} / ${MAX_BOSSES_PER_CHARACTER}
-                                    Weekly Crystals
+                                    ${count} Selected Weekly Crystals
                                 </span>
 
                                 <span class="pill">
@@ -2818,106 +2603,40 @@ function renderCharacters() {
 
 function renderPartySizes() {
 
-    const container =
-        document.getElementById(
-            "partyContainer"
-        );
+    const container = document.getElementById("partyContainer");
 
+    if (!state.characters.length) {
+        container.innerHTML = `<div class="empty">No Calculator characters available.</div>`;
+        return;
+    }
 
-    container.innerHTML =
-        `
+    container.innerHTML = `
         <div class="party-grid">
+            ${state.characters.map(character => {
+                const crystals = getEligibleCrystals(character);
+                const grouped = {};
+                crystals.forEach(c => {
+                    const key = `${c.bossId}:${c.difficulty}`;
+                    if (!grouped[key]) grouped[key] = c;
+                });
 
-            ${
-                defaultBosses
-                    .filter(boss => !boss.monthly)
-                    .map(boss => {
-
-                        return `
-                        <div class="boss-party-card">
-
-                            <div class="boss-party-header">
-
-                                <img
-                                    class="boss-icon"
-                                    src="${boss.icon}"
-                                    alt="${escapeHtml(boss.name)}"
-                                    onerror="this.style.display='none'"
-                                >
-
-                                <div class="boss-name">
-                                    ${escapeHtml(boss.name)}
-                                </div>
-
-                            </div>
-
-                            ${
-                                boss.difficulties
-                                    .map(diff => {
-
-                                        if (
-                                            diff.value === null ||
-                                            diff.value === undefined
-                                        ) {
-
-                                            return "";
-
-                                        }
-
-
-                                        const key =
-                                            `${boss.id}:${diff.name}`;
-
-
-                                        const party =
-                                            clampPartySize(
-                                                state.partySizes[key] ?? 1
-                                            );
-
-
-                                        return `
-                                        <div class="difficulty-row">
-
-                                            <span class="difficulty-name">
-                                                ${escapeHtml(diff.name)}
-                                            </span>
-
-                                            <select disabled>
-
-                                                ${
-                                                    [1,2,3,4,5,6]
-                                                        .map(n =>
-                                                            `
-                                                            <option
-                                                                value="${n}"
-                                                                ${n === party ? "selected" : ""}
-                                                            >
-                                                                ${n} player${n > 1 ? "s" : ""}
-                                                            </option>
-                                                            `
-                                                        )
-                                                        .join("")
-                                                }
-
-                                            </select>
-
-                                        </div>
-                                        `;
-
-                                    })
-                                    .join("")
-                            }
-
+                return `
+                <div class="boss-party-card">
+                    <div class="boss-party-header">
+                        <div>
+                            <div class="boss-name">${escapeHtml(character.name)}</div>
+                            <div class="account-name">${escapeHtml(character.accountName)}</div>
                         </div>
-                        `;
-
-                    })
-                    .join("")
-            }
-
-        </div>
-        `;
-
+                    </div>
+                    ${Object.values(grouped).length ? Object.values(grouped).map(c => `
+                        <div class="difficulty-row">
+                            <span class="difficulty-name">${escapeHtml(c.bossName)} — ${escapeHtml(c.difficulty)}</span>
+                            <select disabled><option>${c.partySize} player${c.partySize > 1 ? "s" : ""}</option></select>
+                        </div>
+                    `).join("") : `<div class="empty">No selected weekly crystals.</div>`}
+                </div>`;
+            }).join("")}
+        </div>`;
 }
 
 
@@ -2927,239 +2646,77 @@ function renderPartySizes() {
 
 function renderResults() {
 
-    const container =
-        document.getElementById(
-            "resultsContainer"
-        );
-
+    const container = document.getElementById("resultsContainer");
 
     if (!state.characters.length) {
-
-        container.innerHTML =
-            `
-            <div class="card">
-                <div class="empty">
-                    No Calculator characters available.
-                </div>
-            </div>
-            `;
-
+        container.innerHTML = `<div class="card"><div class="empty">No Calculator characters available.</div></div>`;
         return;
-
     }
 
-
-    container.innerHTML =
-        state.characters.map(
-            character => {
-
-                const current =
-                    getEligibleCrystals(
-                        character
-                    );
-
-
-                const optimized =
-                    state.optimized[
-                        character.id
-                    ] || [];
-
-
-                const currentTotal =
-                    current.reduce(
-                        (sum, crystal) =>
-                            sum + crystal.dividedValue,
-                        0
-                    );
-
-
-                const optimizedTotal =
-                    optimized.reduce(
-                        (sum, crystal) =>
-                            sum + crystal.dividedValue,
-                        0
-                    );
-
-
-                const gain =
-                    optimizedTotal -
-                    currentTotal;
-
-
-                return `
-
-                <div class="result-card">
-
-                    <div class="result-header">
-
-                        <div>
-
-                            <div class="result-header-title">
-                                ${escapeHtml(character.name)}
-                            </div>
-
-                            <div class="account-name">
-                                ${escapeHtml(character.accountName)}
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="result-header-value ${
-                                gain > 0 ? "green" : ""
-                            }"
-                        >
-                            +${formatMeso(gain)}
-                        </div>
-
-                    </div>
-
-
-                    <div class="result-list">
-
-                        <div
-                            class="result-row current-row"
-                            style="background:#171b23;"
-                        >
-
-                            <div class="rank">
-                                —
-                            </div>
-
-                            <div class="result-boss">
-
-                                <div class="result-boss-text">
-
-                                    <div class="result-boss-name">
-                                        Current
-                                    </div>
-
-                                    <div class="result-difficulty">
-                                        Calculator selection
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="result-party">
-                                ${current.length} crystals
-                            </div>
-
-                            <div class="result-meso">
-                                ${formatMeso(currentTotal)}
-                            </div>
-
-                        </div>
-
-
-                        ${
-                            optimized.length
-
-                            ? optimized.map(
-                                (crystal, index) => {
-
-                                    return `
-
-                                    <div class="result-row optimized-row">
-
-                                        <div class="rank">
-                                            ${index + 1}
-                                        </div>
-
-                                        <div class="result-boss">
-
-                                            <img
-                                                src="${crystal.icon}"
-                                                alt=""
-                                                onerror="this.style.display='none'"
-                                            >
-
-                                            <div class="result-boss-text">
-
-                                                <div class="result-boss-name">
-                                                    ${escapeHtml(crystal.bossName)}
-                                                </div>
-
-                                                <div class="result-difficulty">
-                                                    ${escapeHtml(crystal.difficulty)}
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <div class="result-party">
-                                            ÷${crystal.partySize}
-                                        </div>
-
-                                        <div class="result-meso">
-                                            ${formatMeso(crystal.dividedValue)}
-                                        </div>
-
-                                    </div>
-
-                                    `;
-
-                                }
-                            ).join("")
-
-                            : `
-
-                            <div class="empty">
-                                Press
-                                <strong>Optimize All Characters</strong>
-                                to calculate the best 12 crystals.
-                            </div>
-
-                            `
-                        }
-
-
-                        ${
-                            optimized.length
-
-                            ? `
-
-                            <div
-                                class="result-row"
-                                style="
-                                    background:#11141b;
-                                    border-top:1px solid #303645;
-                                "
-                            >
-
-                                <div></div>
-
-                                <div>
-                                    <strong>
-                                        Optimized Total
-                                    </strong>
-                                </div>
-
-                                <div></div>
-
-                                <div class="result-meso" style="color:#57df8a;">
-                                    ${formatMeso(optimizedTotal)}
-                                </div>
-
-                            </div>
-
-                            `
-
-                            : ""
-
-                        }
-
-                    </div>
-
+    const accountMap = {};
+    for (const character of state.characters) {
+        if (!accountMap[character.accountId]) {
+            accountMap[character.accountId] = {
+                name: character.accountName,
+                characters: []
+            };
+        }
+        accountMap[character.accountId].characters.push(character);
+    }
+
+    container.innerHTML = Object.entries(accountMap).map(([accountId, account]) => {
+        const current = account.characters.flatMap(character => getEligibleCrystals(character));
+        const optimized = state.optimized[accountId] || [];
+        const currentTotal = current.reduce((sum, c) => sum + c.dividedValue, 0);
+        const optimizedTotal = optimized.reduce((sum, c) => sum + c.dividedValue, 0);
+        const gain = optimizedTotal - currentTotal;
+        const hasOptimization = Array.isArray(state.optimized[accountId]);
+        const selectedCount = current.length;
+
+        return `
+        <div class="result-card">
+            <div class="result-header">
+                <div>
+                    <div class="result-header-title">${escapeHtml(account.name)}</div>
+                    <div class="account-name">Current ${selectedCount} / Optimized ${optimized.length} / ${MAX_ACCOUNT_CRYSTALS} weekly crystals</div>
+                </div>
+                <div class="result-header-value ${gain > 0 ? "green" : ""}">+${formatMeso(gain)}</div>
+            </div>
+
+            <div class="result-list">
+                <div class="result-row current-row" style="background:#171b23;">
+                    <div class="rank">—</div>
+                    <div class="result-boss"><div class="result-boss-text"><div class="result-boss-name">Current Selection</div><div class="result-difficulty">All Calculator-selected weekly crystals</div></div></div>
+                    <div class="result-party">${selectedCount} crystals</div>
+                    <div class="result-meso">${formatMeso(currentTotal)}</div>
                 </div>
 
-                `;
+                ${hasOptimization && optimized.length ? optimized.map((crystal, index) => `
+                    <div class="result-row optimized-row">
+                        <div class="rank">${index + 1}</div>
+                        <div class="result-boss">
+                            <img src="${crystal.icon}" alt="" onerror="this.style.display='none'">
+                            <div class="result-boss-text">
+                                <div class="result-boss-name">${escapeHtml(crystal.bossName)}</div>
+                                <div class="result-difficulty">${escapeHtml(crystal.difficulty)} · ${escapeHtml(crystal.characterName)}</div>
+                            </div>
+                        </div>
+                        <div class="result-party">÷${crystal.partySize}</div>
+                        <div class="result-meso">${formatMeso(crystal.dividedValue)}</div>
+                    </div>
+                `).join("") : `
+                    <div class="empty">Press <strong>Optimize All Accounts</strong> to calculate the best ${MAX_ACCOUNT_CRYSTALS} crystals for this account.</div>
+                `}
 
-            }
-        ).join("");
-
+                ${hasOptimization ? `
+                    <div class="result-row" style="background:#11141b;border-top:1px solid #303645;">
+                        <div></div><div><strong>Optimized Total</strong></div><div></div>
+                        <div class="result-meso" style="color:#57df8a;">${formatMeso(optimizedTotal)}</div>
+                    </div>
+                ` : ""}
+            </div>
+        </div>`;
+    }).join("");
 }
 
 
@@ -3317,84 +2874,24 @@ function renderDashboard() {
 
     let currentTotal = 0;
     let optimizedTotal = 0;
-
+    const accountIds = new Set();
 
     for (const character of state.characters) {
-
-        currentTotal +=
-            calculateCurrentIncome(
-                character
-            );
-
-
-        const optimized =
-            state.optimized[
-                character.id
-            ] || [];
-
-
-        optimizedTotal +=
-            optimized.reduce(
-                (sum, crystal) =>
-                    sum + crystal.dividedValue,
-                0
-            );
-
+        currentTotal += calculateCurrentIncome(character);
+        accountIds.add(character.accountId);
     }
 
+    const hasOptimization = Object.keys(state.optimized || {}).length > 0;
+    if (hasOptimization) {
+        for (const crystals of Object.values(state.optimized)) {
+            optimizedTotal += (crystals || []).reduce((sum, crystal) => sum + crystal.dividedValue, 0);
+        }
+    }
 
-    /*
-     * If optimization has not been run,
-     * show current income as optimized income
-     * only if there are no results.
-     */
-
-    const hasOptimization =
-        state.characters.some(
-            character =>
-                Array.isArray(
-                    state.optimized[
-                        character.id
-                    ]
-                )
-        );
-
-
-    const displayedOptimized =
-        hasOptimization
-            ? optimizedTotal
-            : 0;
-
-
-    document.getElementById(
-        "currentIncome"
-    ).textContent =
-        formatMeso(currentTotal);
-
-
-    document.getElementById(
-        "optimizedIncome"
-    ).textContent =
-        formatMeso(displayedOptimized);
-
-
-    document.getElementById(
-        "potentialGain"
-    ).textContent =
-        formatMeso(
-            Math.max(
-                0,
-                displayedOptimized -
-                currentTotal
-            )
-        );
-
-
-    document.getElementById(
-        "characterCount"
-    ).textContent =
-        state.characters.length;
-
+    document.getElementById("currentIncome").textContent = formatMeso(currentTotal);
+    document.getElementById("optimizedIncome").textContent = hasOptimization ? formatMeso(optimizedTotal) : "—";
+    document.getElementById("potentialGain").textContent = hasOptimization ? formatMeso(Math.max(0, optimizedTotal - currentTotal)) : "—";
+    document.getElementById("characterCount").textContent = `${accountIds.size} account${accountIds.size !== 1 ? "s" : ""} · ${state.characters.length} character${state.characters.length !== 1 ? "s" : ""}`;
 }
 
 
