@@ -28,7 +28,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
 .btn:hover{background:#2c3240}.btn.primary{background:#6650d9;border-color:#7c5cff}.btn.primary:hover{background:#7560e8}.btn.danger{color:#ff9d9d}
 .reset-notice,.sync-notice{padding:12px 16px;background:#14171e;border-bottom:1px solid #292e3a;color:#9aa1ad;font-size:12px}
 .reset-notice strong,.sync-notice strong{color:#fff}.reset-weekly{color:#7c5cff;font-weight:700}.reset-monthly{color:#b78cff;font-weight:700}.sync-status{color:#7c5cff;font-weight:700}
-.boss-list{padding:8px 16px 16px}.boss-row{display:grid;grid-template-columns:minmax(220px,1.3fr) minmax(200px,1fr) 150px minmax(180px,1.2fr);align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #242934}.boss-selection-summary{color:#aeb5c2;font-size:12px;line-height:1.5}.boss-selection-summary strong{color:#fff}.boss-selection-label{color:#777f8d;font-size:10px;display:block;margin-bottom:3px}
+.boss-list{padding:8px 16px 16px}.boss-row{display:grid;grid-template-columns:minmax(220px,1.3fr) minmax(200px,1fr) 150px minmax(180px,1.2fr);align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #242934}.boss-selection-summary{color:#aeb5c2;font-size:12px;line-height:1.8}.boss-selection-label{color:#777f8d;font-size:10px;display:block;margin-bottom:3px}.planner-difficulty-badge{display:inline-flex;align-items:center;justify-content:center;min-width:32px;padding:3px 7px;margin:1px 5px 1px 0;border-radius:5px;font-size:11px;line-height:1.2;font-weight:900;letter-spacing:.02em;vertical-align:middle}.planner-difficulty-e{background:#858B98;color:#fff}.planner-difficulty-n{background:#16834A;color:#fff}.planner-difficulty-h{background:#F07878;color:#271014}.planner-difficulty-c{background:#D5D9E0;color:#171a22}.planner-difficulty-ex{background:#741B2B;color:#fff}.planner-difficulty-other{background:#1d222d;border:1px solid #343a49;color:#f1f3f5}
 .boss-row:last-child{border-bottom:none}.boss-name{font-weight:700;display:flex;align-items:center;gap:10px;min-width:0}.boss-icon{width:48px;height:48px;object-fit:contain;border-radius:7px;flex-shrink:0;background:#11141a;border:1px solid #303642}
 .boss-name-text{min-width:0}.boss-type{display:inline-block;margin-left:7px;padding:2px 6px;border-radius:5px;font-size:10px;color:#9da4b1;background:#242934;vertical-align:middle}
 .difficulty-list{display:flex;flex-wrap:wrap;gap:7px}.difficulty-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:48px;padding:7px 9px;background:#332a5d;border:1px solid #7c5cff;color:#fff;border-radius:7px;font-size:12px;font-weight:700}
@@ -1600,7 +1600,14 @@ function createBossRow(boss, character) {
     } else {
         const selectionParts = selections.map(difficulty => {
             const partySize = getPartySize(boss.id, character.id, difficulty);
-            return `<strong>${escapeHtml(difficulty)}</strong> · Party ${partySize}`;
+            const key = String(difficulty).toLowerCase().replace(/[^a-z]/g, "");
+            const badgeClass = key === "easy" || key === "e" ? "planner-difficulty-e"
+                : key === "normal" || key === "n" ? "planner-difficulty-n"
+                : key === "hard" || key === "h" ? "planner-difficulty-h"
+                : key === "chaos" || key === "c" ? "planner-difficulty-c"
+                : key === "extreme" || key === "ex" ? "planner-difficulty-ex"
+                : "planner-difficulty-other";
+            return `<span class="planner-difficulty-badge ${badgeClass}">${escapeHtml(difficulty)}</span> <span>Party <strong>${partySize}</strong></span>`;
         });
         difficultyDiv.innerHTML = `
             <span class="boss-selection-label">Calculator selection (read-only)</span>
