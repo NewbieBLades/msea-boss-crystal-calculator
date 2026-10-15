@@ -895,6 +895,16 @@ const defaultBosses = [
     },
 
     {
+        id: "malicia",
+        name: "Malicia",
+        icon: "../images/Malicia.png",
+        difficulties: [
+            { name: "N", value: 290.2 },
+            { name: "EX", value: 3160 }
+        ]
+    },
+
+    {
         id: "seren",
         name: "Seren",
         icon: "../images/Seren.png",
@@ -1050,14 +1060,23 @@ function clampPartySize(value) {
 
 function formatMeso(value) {
 
-    if (!Number.isFinite(Number(value))) {
+    const amount = Number(value);
+
+    if (!Number.isFinite(amount) || amount === 0) {
         return "0";
     }
 
-    return Number(value).toLocaleString("en-MY", {
+    // All boss values are stored internally in millions of mesos.
+    // Convert values of 1,000m or more to billions for readability.
+    if (Math.abs(amount) >= 1000) {
+        const billions = Number((amount / 1000).toFixed(2));
+        return `${billions}b`;
+    }
+
+    return amount.toLocaleString("en-MY", {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2
-    });
+    }) + "m";
 
 }
 
