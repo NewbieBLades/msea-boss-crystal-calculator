@@ -1700,10 +1700,10 @@ function renderBosses() {
     if (!character) {
 
         weeklyContainer.innerHTML =
-            `<div class="empty">No active character found.</div>`;
+            `<div class="empty">No selected weekly bosses.</div>`;
 
         monthlyContainer.innerHTML =
-            `<div class="empty">No active character found.</div>`;
+            `<div class="empty">No selected monthly bosses.</div>`;
 
         updateSyncStatus();
 
@@ -1718,27 +1718,32 @@ function renderBosses() {
         .trim()
         .toLowerCase();
 
+    /*
+       Only show bosses with at least one selected clear.
+       This keeps the Planner focused on the active character's
+       selected bosses; a boss disappears once all its clears
+       are removed. Search still filters the visible selections.
+    */
+    const selectedBosses =
+        bossDefinitions.filter(boss =>
+            getBossSelections(character, boss.id).length > 0 &&
+            (
+                !search ||
+                boss.name.toLowerCase().includes(search)
+            )
+        );
+
     const monthlyBosses =
-        bossDefinitions.filter(
+        selectedBosses.filter(
             boss => boss.type === "Monthly"
         );
 
     const weeklyBosses =
-        bossDefinitions.filter(
+        selectedBosses.filter(
             boss => boss.type === "Weekly"
         );
 
     monthlyBosses.forEach(boss => {
-
-        if (
-            search &&
-            !boss.name
-                .toLowerCase()
-                .includes(search)
-        ) {
-            return;
-        }
-
         monthlyContainer.appendChild(
             createBossRow(
                 boss,
@@ -1748,16 +1753,6 @@ function renderBosses() {
     });
 
     weeklyBosses.forEach(boss => {
-
-        if (
-            search &&
-            !boss.name
-                .toLowerCase()
-                .includes(search)
-        ) {
-            return;
-        }
-
         weeklyContainer.appendChild(
             createBossRow(
                 boss,
@@ -1768,12 +1763,12 @@ function renderBosses() {
 
     if (!monthlyContainer.children.length) {
         monthlyContainer.innerHTML =
-            `<div class="empty">No monthly bosses found.</div>`;
+            `<div class="empty">No selected monthly bosses${search ? " matching your search" : ""}.</div>`;
     }
 
     if (!weeklyContainer.children.length) {
         weeklyContainer.innerHTML =
-            `<div class="empty">No weekly bosses found.</div>`;
+            `<div class="empty">No selected weekly bosses${search ? " matching your search" : ""}.</div>`;
     }
 
     updateSyncStatus();
