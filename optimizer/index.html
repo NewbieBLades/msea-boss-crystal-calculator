@@ -757,7 +757,7 @@
             <div>
                 <h2 class="section-title">Monthly Boss Income</h2>
                 <div class="section-subtitle">
-                    Black Mage monthly income is separate from the weekly 12-crystal limit.
+                    Black Mage monthly income is separate from weekly selling decisions.
                 </div>
             </div>
         </div>
@@ -2754,7 +2754,7 @@ function renderResults() {
                 </div>
 
                 ${hasOptimization ? `
-                    <div class="result-section-label"><span class="decision-label sell-label">SELL</span> Best ${MAX_ACCOUNT_CRYSTALS} crystals by meso value</div>
+                    <div class="result-section-label"><span class="decision-label sell-label">SELL</span> Best up to ${MAX_ACCOUNT_CRYSTALS} crystals by meso value</div>
                     ${optimized.length ? optimized.map((crystal, index) => `
                         <div class="result-row optimized-row">
                             <div class="rank">${index + 1}</div>
