@@ -58,10 +58,10 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
 </header>
 
 <section class="dashboard">
-    <div class="card"><div class="card-label">Weekly Clears</div><div class="card-value" id="weeklyClears">0</div><div class="card-sub">Maximum 12 Boss Crystals</div></div>
-    <div class="card"><div class="card-label">Remaining</div><div class="card-value" id="remainingClears">12</div><div class="card-sub">Weekly slots available</div></div>
+    <div class="card"><div class="card-label">Weekly Clears</div><div class="card-value" id="weeklyClears">0</div><div class="card-sub">Unlimited weekly selections</div></div>
+    <div class="card"><div class="card-label">Remaining</div><div class="card-value" id="remainingClears">∞</div><div class="card-sub">No selection limit</div></div>
     <div class="card"><div class="card-label">Character</div><div class="card-value" id="characterName">Character 1</div><div class="card-sub">Active character</div></div>
-    <div class="card"><div class="card-label">Account Weekly Clears</div><div class="card-value" id="accountClears">0</div><div class="card-sub">Unlimited account selections</div><div class="progress-wrap"><div class="progress"><div class="progress-bar" id="accountProgress"></div></div></div></div>
+    <div class="card"><div class="card-label">Account Weekly Clears</div><div class="card-value" id="accountClears">0</div><div class="card-sub">Unlimited account selections</div></div>
 </section>
 
 <section class="account-section">
@@ -102,7 +102,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     <div class="section-header">
         <div>
             <div class="section-title">Monthly Boss Planner</div>
-            <div class="section-subtitle">Monthly bosses do not use the weekly 12-crystal limit. Monthly selections automatically reset on the 1st of every month at 00:00 GMT+8.</div>
+            <div class="section-subtitle">Monthly selections automatically reset on the 1st of every month at 00:00 GMT+8.</div>
         </div>
     </div>
     <div class="boss-list" id="monthlyBosses"></div>
@@ -144,14 +144,13 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     The monthly reset removes Monthly boss clear selections. Weekly boss selections remain saved until you untick them in the Calculator.
     <br><br>
 
-    <strong>Weekly selection limits:</strong><br>
-    Each character can have a maximum of <strong>12 weekly Boss Crystals</strong>.
-    There is <strong>no account-wide selection limit</strong> in the Planner.
+    <strong>Weekly selections:</strong><br>
+    There is no character-wide or account-wide selection limit.
+    Each boss difficulty can still be selected up to two times.
     <br><br>
 
-    <strong>Important:</strong><br>
-    The Planner does not apply the 90-crystal selling limit.
-    The separate Optimizer can use the 90-crystal limit when calculating which selected weekly Boss Crystals should be sold.
+    <strong>Optimizer:</strong><br>
+    The Optimizer ranks all selected weekly crystals by meso value after party splitting, then identifies the best 90 per account to sell and the remaining crystals to throw away.
     <br><br>
 
     <strong>How Notes work:</strong><br>
@@ -192,7 +191,6 @@ const PLANNER_NOTES_STORAGE_KEY = "msea_bossing_planner_notes_v1";
 const PLANNER_VIEW_STORAGE_KEY = "msea_bossing_planner_v2";
 const PLANNER_RESET_STORAGE_KEY = "msea_bossing_planner_reset_v1";
 const PLANNER_BOSS_VISIBILITY_KEY = "msea_bossing_planner_boss_visibility_v1";
-const MAX_BOSSES_PER_CHARACTER = 12;
 const CALCULATOR_URL = "../";
 
 /* =========================================================
@@ -1363,7 +1361,7 @@ function renderCharacters() {
                 ${escapeHtml(character.name)}
             </span>
             <span class="character-tab-count">
-                ${count}/${MAX_BOSSES_PER_CHARACTER}
+                ${count} selected
             </span>
         `;
 
@@ -1398,12 +1396,7 @@ function renderDashboard() {
             character
         );
 
-    const remaining =
-        Math.max(
-            0,
-            MAX_BOSSES_PER_CHARACTER -
-            characterClears
-        );
+    const remaining = "∞";
 
     const accountClears =
         getAccountWeeklyClearCount(
@@ -1432,24 +1425,7 @@ function renderDashboard() {
     ).textContent =
         accountClears;
 
-    const percentage =
-        accountClears <= 0
-            ? 0
-            : Math.min(
-                100,
-                (
-                    accountClears /
-                    Math.max(
-                        12,
-                        accountClears
-                    )
-                ) * 100
-            );
-
-    document.getElementById(
-        "accountProgress"
-    ).style.width =
-        percentage + "%";
+    
 }
 
 /* =========================================================
@@ -1489,31 +1465,10 @@ function handlePlannerDifficultyClick(bossId, difficulty) {
                 item => item !== difficulty
             );
     } else if (difficultyCount === 1) {
-        // x1 -> x2, unless weekly limit is already full.
-        if (
-            boss.type === "Weekly" &&
-            getCharacterWeeklyClearCount(character) >= MAX_BOSSES_PER_CHARACTER
-        ) {
-            // Same as the Calculator: when full, this click deselects x1.
-            selections =
-                selections.filter(
-                    item => item !== difficulty
-                );
-        } else {
-            selections.push(difficulty);
-        }
+        // x1 -> x2
+        selections.push(difficulty);
     } else {
         // x0 -> x1
-        if (
-            boss.type === "Weekly" &&
-            getCharacterWeeklyClearCount(character) >= MAX_BOSSES_PER_CHARACTER
-        ) {
-            showToast(
-                `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} weekly Boss Crystals.`
-            );
-            return;
-        }
-
         selections.push(difficulty);
     }
 
