@@ -29,52 +29,19 @@
         padding: 24px 0 50px;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
-
-    .main-header {
+    header {
         margin-bottom: 24px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 20px;
     }
 
-    .header-content {
-        min-width: 0;
-    }
-
-    .main-header h1 {
+    header h1 {
         margin: 0 0 6px;
         font-size: 30px;
     }
 
-    .main-header p {
+    header p {
         margin: 0;
         color: #9aa1ad;
         font-size: 14px;
-    }
-
-    .planner-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        background: #242934;
-        color: #fff;
-        border: 1px solid #7c5cff;
-        border-radius: 8px;
-        padding: 10px 16px;
-        text-decoration: none;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.15s;
-    }
-
-    .planner-button:hover {
-        background: #332a5d;
-        border-color: #927cff;
     }
 
     /* =========================
@@ -484,6 +451,11 @@
         color: #fff;
     }
 
+    .difficulty-option input:disabled + label {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
     .difficulty-count {
         display: inline-flex;
         align-items: center;
@@ -624,6 +596,7 @@
         .party-select {
             max-width: 180px;
         }
+
     }
 
     @media (max-width: 650px) {
@@ -633,18 +606,8 @@
             padding-top: 15px;
         }
 
-        .main-header {
-            align-items: stretch;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .main-header h1 {
+        header h1 {
             font-size: 24px;
-        }
-
-        .planner-button {
-            width: 100%;
         }
 
         .dashboard {
@@ -683,6 +646,7 @@
             width: 38px;
             height: 38px;
         }
+
     }
 </style>
 </head>
@@ -691,123 +655,101 @@
 
 <div class="container">
 
-    <header class="main-header">
-
-        <div class="header-content">
-
-            <h1>MSEA Boss Crystal Calculator</h1>
-
-            <p>
-                Track weekly Boss Crystals, party splits, and meso earnings.
-                Supports multiple accounts and multiple characters.
-            </p>
-
-        </div>
-
-        <a
-            href="planner/"
-            class="planner-button"
-        >
-            Planner
-        </a>
-
+    <header>
+        <h1>MSEA Boss Crystal Calculator</h1>
+        <p>
+            Track weekly Boss Crystals, party splits, and meso earnings.
+            Supports multiple accounts and multiple characters.
+        </p>
     </header>
 
+
+    <!-- =========================
+         DASHBOARD
+    ========================= -->
 
     <section class="dashboard">
 
         <div class="card">
-
             <div class="card-label">
                 Character Crystals
             </div>
 
-            <div
-                class="card-value"
-                id="characterCrystals">
+            <div class="card-value"
+                 id="characterCrystals">
                 0
             </div>
 
             <div class="card-sub">
-                Maximum 12 selected
+                Maximum 12 clears
             </div>
-
         </div>
 
 
         <div class="card">
-
             <div class="card-label">
                 Character Remaining
             </div>
 
-            <div
-                class="card-value"
-                id="characterRemaining">
+            <div class="card-value"
+                 id="characterRemaining">
                 12
             </div>
 
             <div class="card-sub">
-                Boss Crystal sell slots
+                Boss Crystal slots
             </div>
-
         </div>
 
 
         <div class="card">
-
             <div class="card-label">
                 Character Total
             </div>
 
-            <div
-                class="card-value"
-                id="characterTotal">
+            <div class="card-value"
+                 id="characterTotal">
                 0
             </div>
 
             <div class="card-sub">
                 Meso per person
             </div>
-
         </div>
 
 
         <div class="card">
-
             <div class="card-label">
                 Account Total
             </div>
 
-            <div
-                class="card-value"
-                id="accountTotal">
+            <div class="card-value"
+                 id="accountTotal">
                 0
             </div>
 
             <div class="card-sub">
                 <span id="accountCrystalText">
-                    0 selected · 90 sell limit
+                    0 / 90 Boss Crystals
                 </span>
             </div>
 
             <div class="progress-wrap">
-
                 <div class="progress">
-
                     <div
                         class="progress-bar"
                         id="accountProgress">
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
     </section>
 
+
+    <!-- =========================
+         MONTHLY / ANNUAL DASHBOARD
+    ========================= -->
 
     <section class="monthly-dashboard">
 
@@ -881,7 +823,7 @@
                 <div
                     class="card-sub"
                     id="weeklyAnnualSub">
-                    0 selected weekly crystals × 52 weeks
+                    0 / 90 weekly crystals × 52 weeks
                 </div>
 
             </div>
@@ -909,6 +851,12 @@
 
     </section>
 
+
+
+
+    <!-- =========================
+         ACCOUNTS
+    ========================= -->
 
     <section class="account-section">
 
@@ -947,6 +895,10 @@
     </section>
 
 
+    <!-- =========================
+         CHARACTERS
+    ========================= -->
+
     <section class="character-section">
 
         <div class="character-top">
@@ -977,6 +929,10 @@
 
     </section>
 
+
+    <!-- =========================
+         TOOLBAR
+    ========================= -->
 
     <section class="section">
 
@@ -1025,6 +981,10 @@
     </section>
 
 
+    <!-- =========================
+         MONTHLY BOSSES
+    ========================= -->
+
     <section class="section">
 
         <div class="section-header">
@@ -1052,6 +1012,10 @@
     </section>
 
 
+    <!-- =========================
+         WEEKLY BOSSES
+    ========================= -->
+
     <section class="section">
 
         <div class="section-header">
@@ -1064,7 +1028,6 @@
 
                 <div class="section-subtitle">
                     Maximum 12 Boss Crystals per character
-                    · Account selection is unlimited
                     · Each boss can be cleared up to 2 times
                 </div>
 
@@ -1083,11 +1046,19 @@
 </div>
 
 
+<!-- =========================
+     TOAST
+========================= -->
+
 <div
     class="toast"
     id="toast">
 </div>
 
+
+<!-- =========================
+     MODAL
+========================= -->
 
 <div
     class="modal-overlay"
@@ -1161,7 +1132,7 @@ const defaultBosses = [
             { name: "EX", value: 9080 }
         ]
     },
-
+   
     {
         id: "lotus",
         name: "Lotus",
@@ -1250,6 +1221,17 @@ const defaultBosses = [
         difficulties: [
             { name: "N", value: 58.5 },
             { name: "H", value: 124.2 }
+        ]
+    },
+
+    {
+        id: "malicia",
+        name: "Malicia",
+        icon: "images/Malicia.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 290.2 },
+            { name: "EX", value: 3160 }
         ]
     },
 
@@ -1393,7 +1375,9 @@ function init() {
     migrateState();
 
     if (!state.accounts.length) {
+
         createInitialAccount();
+
     }
 
     ensureActiveAccount();
@@ -1722,9 +1706,7 @@ function migrateOldSelections() {
                     account.characters
                 )
             ) {
-
                 account.characters = [];
-
             }
 
 
@@ -2081,19 +2063,12 @@ function formatMeso(value) {
 
     if (
         value === null ||
-        value === undefined ||
-        !Number.isFinite(
-            Number(value)
-        )
+        value === undefined
     ) {
 
         return "—";
 
     }
-
-
-    value =
-        Number(value);
 
 
     if (
@@ -2181,7 +2156,7 @@ function setPartySize(
 
 
     state.partySizes[key] =
-        Number(value) || 1;
+        Number(value);
 
 
     saveState();
@@ -2216,14 +2191,11 @@ function getCharacterTotal(
             const boss =
                 getBoss(bossId);
 
-
             if (
                 !boss ||
                 boss.type !== "Weekly"
             ) {
-
                 return;
-
             }
 
 
@@ -2350,9 +2322,7 @@ function getCharacterBlackMageMonthlyTotal(
                 !difficulty ||
                 difficulty.value === null
             ) {
-
                 return;
-
             }
 
 
@@ -2460,20 +2430,18 @@ function getAnnualWeeklyIncome() {
 
 function getAnnualBlackMageIncome() {
 
-    return (
+    return
         getAccountBlackMageMonthlyTotal() *
-        12
-    );
+        12;
 
 }
 
 
 function getAnnualTotalIncome() {
 
-    return (
+    return
         getAnnualWeeklyIncome() +
-        getAnnualBlackMageIncome()
-    );
+        getAnnualBlackMageIncome();
 
 }
 
@@ -2530,11 +2498,9 @@ function selectDifficulty(
         selections.length;
 
 
-    /* =========================================
-       x2 -> REMOVE BOTH
-
-       This ALWAYS works, including at 12/12.
-    ========================================= */
+    /*
+        x2 -> remove both
+    */
 
     if (
         difficultyCount === 2
@@ -2548,124 +2514,53 @@ function selectDifficulty(
 
     }
 
+    /*
+        x1 -> x2 normally.
 
-    /* =========================================
-       x1
-
-       Normally:
-           x1 -> x2
-
-       BUT if the character is already 12/12:
-           x1 -> x0
-
-       This allows the user to remove a
-       selected crystal even when the character
-       has reached the maximum.
-    ========================================= */
+        If character/account is full,
+        x1 becomes deselect.
+    */
 
     else if (
         difficultyCount === 1
     ) {
 
+        const characterCount =
+            getCharacterCrystalCount(
+                character
+            );
+
+
+        const accountCount =
+            getAccountCrystalCount();
+
+
+        const characterFull =
+            !isMonthlyBoss(boss) &&
+            characterCount >=
+                MAX_BOSSES_PER_CHARACTER;
+
+
+        const accountFull =
+            !isMonthlyBoss(boss) &&
+            accountCount >=
+            MAX_ACCOUNT_CRYSTALS;
+
+
         if (
-            !isMonthlyBoss(boss)
+            characterFull ||
+            accountFull
         ) {
 
-            const characterCount =
-                getCharacterCrystalCount(
-                    character
+            selections =
+                selections.filter(
+                    item =>
+                        item !== difficulty
                 );
-
-
-            /*
-                IMPORTANT FIX:
-
-                At 12/12, there is no room
-                for another crystal.
-
-                Instead of blocking the click,
-                remove the existing x1 selection.
-            */
-
-            if (
-                characterCount >=
-                MAX_BOSSES_PER_CHARACTER
-            ) {
-
-                const index =
-                    selections.indexOf(
-                        difficulty
-                    );
-
-
-                if (
-                    index !== -1
-                ) {
-
-                    selections.splice(
-                        index,
-                        1
-                    );
-
-                }
-
-            }
-
-            else {
-
-                /*
-                    Character still has room,
-                    so normal behavior remains:
-
-                    x1 -> x2
-                */
-
-                if (
-                    currentBossClears >=
-                    MAX_CLEARS_PER_BOSS
-                ) {
-
-                    showToast(
-                        "This boss can only be cleared 2 times."
-                    );
-
-                    return;
-
-                }
-
-
-                selections.push(
-                    difficulty
-                );
-
-            }
 
         }
 
         else {
-
-            /*
-                Monthly bosses are not affected
-                by the 12 weekly crystal limit.
-
-                Therefore they keep normal behavior:
-
-                x1 -> x2
-            */
-
-            if (
-                currentBossClears >=
-                MAX_CLEARS_PER_BOSS
-            ) {
-
-                showToast(
-                    "This boss can only be cleared 2 times."
-                );
-
-                return;
-
-            }
-
 
             selections.push(
                 difficulty
@@ -2675,47 +2570,51 @@ function selectDifficulty(
 
     }
 
-
-    /* =========================================
-       x0 -> x1
-    ========================================= */
+    /*
+        x0 -> x1
+    */
 
     else {
 
-        /*
-            Only check the character limit
-            when ADDING a new weekly crystal.
-        */
+        const characterCount =
+            getCharacterCrystalCount(
+                character
+            );
+
+
+        const accountCount =
+            getAccountCrystalCount();
+
 
         if (
-            !isMonthlyBoss(boss)
+            !isMonthlyBoss(boss) &&
+            characterCount >=
+                MAX_BOSSES_PER_CHARACTER
         ) {
 
-            const characterCount =
-                getCharacterCrystalCount(
-                    character
-                );
+            showToast(
+                `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
+            );
 
-
-            if (
-                characterCount >=
-                MAX_BOSSES_PER_CHARACTER
-            ) {
-
-                showToast(
-                    `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
-                );
-
-                return;
-
-            }
+            return;
 
         }
 
 
-        /*
-            Maximum 2 clears for the same boss.
-        */
+        if (
+            !isMonthlyBoss(boss) &&
+            accountCount >=
+            MAX_ACCOUNT_CRYSTALS
+        ) {
+
+            showToast(
+                `Account limit reached: ${MAX_ACCOUNT_CRYSTALS} Boss Crystals.`
+            );
+
+            return;
+
+        }
+
 
         if (
             currentBossClears >=
@@ -2840,7 +2739,7 @@ function renderAccounts() {
                 </span>
 
                 <span class="account-tab-count">
-                    ${crystalCount} selected
+                    ${crystalCount}/${MAX_ACCOUNT_CRYSTALS}
                 </span>
 
             `;
@@ -3033,7 +2932,7 @@ function renderDashboard() {
     document.getElementById(
         "accountCrystalText"
     ).textContent =
-        `${accountCrystals} selected · ${MAX_ACCOUNT_CRYSTALS} sell limit`;
+        `${accountCrystals} / ${MAX_ACCOUNT_CRYSTALS} Boss Crystals`;
 
 
     const percentage =
@@ -3116,7 +3015,7 @@ function renderMonthlyDashboard() {
     document.getElementById(
         "weeklyAnnualSub"
     ).textContent =
-        `${weeklyCrystals} selected weekly crystals × 52 weeks · ${MAX_ACCOUNT_CRYSTALS} sell limit`;
+        `${weeklyCrystals} / ${MAX_ACCOUNT_CRYSTALS} weekly crystals × 52 weeks`;
 
 
     document.getElementById(
@@ -3193,6 +3092,10 @@ function renderBossList(
         );
 
 
+    const accountCount =
+        getAccountCrystalCount();
+
+
     const bosses =
         defaultBosses.filter(
             boss =>
@@ -3266,6 +3169,12 @@ function renderBossList(
                 MAX_BOSSES_PER_CHARACTER;
 
 
+            const accountLimitReached =
+                !isMonthly &&
+                accountCount >=
+                MAX_ACCOUNT_CRYSTALS;
+
+
             let difficultyHtml = "";
 
 
@@ -3276,6 +3185,28 @@ function renderBossList(
                         difficultyCounts[
                             difficulty.name
                         ] || 0;
+
+
+                    /*
+                        Existing selections are NEVER
+                        disabled.
+
+                        This allows x1/x2 selections to
+                        always be clicked and removed,
+                        even at 12/12 or 90/90.
+
+                        Monthly bosses ignore weekly
+                        character/account limits.
+                    */
+
+                    const disabled =
+                        count === 0 &&
+                        (
+                            characterLimitReached ||
+                            accountLimitReached ||
+                            bossClearCount >=
+                            MAX_CLEARS_PER_BOSS
+                        );
 
 
                     const inputId =
@@ -3309,73 +3240,6 @@ function renderBossList(
                         );
 
 
-                    let tooltip;
-
-
-                    if (
-                        count === 0
-                    ) {
-
-                        if (
-                            characterLimitReached &&
-                            !isMonthly
-                        ) {
-
-                            tooltip =
-                                "Character is full. Remove an existing selection first.";
-
-                        }
-
-                        else if (
-                            bossClearCount >=
-                            MAX_CLEARS_PER_BOSS
-                        ) {
-
-                            tooltip =
-                                "This boss already has 2 clears.";
-
-                        }
-
-                        else {
-
-                            tooltip =
-                                `Select ${difficulty.name}`;
-
-                        }
-
-                    }
-
-                    else if (
-                        count === 1
-                    ) {
-
-                        if (
-                            characterLimitReached &&
-                            !isMonthly
-                        ) {
-
-                            tooltip =
-                                "Click to deselect";
-
-                        }
-
-                        else {
-
-                            tooltip =
-                                "Click again to select x2";
-
-                        }
-
-                    }
-
-                    else {
-
-                        tooltip =
-                            "Click to deselect";
-
-                    }
-
-
                     difficultyHtml += `
 
                         <div
@@ -3391,7 +3255,7 @@ function renderBossList(
                                 type="checkbox"
                                 id="${inputId}"
                                 ${count > 0 ? "checked" : ""}
-                                tabindex="-1"
+                                ${disabled ? "disabled" : ""}
                             >
 
 
@@ -3404,9 +3268,6 @@ function renderBossList(
                                         '${difficulty.name}'
                                     )
                                 "
-                                title="${escapeHtml(
-                                    tooltip
-                                )}"
                             >
                                 ${labelContent}
                             </label>
@@ -3414,10 +3275,7 @@ function renderBossList(
 
                             <select
                                 class="party-select"
-                                title="${escapeHtml(
-                                    difficulty.name +
-                                    ' party size'
-                                )}"
+                                title="${difficulty.name} party size"
                                 onchange="
                                     setPartySize(
                                         '${boss.id}',
@@ -3474,12 +3332,7 @@ function renderBossList(
 
                     if (
                         difficulty &&
-                        difficulty.value !== null &&
-                        Number.isFinite(
-                            Number(
-                                difficulty.value
-                            )
-                        )
+                        difficulty.value !== null
                     ) {
 
                         const partySize =
@@ -3593,9 +3446,7 @@ function renderBossList(
         container.innerHTML = `
 
             <div class="empty">
-                ${escapeHtml(
-                    emptyMessage
-                )}
+                ${escapeHtml(emptyMessage)}
             </div>
 
         `;
@@ -3603,7 +3454,6 @@ function renderBossList(
     }
 
 }
-
 
 /* =========================================================
    DIFFICULTY CLICK
@@ -3616,8 +3466,6 @@ function handleDifficultyClick(
 ) {
 
     event.preventDefault();
-
-    event.stopPropagation();
 
 
     selectDifficulty(
