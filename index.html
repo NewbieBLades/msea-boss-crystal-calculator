@@ -29,8 +29,16 @@
         padding: 24px 0 50px;
     }
 
-    header {
+    header.main-header {
         margin-bottom: 24px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .header-content {
+        min-width: 0;
     }
 
     header h1 {
@@ -42,6 +50,44 @@
         margin: 0;
         color: #9aa1ad;
         font-size: 14px;
+    }
+
+    .header-nav {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .header-nav-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #242934;
+        color: #fff;
+        border: 1px solid #7c5cff;
+        border-radius: 8px;
+        padding: 10px 16px;
+        text-decoration: none;
+        font-weight: 700;
+        white-space: nowrap;
+        transition: 0.15s;
+    }
+
+    .header-nav-button:hover {
+        background: #332a5d;
+        border-color: #927cff;
+    }
+
+    .header-nav-button.optimizer-button {
+        border-color: #36a3a0;
+    }
+
+    .header-nav-button.optimizer-button:hover {
+        background: #173d3c;
+        border-color: #55c8c3;
     }
 
     /* =========================
@@ -648,6 +694,10 @@
         }
 
     }
+    @media (max-width: 700px) {
+        header.main-header { flex-direction: column; align-items: stretch; }
+        .header-nav { justify-content: flex-start; }
+    }
 </style>
 </head>
 
@@ -655,12 +705,18 @@
 
 <div class="container">
 
-    <header>
-        <h1>MSEA Boss Crystal Calculator</h1>
-        <p>
-            Track weekly Boss Crystals, party splits, and meso earnings.
-            Supports multiple accounts and multiple characters.
-        </p>
+    <header class="main-header">
+        <div class="header-content">
+            <h1>MSEA Boss Crystal Calculator</h1>
+            <p>
+                Track weekly Boss Crystals, party splits, and meso earnings.
+                Supports multiple accounts and multiple characters.
+            </p>
+        </div>
+        <nav class="header-nav" aria-label="Related tools">
+            <a href="planner/" class="header-nav-button planner-button">Planner</a>
+            <a href="optimizer/" class="header-nav-button optimizer-button">Optimizer</a>
+        </nav>
     </header>
 
 
