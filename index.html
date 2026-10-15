@@ -737,7 +737,7 @@
             </div>
 
             <div class="card-sub">
-                Unlimited weekly clears
+                Maximum 12 weekly boss crystals
             </div>
         </div>
 
@@ -749,11 +749,11 @@
 
             <div class="card-value"
                  id="characterRemaining">
-                ∞
+                12
             </div>
 
             <div class="card-sub">
-                No selection limit
+                Weekly crystals remaining
             </div>
         </div>
 
@@ -1156,6 +1156,7 @@
 ========================================================= */
 
 const MAX_CLEARS_PER_BOSS = 2;
+const MAX_BOSSES_PER_CHARACTER = 12;
 
 const STORAGE_KEY =
     "msea_boss_crystal_calculator_v11";
@@ -2543,6 +2544,16 @@ function selectDifficulty(
         selections.length;
 
 
+    if (
+        difficultyCount !== 2 &&
+        boss.type === "Weekly" &&
+        getCharacterCrystalCount(character) >= MAX_BOSSES_PER_CHARACTER
+    ) {
+        showToast("This character has reached the 12 weekly boss crystal limit.");
+        return;
+    }
+
+
     /*
         x2 -> remove both
     */
@@ -2817,7 +2828,7 @@ function renderDashboard() {
         );
 
 
-    const characterRemaining = "∞";
+    const characterRemaining = Math.max(0, MAX_BOSSES_PER_CHARACTER - characterCrystals);
 
 
     const characterTotal =
