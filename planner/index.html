@@ -94,7 +94,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
 
     <div class="reset-notice">
         <strong>Automatic Reset:</strong>
-        Weekly selections reset every <span class="reset-weekly">Thursday 00:00 GMT+8</span>.
+        Weekly boss selections stay visible until you untick them in the Calculator.
         Monthly selections reset every <span class="reset-monthly">1st of the month 00:00 GMT+8</span>.
         <br>
         <strong>Last reset check:</strong> <span id="resetStatus">Checking...</span>
@@ -122,7 +122,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     <div class="section-header">
         <div>
             <div class="section-title">Weekly Boss Planner</div>
-            <div class="section-subtitle">This list is automatically generated from the Calculator's Weekly Boss list. Weekly selections automatically reset every Thursday at 00:00 GMT+8.</div>
+            <div class="section-subtitle">Shows your selected weekly bosses and keeps them visible across weekly resets until you untick them in the Calculator.</div>
         </div>
     </div>
     <div class="boss-list" id="weeklyBosses"></div>
@@ -136,9 +136,9 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     <br><br>
 
     <strong>Automatic reset system:</strong><br>
-    <strong>Weekly:</strong> All Weekly Boss selections are automatically cleared every Thursday at 00:00 GMT+8.
+    <strong>Weekly:</strong> Weekly boss selections are not automatically cleared. They remain visible in the Planner until you untick that boss in the Calculator.
     <br>
-    <strong>Monthly:</strong> All Monthly Boss selections are automatically cleared on the 1st of every month at 00:00 GMT+8.
+    <strong>Monthly:</strong> Monthly Boss selections are still automatically cleared on the 1st of every month at 00:00 GMT+8.
     <br><br>
 
     Resetting selections does <strong>not</strong> delete:
@@ -151,7 +151,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     • Boss data
     <br><br>
 
-    The reset only removes the corresponding Weekly or Monthly boss clear selections.
+    The monthly reset removes Monthly boss clear selections. Weekly boss selections remain saved until you untick them in the Calculator.
     <br><br>
 
     <strong>Weekly selection limits:</strong><br>
@@ -938,16 +938,13 @@ function runAutomaticResets() {
         currentWeeklyPeriod
     ) {
 
-        calculatorChanged =
-            clearBossSelectionsByType(
-                "Weekly"
-            ) ||
-            calculatorChanged;
-
+        /*
+           Keep weekly boss selections persistent across weekly resets.
+           The user removes a boss by unticking it in the Calculator.
+           Only update the period marker; do not delete selected bosses.
+        */
         resetState.weeklyPeriod =
             currentWeeklyPeriod;
-
-        weeklyResetPerformed = true;
     }
 
     if (!resetState.monthlyPeriod) {
@@ -979,25 +976,7 @@ function runAutomaticResets() {
 
     saveResetState(resetState);
 
-    if (
-        weeklyResetPerformed &&
-        monthlyResetPerformed
-    ) {
-
-        showToast(
-            "Weekly and monthly boss selections reset."
-        );
-
-    }
-    else if (weeklyResetPerformed) {
-
-        showToast(
-            "Weekly boss selections reset."
-        );
-
-    }
-    else if (monthlyResetPerformed) {
-
+    if (monthlyResetPerformed) {
         showToast(
             "Monthly boss selections reset."
         );
