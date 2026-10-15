@@ -201,6 +201,7 @@ const CALCULATOR_STORAGE_KEY = "msea_boss_crystal_calculator_v11";
 const PLANNER_NOTES_STORAGE_KEY = "msea_bossing_planner_notes_v1";
 const PLANNER_VIEW_STORAGE_KEY = "msea_bossing_planner_v2";
 const PLANNER_RESET_STORAGE_KEY = "msea_bossing_planner_reset_v1";
+const PLANNER_BOSS_VISIBILITY_KEY = "msea_bossing_planner_boss_visibility_v1";
 const MAX_BOSSES_PER_CHARACTER = 12;
 const CALCULATOR_URL = "../";
 
@@ -215,6 +216,7 @@ let state = {
 };
 
 let calculatorState = null;
+let plannerBossVisibility = { visible: {}, snapshot: {} };
 let modalAction = null;
 let toastTimer = null;
 
@@ -230,6 +232,8 @@ function init() {
     ensureActiveCharacter();
 
     runAutomaticResets();
+    loadPlannerBossVisibility();
+    reconcilePlannerBossVisibility();
 
     renderAll();
     startResetWatcher();
@@ -292,6 +296,105 @@ function savePlannerViewState() {
             activeAccountId: state.activeAccountId,
             activeCharacterId: state.activeCharacterId
         })
+    );
+}
+
+/* =========================================================
+   PLANNER BOSS VISIBILITY
+========================================================= */
+
+/*
+   Keep a boss row visible after its Planner clear count reaches zero.
+   Visibility is separate from Calculator clear counts. If a boss is
+   unticked directly in the Calculator, reconciliation removes its pin.
+*/
+function loadPlannerBossVisibility() {
+    try {
+        const saved = localStorage.getItem(PLANNER_BOSS_VISIBILITY_KEY);
+        if (!saved) {
+            plannerBossVisibility = { visible: {}, snapshot: {} };
+            return;
+        }
+        const parsed = JSON.parse(saved);
+        plannerBossVisibility = {
+            visible: parsed && parsed.visible && typeof parsed.visible === "object" ? parsed.visible : {},
+            snapshot: parsed && parsed.snapshot && typeof parsed.snapshot === "object" ? parsed.snapshot : {}
+        };
+    } catch (error) {
+        console.error("Failed to load Planner boss visibility:", error);
+        plannerBossVisibility = { visible: {}, snapshot: {} };
+    }
+}
+
+function savePlannerBossVisibility() {
+    localStorage.setItem(
+        PLANNER_BOSS_VISIBILITY_KEY,
+        JSON.stringify(plannerBossVisibility)
+    );
+}
+
+function getSelectionSnapshot(character, bossId) {
+    return getBossSelections(character, bossId).slice().sort();
+}
+
+function reconcilePlannerBossVisibility() {
+    if (!calculatorState) return;
+
+    const hasSnapshot = Object.keys(plannerBossVisibility.snapshot).length > 0;
+    const accounts = Array.isArray(calculatorState.accounts) ? calculatorState.accounts : [];
+
+    accounts.forEach(account => {
+        (Array.isArray(account.characters) ? account.characters : []).forEach(character => {
+            if (!plannerBossVisibility.visible[character.id]) {
+                plannerBossVisibility.visible[character.id] = {};
+            }
+            if (!plannerBossVisibility.snapshot[character.id]) {
+                plannerBossVisibility.snapshot[character.id] = {};
+            }
+
+            bossDefinitions.forEach(boss => {
+                const current = getSelectionSnapshot(character, boss.id);
+                const previous = plannerBossVisibility.snapshot[character.id][boss.id];
+
+                if (!hasSnapshot) {
+                    if (current.length) {
+                        plannerBossVisibility.visible[character.id][boss.id] = true;
+                    }
+                } else if (Array.isArray(previous)) {
+                    if (previous.length > 0 && current.length === 0) {
+                        delete plannerBossVisibility.visible[character.id][boss.id];
+                    } else if (current.length > 0) {
+                        plannerBossVisibility.visible[character.id][boss.id] = true;
+                    }
+                } else if (current.length > 0) {
+                    plannerBossVisibility.visible[character.id][boss.id] = true;
+                }
+
+                plannerBossVisibility.snapshot[character.id][boss.id] = current;
+            });
+        });
+    });
+
+    savePlannerBossVisibility();
+}
+
+function markBossVisibleFromPlanner(character, bossId) {
+    if (!plannerBossVisibility.visible[character.id]) {
+        plannerBossVisibility.visible[character.id] = {};
+    }
+    if (!plannerBossVisibility.snapshot[character.id]) {
+        plannerBossVisibility.snapshot[character.id] = {};
+    }
+
+    plannerBossVisibility.visible[character.id][bossId] = true;
+    plannerBossVisibility.snapshot[character.id][bossId] = getSelectionSnapshot(character, bossId);
+    savePlannerBossVisibility();
+}
+
+function isBossVisibleInPlanner(character, bossId) {
+    return !!(
+        plannerBossVisibility.visible[character.id] &&
+        plannerBossVisibility.visible[character.id][bossId]
     );
 }
 
@@ -1431,6 +1534,7 @@ function handlePlannerDifficultyClick(bossId, difficulty) {
     }
 
     saveCalculatorState();
+    markBossVisibleFromPlanner(character, bossId);
     renderAll();
 }
 
@@ -1698,14 +1802,16 @@ function renderBosses() {
         .toLowerCase();
 
     /*
-       Only show bosses with at least one selected clear.
-       This keeps the Planner focused on the active character's
-       selected bosses; a boss disappears once all its clears
-       are removed. Search still filters the visible selections.
+       Show bosses that are selected in the Calculator or pinned in
+       Planner visibility history. A Planner click that changes a
+       boss to Not Cleared does not remove the row.
     */
     const selectedBosses =
         bossDefinitions.filter(boss =>
-            getBossSelections(character, boss.id).length > 0 &&
+            (
+                getBossSelections(character, boss.id).length > 0 ||
+                isBossVisibleInPlanner(character, boss.id)
+            ) &&
             (
                 !search ||
                 boss.name.toLowerCase().includes(search)
@@ -1765,6 +1871,8 @@ function syncFromCalculator() {
        Check reset again when manually syncing.
     */
     runAutomaticResets();
+    loadPlannerBossVisibility();
+    reconcilePlannerBossVisibility();
 
     ensureActiveAccount();
     ensureActiveCharacter();
@@ -2409,6 +2517,8 @@ window.addEventListener(
             loadCalculatorState();
 
             runAutomaticResets();
+            loadPlannerBossVisibility();
+            reconcilePlannerBossVisibility();
 
             ensureActiveAccount();
             ensureActiveCharacter();
@@ -2447,6 +2557,8 @@ document.addEventListener(
             loadPlannerNotes();
 
             runAutomaticResets();
+            loadPlannerBossVisibility();
+            reconcilePlannerBossVisibility();
 
             ensureActiveAccount();
             ensureActiveCharacter();
