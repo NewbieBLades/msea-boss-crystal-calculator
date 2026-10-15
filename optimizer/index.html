@@ -393,6 +393,46 @@
         margin-top: 2px;
     }
 
+    .difficulty-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 27px;
+        padding: 2px 6px;
+        margin-right: 4px;
+        border-radius: 5px;
+        font-size: 13px;
+        line-height: 1.2;
+        font-weight: 900;
+        letter-spacing: .02em;
+        vertical-align: baseline;
+    }
+
+    .difficulty-e {
+        background: #858B98;
+        color: #ffffff;
+    }
+
+    .difficulty-n {
+        background: #16834A;
+        color: #ffffff;
+    }
+
+    .difficulty-h {
+        background: #F07878;
+        color: #271014;
+    }
+
+    .difficulty-c {
+        background: #D5D9E0;
+        color: #171a22;
+    }
+
+    .difficulty-ex {
+        background: #741B2B;
+        color: #ffffff;
+    }
+
     .result-party {
         color: #9da5b3;
         white-space: nowrap;
@@ -672,30 +712,6 @@
                 The Optimizer does not add, remove, rename, or clear characters.
                 Make changes in the Calculator, then press
                 <strong>Sync from Calculator</strong>.
-            </div>
-        </div>
-
-    </section>
-
-
-    <!-- PARTY SIZE -->
-    <section class="section">
-
-        <div class="section-header">
-            <div>
-                <h2 class="section-title">Party Size Configuration</h2>
-                <div class="section-subtitle">
-                    Party sizes are read-only here and synced from the Calculator.
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div id="partyContainer"></div>
-
-            <div class="sync-note">
-                Party size cannot be changed in the Optimizer.
-                Change the party size in the Calculator, then sync again.
             </div>
         </div>
 
@@ -2728,6 +2744,24 @@ function groupCrystalsForDisplay(crystals) {
     });
 }
 
+function getDifficultyBadgeInfo(difficulty) {
+    const normalized = String(difficulty ?? "").trim().toUpperCase();
+    const aliases = {
+        "E": "E", "EASY": "E",
+        "N": "N", "NORMAL": "N",
+        "H": "H", "HARD": "H",
+        "C": "C", "CHAOS": "C",
+        "EX": "EX", "EXTREME": "EX"
+    };
+    const code = aliases[normalized] || normalized;
+    const labels = { E: "E", N: "N", H: "H", C: "C", EX: "EX" };
+    const safeCode = ["E", "N", "H", "C", "EX"].includes(code) ? code : "N";
+    return {
+        label: labels[safeCode],
+        className: "difficulty-" + safeCode.toLowerCase()
+    };
+}
+
 function renderGroupedCrystalRows(crystals, rowClass, rankColor) {
     const groups = groupCrystalsForDisplay(crystals);
 
@@ -2751,7 +2785,7 @@ function renderGroupedCrystalRows(crystals, rowClass, rankColor) {
                     <img src="${group.icon}" alt="" onerror="this.style.display='none'">
                     <div class="result-boss-text">
                         <div class="result-boss-name">${escapeHtml(group.bossName)} <span style="color:#aeb5c2;font-weight:normal;">×${count}</span></div>
-                        <div class="result-difficulty">${escapeHtml(group.difficulty)} · ${count} ${crystalLabel} · ${characterCount} ${characterLabel}</div>
+                        <div class="result-difficulty"><span class="difficulty-badge ${getDifficultyBadgeInfo(group.difficulty).className}">${getDifficultyBadgeInfo(group.difficulty).label}</span> · ${count} ${crystalLabel} · ${characterCount} ${characterLabel}</div>
                     </div>
                 </div>
                 <div class="result-party">${partyLabel}</div>
@@ -3085,8 +3119,6 @@ function renderAll() {
     renderWarning();
 
     renderCharacters();
-
-    renderPartySizes();
 
     renderResults();
 
