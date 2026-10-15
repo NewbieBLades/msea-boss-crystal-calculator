@@ -411,6 +411,40 @@
         background: rgba(63, 108, 240, 0.07);
     }
 
+    .discard-row {
+        background: rgba(220, 70, 70, 0.07);
+    }
+
+    .decision-label {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .04em;
+        border-radius: 5px;
+        padding: 3px 6px;
+        margin-right: 6px;
+    }
+
+    .sell-label {
+        color: #57df8a;
+        background: rgba(87, 223, 138, .12);
+    }
+
+    .discard-label {
+        color: #ff8b8b;
+        background: rgba(255, 100, 100, .12);
+    }
+
+    .result-section-label {
+        padding: 10px 14px;
+        background: #11141b;
+        color: #aeb6c5;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .06em;
+        border-top: 1px solid #303645;
+    }
+
     .empty {
         padding: 25px;
         text-align: center;
@@ -593,12 +627,12 @@
         </div>
 
         <div class="stat">
-            <div class="stat-label">Optimized Weekly Income</div>
+            <div class="stat-label">Sellable Weekly Income</div>
             <div class="stat-value" id="optimizedIncome">0</div>
         </div>
 
         <div class="stat">
-            <div class="stat-label">Potential Gain</div>
+            <div class="stat-label">Throw-away Value</div>
             <div class="stat-value gain" id="potentialGain">0</div>
         </div>
 
@@ -684,7 +718,7 @@
                         The Optimizer will choose the highest-value crystals
                         <strong>only from the bosses and difficulties currently selected in your Calculator</strong>.
                         It will never add a boss that is not in your Calculator list.
-                        Maximum: 90 weekly Boss Crystals per account. A character may contribute any of the crystals selected in the Calculator.
+                        The best 90 weekly crystals per account are marked SELL. All remaining selected weekly crystals are marked THROW AWAY.
                     </div>
                 </div>
 
@@ -753,9 +787,9 @@
             and they are not selected in the Calculator, they will not appear as optimization candidates
             even if their crystal values are higher.<br><br>
 
-            <strong>3. Best 90 Weekly Crystals Per Account</strong><br>
-            Across each account, the Optimizer ranks all weekly crystals actually selected in the Calculator
-            and chooses the best 90 based on their meso value after party splitting.<br><br>
+            <strong>3. SELL vs THROW AWAY</strong><br>
+            Across each account, the Optimizer ranks every selected weekly crystal by meso value after party splitting.
+            The highest-value 90 are marked SELL; every remaining selected weekly crystal is marked THROW AWAY.<br><br>
 
             <strong>4. Party Size</strong><br>
             Crystal value is divided by the party size configured in the Calculator.<br><br>
@@ -2486,7 +2520,7 @@ function optimizeAllCharacters() {
 
     saveOptimizerState();
     renderAll();
-    showToast("Optimization completed: best 90 selected crystals per account.");
+    showToast("Optimization completed: SELL and THROW AWAY lists are ready for every account.");
 }
 
 
@@ -2688,7 +2722,16 @@ function renderResults() {
         const optimized = state.optimized[accountId] || [];
         const currentTotal = current.reduce((sum, c) => sum + c.dividedValue, 0);
         const optimizedTotal = optimized.reduce((sum, c) => sum + c.dividedValue, 0);
-        const gain = optimizedTotal - currentTotal;
+        const optimizedIds = new Set(optimized.map(crystal => crystal.id));
+        const discarded = current
+            .filter(crystal => !optimizedIds.has(crystal.id))
+            .sort((a, b) => {
+                if (b.dividedValue !== a.dividedValue) {
+                    return b.dividedValue - a.dividedValue;
+                }
+                return a.characterName.localeCompare(b.characterName);
+            });
+        const discardedTotal = discarded.reduce((sum, c) => sum + c.dividedValue, 0);
         const hasOptimization = Array.isArray(state.optimized[accountId]);
         const selectedCount = current.length;
 
@@ -2697,9 +2740,9 @@ function renderResults() {
             <div class="result-header">
                 <div>
                     <div class="result-header-title">${escapeHtml(account.name)}</div>
-                    <div class="account-name">Current ${selectedCount} / Optimized ${optimized.length} / ${MAX_ACCOUNT_CRYSTALS} weekly crystals</div>
+                    <div class="account-name">Selected ${selectedCount} · SELL ${optimized.length} · THROW AWAY ${discarded.length}</div>
                 </div>
-                <div class="result-header-value ${gain > 0 ? "green" : ""}">+${formatMeso(gain)}</div>
+                <div class="result-header-value">${hasOptimization ? formatMeso(discardedTotal) : "—"}</div>
             </div>
 
             <div class="result-list">
@@ -2710,29 +2753,48 @@ function renderResults() {
                     <div class="result-meso">${formatMeso(currentTotal)}</div>
                 </div>
 
-                ${hasOptimization && optimized.length ? optimized.map((crystal, index) => `
-                    <div class="result-row optimized-row">
-                        <div class="rank">${index + 1}</div>
-                        <div class="result-boss">
-                            <img src="${crystal.icon}" alt="" onerror="this.style.display='none'">
-                            <div class="result-boss-text">
-                                <div class="result-boss-name">${escapeHtml(crystal.bossName)}</div>
-                                <div class="result-difficulty">${escapeHtml(crystal.difficulty)} · ${escapeHtml(crystal.characterName)}</div>
-                            </div>
-                        </div>
-                        <div class="result-party">÷${crystal.partySize}</div>
-                        <div class="result-meso">${formatMeso(crystal.dividedValue)}</div>
-                    </div>
-                `).join("") : `
-                    <div class="empty">Press <strong>Optimize All Accounts</strong> to calculate the best ${MAX_ACCOUNT_CRYSTALS} crystals for this account.</div>
-                `}
-
                 ${hasOptimization ? `
+                    <div class="result-section-label"><span class="decision-label sell-label">SELL</span> Best ${MAX_ACCOUNT_CRYSTALS} crystals by meso value</div>
+                    ${optimized.length ? optimized.map((crystal, index) => `
+                        <div class="result-row optimized-row">
+                            <div class="rank">${index + 1}</div>
+                            <div class="result-boss">
+                                <img src="${crystal.icon}" alt="" onerror="this.style.display='none'">
+                                <div class="result-boss-text">
+                                    <div class="result-boss-name">${escapeHtml(crystal.bossName)}</div>
+                                    <div class="result-difficulty">${escapeHtml(crystal.difficulty)} · ${escapeHtml(crystal.characterName)}</div>
+                                </div>
+                            </div>
+                            <div class="result-party">÷${crystal.partySize}</div>
+                            <div class="result-meso">${formatMeso(crystal.dividedValue)}</div>
+                        </div>
+                    `).join("") : `<div class="empty">No selected weekly crystals to sell.</div>`}
                     <div class="result-row" style="background:#11141b;border-top:1px solid #303645;">
-                        <div></div><div><strong>Optimized Total</strong></div><div></div>
+                        <div></div><div><strong>SELL Total</strong></div><div></div>
                         <div class="result-meso" style="color:#57df8a;">${formatMeso(optimizedTotal)}</div>
                     </div>
-                ` : ""}
+                    <div class="result-section-label"><span class="decision-label discard-label">THROW AWAY</span> Selected crystals outside the best ${MAX_ACCOUNT_CRYSTALS}</div>
+                    ${discarded.length ? discarded.map((crystal, index) => `
+                        <div class="result-row discard-row">
+                            <div class="rank">${index + 1}</div>
+                            <div class="result-boss">
+                                <img src="${crystal.icon}" alt="" onerror="this.style.display='none'">
+                                <div class="result-boss-text">
+                                    <div class="result-boss-name">${escapeHtml(crystal.bossName)}</div>
+                                    <div class="result-difficulty">${escapeHtml(crystal.difficulty)} · ${escapeHtml(crystal.characterName)}</div>
+                                </div>
+                            </div>
+                            <div class="result-party">÷${crystal.partySize}</div>
+                            <div class="result-meso">${formatMeso(crystal.dividedValue)}</div>
+                        </div>
+                    `).join("") : `<div class="empty">No selected crystals need to be thrown away.</div>`}
+                    <div class="result-row" style="background:#11141b;border-top:1px solid #303645;">
+                        <div></div><div><strong>THROW AWAY Value</strong></div><div></div>
+                        <div class="result-meso" style="color:#ff8b8b;">${formatMeso(discardedTotal)}</div>
+                    </div>
+                ` : `
+                    <div class="empty">Press <strong>Optimize All Accounts</strong> to identify which selected crystals to SELL and which to THROW AWAY.</div>
+                `}
             </div>
         </div>`;
     }).join("");
@@ -2901,15 +2963,29 @@ function renderDashboard() {
     }
 
     const hasOptimization = Object.keys(state.optimized || {}).length > 0;
+    let discardedTotal = 0;
     if (hasOptimization) {
         for (const crystals of Object.values(state.optimized)) {
             optimizedTotal += (crystals || []).reduce((sum, crystal) => sum + crystal.dividedValue, 0);
+        }
+
+        const accounts = {};
+        for (const character of state.characters) {
+            if (!accounts[character.accountId]) accounts[character.accountId] = [];
+            accounts[character.accountId].push(character);
+        }
+        for (const [accountId, characters] of Object.entries(accounts)) {
+            const allCrystals = characters.flatMap(character => getEligibleCrystals(character));
+            const sellIds = new Set((state.optimized[accountId] || []).map(crystal => crystal.id));
+            discardedTotal += allCrystals
+                .filter(crystal => !sellIds.has(crystal.id))
+                .reduce((sum, crystal) => sum + crystal.dividedValue, 0);
         }
     }
 
     document.getElementById("currentIncome").textContent = formatMeso(currentTotal);
     document.getElementById("optimizedIncome").textContent = hasOptimization ? formatMeso(optimizedTotal) : "—";
-    document.getElementById("potentialGain").textContent = hasOptimization ? formatMeso(Math.max(0, optimizedTotal - currentTotal)) : "—";
+    document.getElementById("potentialGain").textContent = hasOptimization ? formatMeso(discardedTotal) : "—";
     document.getElementById("characterCount").textContent = `${accountIds.size} account${accountIds.size !== 1 ? "s" : ""} · ${state.characters.length} character${state.characters.length !== 1 ? "s" : ""}`;
 }
 
