@@ -349,12 +349,28 @@
 
     .result-row {
         display: grid;
-        grid-template-columns: 42px 1fr auto auto;
+        grid-template-columns: 42px minmax(0, 1fr) 82px auto;
         gap: 10px;
         align-items: center;
         padding: 9px 14px;
         border-bottom: 1px solid #222731;
         font-size: 13px;
+    }
+
+    .result-party {
+        color: #c1c8d4;
+        text-align: center;
+        white-space: nowrap;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .result-column-heading {
+        color: #858d9d;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .04em;
     }
 
     .result-row:last-child {
@@ -609,11 +625,19 @@
         }
 
         .result-row {
-            grid-template-columns: 30px 1fr auto;
+            grid-template-columns: 24px minmax(0, 1fr) 58px auto;
+            gap: 6px;
+            padding-left: 8px;
+            padding-right: 8px;
         }
 
         .result-party {
-            display: none;
+            display: block;
+            font-size: 11px;
+        }
+
+        .result-column-heading {
+            font-size: 9px;
         }
 
         h1 {
@@ -2840,10 +2864,16 @@ function renderResults() {
             </div>
 
             <div class="result-list">
+                <div class="result-row" style="background:#11141b;padding-top:7px;padding-bottom:7px;">
+                    <div></div>
+                    <div class="result-column-heading">Boss / Difficulty</div>
+                    <div class="result-column-heading" style="text-align:center;">Party Size</div>
+                    <div class="result-column-heading" style="text-align:right;">Meso</div>
+                </div>
                 <div class="result-row current-row" style="background:#171b23;">
                     <div class="rank">—</div>
                     <div class="result-boss"><div class="result-boss-text"><div class="result-boss-name">Current Selection</div><div class="result-difficulty">All Calculator-selected weekly crystals</div></div></div>
-                    <div class="result-party">${selectedCount} crystals</div>
+                    <div class="result-party">—</div>
                     <div class="result-meso">${formatMeso(currentTotal)}</div>
                 </div>
 
