@@ -492,9 +492,39 @@
     }
 
     .difficulty-option input:checked + label {
-        background: #332a5d;
-        border-color: #7c5cff;
-        color: #fff;
+        border-color: #ffffff;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.2);
+    }
+
+    /* Match the Optimizer's difficulty colours. */
+    .difficulty-option label.difficulty-color-e {
+        background: #858B98;
+        border-color: #858B98;
+        color: #ffffff;
+    }
+
+    .difficulty-option label.difficulty-color-n {
+        background: #16834A;
+        border-color: #16834A;
+        color: #ffffff;
+    }
+
+    .difficulty-option label.difficulty-color-h {
+        background: #F07878;
+        border-color: #F07878;
+        color: #271014;
+    }
+
+    .difficulty-option label.difficulty-color-c {
+        background: #D5D9E0;
+        border-color: #D5D9E0;
+        color: #171a22;
+    }
+
+    .difficulty-option label.difficulty-color-ex {
+        background: #741B2B;
+        border-color: #741B2B;
+        color: #ffffff;
     }
 
     .difficulty-option input:disabled + label {
@@ -3185,6 +3215,7 @@ function renderBossList(
 
 
                             <label
+                                class="difficulty-color-${difficulty.name.toLowerCase()}"
                                 for="${inputId}"
                                 onclick="
                                     handleDifficultyClick(
