@@ -58,10 +58,10 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
 </header>
 
 <section class="dashboard">
-    <div class="card"><div class="card-label">Weekly Clears</div><div class="card-value" id="weeklyClears">0</div><div class="card-sub">Unlimited weekly selections</div></div>
-    <div class="card"><div class="card-label">Remaining</div><div class="card-value" id="remainingClears">∞</div><div class="card-sub">No selection limit</div></div>
+    <div class="card"><div class="card-label">Weekly Clears</div><div class="card-value" id="weeklyClears">0</div><div class="card-sub">Maximum 12 weekly boss crystals</div></div>
+    <div class="card"><div class="card-label">Remaining</div><div class="card-value" id="remainingClears">12</div><div class="card-sub">Weekly crystals remaining</div></div>
     <div class="card"><div class="card-label">Character</div><div class="card-value" id="characterName">Character 1</div><div class="card-sub">Active character</div></div>
-    <div class="card"><div class="card-label">Account Weekly Clears</div><div class="card-value" id="accountClears">0</div><div class="card-sub">Unlimited account selections</div></div>
+    <div class="card"><div class="card-label">Account Weekly Clears</div><div class="card-value" id="accountClears">0</div><div class="card-sub">Across all characters</div></div>
 </section>
 
 <section class="account-section">
@@ -749,6 +749,8 @@ const bossDefinitions = [
     }
 ];
 
+const MAX_BOSSES_PER_CHARACTER = 12;
+
 /* =========================================================
    BOSS HELPERS
 ========================================================= */
@@ -1396,7 +1398,7 @@ function renderDashboard() {
             character
         );
 
-    const remaining = "∞";
+    const remaining = Math.max(0, MAX_BOSSES_PER_CHARACTER - characterClears);
 
     const accountClears =
         getAccountWeeklyClearCount(
@@ -1457,6 +1459,15 @@ function handlePlannerDifficultyClick(bossId, difficulty) {
         selections.filter(
             item => item === difficulty
         ).length;
+
+    if (
+        difficultyCount !== 2 &&
+        boss.type === "Weekly" &&
+        getCharacterWeeklyClearCount(character) >= MAX_BOSSES_PER_CHARACTER
+    ) {
+        showToast("This character has reached the 12 weekly boss crystal limit.");
+        return;
+    }
 
     if (difficultyCount === 2) {
         // x2 -> remove both
