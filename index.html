@@ -2545,12 +2545,26 @@ function selectDifficulty(
 
 
     if (
-        difficultyCount !== 2 &&
         boss.type === "Weekly" &&
         getCharacterCrystalCount(character) >= MAX_BOSSES_PER_CHARACTER
     ) {
-        showToast("This character has reached the 12 weekly boss crystal limit.");
-        return;
+        if (difficultyCount === 1) {
+            // At the limit, x1 must be removable instead of becoming x2.
+            selections = selections.filter(item => item !== difficulty);
+            if (!selections.length) {
+                delete character.selected[bossId];
+            } else {
+                character.selected[bossId] = selections;
+            }
+            saveState();
+            renderAll();
+            return;
+        }
+
+        if (difficultyCount === 0) {
+            showToast("This character has reached the 12 weekly boss crystal limit.");
+            return;
+        }
     }
 
 
