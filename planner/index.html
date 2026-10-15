@@ -33,6 +33,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
 .boss-name-text{min-width:0}.boss-type{display:inline-block;margin-left:7px;padding:2px 6px;border-radius:5px;font-size:10px;color:#9da4b1;background:#242934;vertical-align:middle}
 .difficulty-list{display:flex;flex-wrap:wrap;gap:7px}.difficulty-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:48px;padding:7px 9px;background:#332a5d;border:1px solid #7c5cff;color:#fff;border-radius:7px;font-size:12px;font-weight:700}
 .difficulty-badge.not-cleared{background:#11141a;border-color:#303642;color:#777f8d}.difficulty-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#7c5cff;color:#fff;font-size:10px;line-height:1}
+.planner-difficulty-button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:48px;padding:7px 9px;background:#11141a;border:1px solid #303642;color:#777f8d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}.planner-difficulty-button:hover{border-color:#7c5cff;color:#fff}.planner-difficulty-button.selected{background:#332a5d;border-color:#7c5cff;color:#fff}.planner-difficulty-button:disabled{opacity:.4;cursor:not-allowed}.planner-difficulty-button .difficulty-count{background:#7c5cff}
 .party-info{color:#aeb5c2;font-size:12px}.party-info strong{color:#fff}.status{text-align:right;font-weight:700}.status-cleared{color:#b7ffcf}.status-not-cleared{color:#777f8d}
 .status small{display:block;color:#777f8d;font-weight:400;font-size:11px;margin-top:3px}.boss-note{width:100%;min-height:40px;height:40px;resize:vertical;background:#0f1117;border:1px solid #303642;color:#fff;border-radius:7px;padding:8px 9px;outline:none;font-size:12px;line-height:1.35}
 .boss-note::placeholder{color:#626a78}.boss-note:focus{border-color:#7c5cff;box-shadow:0 0 0 1px rgba(124,92,255,.15)}.note-label{color:#777f8d;font-size:10px;margin-bottom:4px}
@@ -545,6 +546,16 @@ const bossDefinitions = [
         difficulties: [
             { name: "N", value: 58.5 },
             { name: "H", value: 124.2 }
+        ]
+    },
+    {
+        id: "malicia",
+        name: "Malicia",
+        icon: "../images/Malicia.png",
+        type: "Weekly",
+        difficulties: [
+            { name: "N", value: 290.2 },
+            { name: "EX", value: 3160 }
         ]
     },
     {
@@ -1370,6 +1381,81 @@ function renderDashboard() {
 }
 
 /* =========================================================
+   PLANNER DIFFICULTY CLICK
+========================================================= */
+
+/*
+   Uses the Calculator's same x0 -> x1 -> x2 -> x0 behavior.
+   Planner writes to the same Calculator state so both pages stay in sync.
+*/
+function handlePlannerDifficultyClick(bossId, difficulty) {
+
+    const character = getActiveCharacter();
+    const boss = getBoss(bossId);
+
+    if (!character || !boss || !calculatorState) {
+        showToast("Calculator data not found.");
+        return;
+    }
+
+    if (!character.selected) {
+        character.selected = {};
+    }
+
+    let selections =
+        getBossSelections(character, bossId).slice();
+
+    const difficultyCount =
+        selections.filter(
+            item => item === difficulty
+        ).length;
+
+    if (difficultyCount === 2) {
+        // x2 -> remove both
+        selections =
+            selections.filter(
+                item => item !== difficulty
+            );
+    } else if (difficultyCount === 1) {
+        // x1 -> x2, unless weekly limit is already full.
+        if (
+            boss.type === "Weekly" &&
+            getCharacterWeeklyClearCount(character) >= MAX_BOSSES_PER_CHARACTER
+        ) {
+            // Same as the Calculator: when full, this click deselects x1.
+            selections =
+                selections.filter(
+                    item => item !== difficulty
+                );
+        } else {
+            selections.push(difficulty);
+        }
+    } else {
+        // x0 -> x1
+        if (
+            boss.type === "Weekly" &&
+            getCharacterWeeklyClearCount(character) >= MAX_BOSSES_PER_CHARACTER
+        ) {
+            showToast(
+                `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} weekly Boss Crystals.`
+            );
+            return;
+        }
+
+        selections.push(difficulty);
+    }
+
+    if (selections.length) {
+        character.selected[bossId] = selections;
+    } else {
+        delete character.selected[bossId];
+    }
+
+    saveCalculatorState();
+    renderAll();
+}
+
+/* =========================================================
    BOSS ROW
 ========================================================= */
 
@@ -1419,45 +1505,45 @@ function createBossRow(boss, character) {
     difficultyDiv.className =
         "difficulty-list";
 
-    if (!selections.length) {
+    boss.difficulties.forEach(difficulty => {
 
-        difficultyDiv.innerHTML = `
-            <span class="difficulty-badge not-cleared">
-                Not cleared
-            </span>
+        const count =
+            selections.filter(
+                selectedDifficulty =>
+                    selectedDifficulty === difficulty.name
+            ).length;
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type = "button";
+        button.className =
+            "planner-difficulty-button" +
+            (count > 0 ? " selected" : "");
+
+        button.title =
+            `${difficulty.name}: ${count} clear${count === 1 ? "" : "s"} — click to cycle`;
+
+        button.innerHTML = `
+            ${escapeHtml(difficulty.name)}
+            <span class="difficulty-count">${count}</span>
         `;
 
-    } else {
-
-        const counts = {};
-
-        selections.forEach(difficulty => {
-            counts[difficulty] =
-                (counts[difficulty] || 0) + 1;
-        });
-
-        Object.keys(counts).forEach(difficulty => {
-
-            const badge =
-                document.createElement(
-                    "span"
+        if (difficulty.value === null) {
+            button.disabled = true;
+            button.title = "Crystal value not available";
+        } else {
+            button.onclick = () =>
+                handlePlannerDifficultyClick(
+                    boss.id,
+                    difficulty.name
                 );
+        }
 
-            badge.className =
-                "difficulty-badge";
-
-            badge.innerHTML = `
-                ${escapeHtml(difficulty)}
-                <span class="difficulty-count">
-                    ${counts[difficulty]}
-                </span>
-            `;
-
-            difficultyDiv.appendChild(
-                badge
-            );
-        });
-    }
+        difficultyDiv.appendChild(button);
+    });
 
     const partyDiv =
         document.createElement(
