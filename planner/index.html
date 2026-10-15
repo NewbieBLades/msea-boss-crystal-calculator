@@ -1461,12 +1461,27 @@ function handlePlannerDifficultyClick(bossId, difficulty) {
         ).length;
 
     if (
-        difficultyCount !== 2 &&
         boss.type === "Weekly" &&
         getCharacterWeeklyClearCount(character) >= MAX_BOSSES_PER_CHARACTER
     ) {
-        showToast("This character has reached the 12 weekly boss crystal limit.");
-        return;
+        if (difficultyCount === 1) {
+            // At the limit, x1 must be removable instead of becoming x2.
+            selections = selections.filter(item => item !== difficulty);
+            if (selections.length) {
+                character.selected[bossId] = selections;
+            } else {
+                delete character.selected[bossId];
+            }
+            markBossVisibleFromPlanner(character, bossId);
+            saveCalculatorState();
+            renderAll();
+            return;
+        }
+
+        if (difficultyCount === 0) {
+            showToast("This character has reached the 12 weekly boss crystal limit.");
+            return;
+        }
     }
 
     if (difficultyCount === 2) {
