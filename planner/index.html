@@ -1533,8 +1533,15 @@ function handlePlannerDifficultyClick(bossId, difficulty) {
         delete character.selected[bossId];
     }
 
-    saveCalculatorState();
+    /*
+       Save the Planner visibility pin BEFORE writing the shared
+       Calculator state. Other open Planner tabs receive the Calculator
+       storage event immediately; saving the pin first prevents them
+       from interpreting this Planner click (x2 -> x0) as a Calculator
+       untick and deleting the row's visibility pin.
+    */
     markBossVisibleFromPlanner(character, bossId);
+    saveCalculatorState();
     renderAll();
 }
 
