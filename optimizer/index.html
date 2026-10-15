@@ -2697,6 +2697,70 @@ function renderPartySizes() {
    RENDER RESULTS
 ========================================================= */
 
+function groupCrystalsForDisplay(crystals) {
+    const groups = new Map();
+
+    for (const crystal of crystals) {
+        const key = `${crystal.bossId}:${crystal.difficulty}`;
+        if (!groups.has(key)) {
+            groups.set(key, {
+                bossId: crystal.bossId,
+                bossName: crystal.bossName,
+                difficulty: crystal.difficulty,
+                icon: crystal.icon,
+                crystals: [],
+                totalValue: 0,
+                characterNames: new Set(),
+                partySizes: new Set()
+            });
+        }
+
+        const group = groups.get(key);
+        group.crystals.push(crystal);
+        group.totalValue += crystal.dividedValue;
+        group.characterNames.add(crystal.characterName);
+        group.partySizes.add(crystal.partySize);
+    }
+
+    return Array.from(groups.values()).sort((a, b) => {
+        if (b.totalValue !== a.totalValue) return b.totalValue - a.totalValue;
+        return a.bossName.localeCompare(b.bossName) || a.difficulty.localeCompare(b.difficulty);
+    });
+}
+
+function renderGroupedCrystalRows(crystals, rowClass, rankColor) {
+    const groups = groupCrystalsForDisplay(crystals);
+
+    if (!groups.length) {
+        return `<div class="empty">No crystals in this section.</div>`;
+    }
+
+    return groups.map((group, index) => {
+        const count = group.crystals.length;
+        const characterCount = group.characterNames.size;
+        const characterLabel = characterCount === 1 ? "character" : "characters";
+        const crystalLabel = count === 1 ? "crystal" : "crystals";
+        const partyLabel = group.partySizes.size === 1
+            ? `÷${Array.from(group.partySizes)[0]}`
+            : "party varies";
+
+        return `
+            <div class="result-row ${rowClass}">
+                <div class="rank" style="${rankColor ? `color:${rankColor};` : ""}">${index + 1}</div>
+                <div class="result-boss">
+                    <img src="${group.icon}" alt="" onerror="this.style.display='none'">
+                    <div class="result-boss-text">
+                        <div class="result-boss-name">${escapeHtml(group.bossName)} <span style="color:#aeb5c2;font-weight:normal;">×${count}</span></div>
+                        <div class="result-difficulty">${escapeHtml(group.difficulty)} · ${count} ${crystalLabel} · ${characterCount} ${characterLabel}</div>
+                    </div>
+                </div>
+                <div class="result-party">${partyLabel}</div>
+                <div class="result-meso">${formatMeso(group.totalValue)}</div>
+            </div>
+        `;
+    }).join("");
+}
+
 function renderResults() {
 
     const container = document.getElementById("resultsContainer");
@@ -2724,23 +2788,19 @@ function renderResults() {
         const optimizedTotal = optimized.reduce((sum, c) => sum + c.dividedValue, 0);
         const optimizedIds = new Set(optimized.map(crystal => crystal.id));
         const discarded = current
-            .filter(crystal => !optimizedIds.has(crystal.id))
-            .sort((a, b) => {
-                if (b.dividedValue !== a.dividedValue) {
-                    return b.dividedValue - a.dividedValue;
-                }
-                return a.characterName.localeCompare(b.characterName);
-            });
+            .filter(crystal => !optimizedIds.has(crystal.id));
         const discardedTotal = discarded.reduce((sum, c) => sum + c.dividedValue, 0);
         const hasOptimization = Array.isArray(state.optimized[accountId]);
         const selectedCount = current.length;
+        const optimizedGroups = groupCrystalsForDisplay(optimized).length;
+        const discardedGroups = groupCrystalsForDisplay(discarded).length;
 
         return `
         <div class="result-card">
             <div class="result-header">
                 <div>
                     <div class="result-header-title">${escapeHtml(account.name)}</div>
-                    <div class="account-name">Selected ${selectedCount} · SELL ${hasOptimization ? optimized.length : "—"} · THROW AWAY ${hasOptimization ? discarded.length : "—"}</div>
+                    <div class="account-name">Selected ${selectedCount} · SELL ${hasOptimization ? optimized.length : "—"} crystals · THROW AWAY ${hasOptimization ? discarded.length : "—"} crystals</div>
                 </div>
                 <div class="result-header-value">${hasOptimization ? formatMeso(discardedTotal) : "—"}</div>
             </div>
@@ -2754,40 +2814,14 @@ function renderResults() {
                 </div>
 
                 ${hasOptimization ? `
-                    <div class="result-section-label"><span class="decision-label sell-label">SELL</span> Best up to ${MAX_ACCOUNT_CRYSTALS} crystals by meso value</div>
-                    ${optimized.length ? optimized.map((crystal, index) => `
-                        <div class="result-row optimized-row">
-                            <div class="rank">${index + 1}</div>
-                            <div class="result-boss">
-                                <img src="${crystal.icon}" alt="" onerror="this.style.display='none'">
-                                <div class="result-boss-text">
-                                    <div class="result-boss-name">${escapeHtml(crystal.bossName)}</div>
-                                    <div class="result-difficulty">${escapeHtml(crystal.difficulty)} · ${escapeHtml(crystal.characterName)}</div>
-                                </div>
-                            </div>
-                            <div class="result-party">÷${crystal.partySize}</div>
-                            <div class="result-meso">${formatMeso(crystal.dividedValue)}</div>
-                        </div>
-                    `).join("") : `<div class="empty">No selected weekly crystals to sell.</div>`}
+                    <div class="result-section-label"><span class="decision-label sell-label">SELL</span> ${optimized.length} crystals · ${optimizedGroups} grouped boss/difficulty rows · best up to ${MAX_ACCOUNT_CRYSTALS}</div>
+                    ${renderGroupedCrystalRows(optimized, "optimized-row", "#6f7787")}
                     <div class="result-row" style="background:#11141b;border-top:1px solid #303645;">
                         <div></div><div><strong>SELL Total</strong></div><div></div>
                         <div class="result-meso" style="color:#57df8a;">${formatMeso(optimizedTotal)}</div>
                     </div>
-                    <div class="result-section-label"><span class="decision-label discard-label">THROW AWAY</span> Selected crystals outside the best ${MAX_ACCOUNT_CRYSTALS}</div>
-                    ${discarded.length ? discarded.map((crystal, index) => `
-                        <div class="result-row discard-row">
-                            <div class="rank">${index + 1}</div>
-                            <div class="result-boss">
-                                <img src="${crystal.icon}" alt="" onerror="this.style.display='none'">
-                                <div class="result-boss-text">
-                                    <div class="result-boss-name">${escapeHtml(crystal.bossName)}</div>
-                                    <div class="result-difficulty">${escapeHtml(crystal.difficulty)} · ${escapeHtml(crystal.characterName)}</div>
-                                </div>
-                            </div>
-                            <div class="result-party">÷${crystal.partySize}</div>
-                            <div class="result-meso">${formatMeso(crystal.dividedValue)}</div>
-                        </div>
-                    `).join("") : `<div class="empty">No selected crystals need to be thrown away.</div>`}
+                    <div class="result-section-label"><span class="decision-label discard-label">THROW AWAY</span> ${discarded.length} crystals · ${discardedGroups} grouped boss/difficulty rows</div>
+                    ${renderGroupedCrystalRows(discarded, "discard-row", "#6f7787")}
                     <div class="result-row" style="background:#11141b;border-top:1px solid #303645;">
                         <div></div><div><strong>THROW AWAY Value</strong></div><div></div>
                         <div class="result-meso" style="color:#ff8b8b;">${formatMeso(discardedTotal)}</div>
