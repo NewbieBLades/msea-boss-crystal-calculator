@@ -28,20 +28,20 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
 .btn:hover{background:#2c3240}.btn.primary{background:#6650d9;border-color:#7c5cff}.btn.primary:hover{background:#7560e8}.btn.danger{color:#ff9d9d}
 .reset-notice,.sync-notice{padding:12px 16px;background:#14171e;border-bottom:1px solid #292e3a;color:#9aa1ad;font-size:12px}
 .reset-notice strong,.sync-notice strong{color:#fff}.reset-weekly{color:#7c5cff;font-weight:700}.reset-monthly{color:#b78cff;font-weight:700}.sync-status{color:#7c5cff;font-weight:700}
-.boss-list{padding:8px 16px 16px}.boss-row{display:grid;grid-template-columns:minmax(220px,1fr) minmax(250px,2fr) 150px 170px minmax(180px,1.2fr);align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #242934}
+.boss-list{padding:8px 16px 16px}.boss-row{display:grid;grid-template-columns:minmax(220px,1.3fr) minmax(200px,1fr) 150px minmax(180px,1.2fr);align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #242934}.boss-selection-summary{color:#aeb5c2;font-size:12px;line-height:1.5}.boss-selection-summary strong{color:#fff}.boss-selection-label{color:#777f8d;font-size:10px;display:block;margin-bottom:3px}
 .boss-row:last-child{border-bottom:none}.boss-name{font-weight:700;display:flex;align-items:center;gap:10px;min-width:0}.boss-icon{width:48px;height:48px;object-fit:contain;border-radius:7px;flex-shrink:0;background:#11141a;border:1px solid #303642}
 .boss-name-text{min-width:0}.boss-type{display:inline-block;margin-left:7px;padding:2px 6px;border-radius:5px;font-size:10px;color:#9da4b1;background:#242934;vertical-align:middle}
 .difficulty-list{display:flex;flex-wrap:wrap;gap:7px}.difficulty-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:48px;padding:7px 9px;background:#332a5d;border:1px solid #7c5cff;color:#fff;border-radius:7px;font-size:12px;font-weight:700}
 .difficulty-badge.not-cleared{background:#11141a;border-color:#303642;color:#777f8d}.difficulty-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#7c5cff;color:#fff;font-size:10px;line-height:1}
 .planner-difficulty-button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:48px;padding:7px 9px;background:#11141a;border:1px solid #303642;color:#777f8d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}.planner-difficulty-button:hover{border-color:#7c5cff;color:#fff}.planner-difficulty-button.selected{background:#332a5d;border-color:#7c5cff;color:#fff}.planner-difficulty-button:disabled{opacity:.4;cursor:not-allowed}.planner-difficulty-button .difficulty-count{background:#7c5cff}
-.party-info{color:#aeb5c2;font-size:12px}.party-info strong{color:#fff}.status{text-align:right;font-weight:700}.status-cleared{color:#b7ffcf}.status-not-cleared{color:#777f8d}.planner-status-toggle{border:1px solid #465064;border-radius:8px;background:#1b222d;color:#c6ccd6;padding:8px 10px;font:inherit;font-weight:700;cursor:pointer;min-width:104px}.planner-status-toggle.status-cleared{background:#153326;border-color:#276846;color:#b7ffcf}.planner-status-toggle.status-not-cleared{background:#1b2029;border-color:#38404e;color:#aab2bf}.planner-status-toggle:focus-visible{outline:2px solid #8b7cff;outline-offset:2px}.status small{display:block;margin-top:4px;color:#8f98a8;font-size:11px;font-weight:400}
+.party-info{color:#aeb5c2;font-size:12px}.party-info strong{color:#fff}.status{text-align:left;font-weight:700}.status-cleared{color:#b7ffcf}.status-not-cleared{color:#777f8d}.planner-status-toggle{border:1px solid #465064;border-radius:8px;background:#1b222d;color:#c6ccd6;padding:8px 10px;font:inherit;font-weight:700;cursor:pointer;min-width:104px}.planner-status-toggle.status-cleared{background:#153326;border-color:#276846;color:#b7ffcf}.planner-status-toggle.status-not-cleared{background:#1b2029;border-color:#38404e;color:#aab2bf}.planner-status-toggle:focus-visible{outline:2px solid #8b7cff;outline-offset:2px}.status small{display:block;margin-top:4px;color:#8f98a8;font-size:11px;font-weight:400}
 .status small{display:block;color:#777f8d;font-weight:400;font-size:11px;margin-top:3px}.boss-note{width:100%;min-height:40px;height:40px;resize:vertical;background:#0f1117;border:1px solid #303642;color:#fff;border-radius:7px;padding:8px 9px;outline:none;font-size:12px;line-height:1.35}
 .boss-note::placeholder{color:#626a78}.boss-note:focus{border-color:#7c5cff;box-shadow:0 0 0 1px rgba(124,92,255,.15)}.note-label{color:#777f8d;font-size:10px;margin-bottom:4px}
 .empty{padding:35px 15px;text-align:center;color:#777f8d}.info-box{background:#171a22;border:1px solid #292e3a;border-radius:12px;padding:16px;margin-top:16px;color:#9aa1ad;font-size:12px;line-height:1.6}.info-box strong{color:#fff}
 .toast{position:fixed;right:20px;bottom:20px;background:#242934;border:1px solid #424958;color:#fff;padding:12px 15px;border-radius:9px;box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:1000}.toast.show{opacity:1;transform:translateY(0)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:2000}.modal-overlay.show{display:flex}
 .modal{width:min(420px,calc(100% - 30px));background:#171a22;border:1px solid #303642;border-radius:12px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.modal h3{margin:0 0 12px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
-@media(max-width:1150px){.boss-row{grid-template-columns:minmax(200px,1fr) minmax(220px,1.5fr) 130px 150px minmax(160px,1fr)}}
+@media(max-width:1150px){.boss-row{grid-template-columns:minmax(200px,1.2fr) minmax(180px,1fr) 140px minmax(160px,1fr)}}
 @media(max-width:1000px){.dashboard{grid-template-columns:repeat(2,1fr)}.boss-row{grid-template-columns:1fr;gap:8px}.status{text-align:left}.boss-note{max-width:500px}}
 @media(max-width:650px){.container{width:min(100% - 20px,1400px);padding-top:15px}header h1{font-size:24px}.dashboard{grid-template-columns:1fr 1fr}.account-top,.character-top{align-items:stretch;flex-direction:column}.account-actions,.character-actions{width:100%}.account-actions .btn,.character-actions .btn{flex:1}.toolbar{flex-direction:column}.search{min-width:0}.boss-icon{width:42px;height:42px}.boss-note{max-width:none}}
 </style>
@@ -84,9 +84,9 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     </div>
 
     <div class="reset-notice">
-        <strong>Automatic Reset:</strong>
-        Weekly boss selections stay visible until you untick them in the Calculator.
-        Monthly selections reset every <span class="reset-monthly">1st of the month 00:00 GMT+8</span>.
+        <strong>Selection Safety:</strong>
+        Boss selections are read-only here and remain managed by the Calculator.
+        Planner clear status is tracked separately.
         <br>
         <strong>Last reset check:</strong> <span id="resetStatus">Checking...</span>
     </div>
@@ -103,7 +103,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     <div class="section-header">
         <div>
             <div class="section-title">Monthly Boss Planner</div>
-            <div class="section-subtitle">Monthly selections automatically reset on the 1st of every month at 00:00 GMT+8.</div>
+            <div class="section-subtitle">Boss selections are read-only; toggle Planner status independently.</div>
         </div>
     </div>
     <div class="boss-list" id="monthlyBosses"></div>
@@ -113,7 +113,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     <div class="section-header">
         <div>
             <div class="section-title">Weekly Boss Planner</div>
-            <div class="section-subtitle">Shows your selected weekly bosses and keeps them visible across weekly resets until you untick them in the Calculator.</div>
+            <div class="section-subtitle">Boss selections are read-only; toggle Planner status independently.</div>
         </div>
     </div>
     <div class="boss-list" id="weeklyBosses"></div>
@@ -121,15 +121,15 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
 
 <div class="info-box">
     <strong>How synchronization works:</strong><br>
-    The MSEA Boss Crystal Calculator is the master source for boss information and clear status.
+    The Calculator is the master source for boss selections. Planner clear status is stored separately.
     If you select or deselect a boss in the Calculator, this Planner will reflect that selection.
     Changing the party size in the Calculator will also update here.
     <br><br>
 
-    <strong>Automatic reset system:</strong><br>
-    <strong>Weekly:</strong> Weekly boss selections are not automatically cleared. They remain visible in the Planner until you untick that boss in the Calculator.
+    <strong>Selection safety:</strong><br>
+    Boss selections are read-only here and remain managed by the Calculator.
     <br>
-    <strong>Monthly:</strong> Monthly Boss selections are still automatically cleared on the 1st of every month at 00:00 GMT+8.
+    Cleared / Not Cleared status is tracked independently and saved in the Planner.
     <br><br>
 
     Resetting selections does <strong>not</strong> delete:
@@ -142,7 +142,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     • Boss data
     <br><br>
 
-    The monthly reset removes Monthly boss clear selections. Weekly boss selections remain saved until you untick them in the Calculator.
+    This preview never changes or resets Calculator boss selections.
     <br><br>
 
     <strong>Weekly selections:</strong><br>
@@ -1091,17 +1091,9 @@ function runAutomaticResets() {
         resetState.monthlyPeriod !==
         currentMonthlyPeriod
     ) {
-
-        calculatorChanged =
-            clearBossSelectionsByType(
-                "Monthly"
-            ) ||
-            calculatorChanged;
-
-        resetState.monthlyPeriod =
-            currentMonthlyPeriod;
-
-        monthlyResetPerformed = true;
+        // Preview safety: never delete or modify Calculator selections.
+        // The live Calculator remains the only place that manages boss selections.
+        resetState.monthlyPeriod = currentMonthlyPeriod;
     }
 
     if (calculatorChanged) {
@@ -1599,87 +1591,21 @@ function createBossRow(boss, character) {
         </div>
     `;
 
-    const difficultyDiv =
-        document.createElement(
-            "div"
-        );
-
-    difficultyDiv.className =
-        "difficulty-list";
-
-    boss.difficulties.forEach(difficulty => {
-
-        const count =
-            selections.filter(
-                selectedDifficulty =>
-                    selectedDifficulty === difficulty.name
-            ).length;
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.type = "button";
-        button.className =
-            "planner-difficulty-button" +
-            (count > 0 ? " selected" : "");
-
-        button.title =
-            `${difficulty.name}: ${count} clear${count === 1 ? "" : "s"} — click to cycle`;
-
-        button.innerHTML = `
-            ${escapeHtml(difficulty.name)}
-            <span class="difficulty-count">${count}</span>
-        `;
-
-        if (difficulty.value === null) {
-            button.disabled = true;
-            button.title = "Crystal value not available";
-        } else {
-            button.onclick = () =>
-                handlePlannerDifficultyClick(
-                    boss.id,
-                    difficulty.name
-                );
-        }
-
-        difficultyDiv.appendChild(button);
-    });
-
-    const partyDiv =
-        document.createElement(
-            "div"
-        );
-
-    partyDiv.className =
-        "party-info";
+    // Read-only summary from Calculator data; the Planner no longer edits selections.
+    const difficultyDiv = document.createElement("div");
+    difficultyDiv.className = "boss-selection-summary";
 
     if (!selections.length) {
-
-        partyDiv.innerHTML =
-            "No active clear";
-
+        difficultyDiv.textContent = "No active Calculator selection";
     } else {
-
-        const partyParts = [];
-
-        selections.forEach(difficulty => {
-
-            const partySize =
-                getPartySize(
-                    boss.id,
-                    character.id,
-                    difficulty
-                );
-
-            partyParts.push(
-                `${escapeHtml(difficulty)}: Party <strong>${partySize}</strong>`
-            );
+        const selectionParts = selections.map(difficulty => {
+            const partySize = getPartySize(boss.id, character.id, difficulty);
+            return `<strong>${escapeHtml(difficulty)}</strong> · Party ${partySize}`;
         });
-
-        partyDiv.innerHTML =
-            partyParts.join(" · ");
+        difficultyDiv.innerHTML = `
+            <span class="boss-selection-label">Calculator selection (read-only)</span>
+            ${selectionParts.join("<br>")}
+        `;
     }
 
     const statusDiv =
@@ -1760,7 +1686,6 @@ function createBossRow(boss, character) {
 
     row.appendChild(nameDiv);
     row.appendChild(difficultyDiv);
-    row.appendChild(partyDiv);
     row.appendChild(statusDiv);
     row.appendChild(noteWrapper);
 
