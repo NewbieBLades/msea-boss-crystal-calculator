@@ -2740,7 +2740,7 @@ function renderResults() {
             <div class="result-header">
                 <div>
                     <div class="result-header-title">${escapeHtml(account.name)}</div>
-                    <div class="account-name">Selected ${selectedCount} · SELL ${optimized.length} · THROW AWAY ${discarded.length}</div>
+                    <div class="account-name">Selected ${selectedCount} · SELL ${hasOptimization ? optimized.length : "—"} · THROW AWAY ${hasOptimization ? discarded.length : "—"}</div>
                 </div>
                 <div class="result-header-value">${hasOptimization ? formatMeso(discardedTotal) : "—"}</div>
             </div>
