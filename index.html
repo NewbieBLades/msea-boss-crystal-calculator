@@ -737,7 +737,7 @@
             </div>
 
             <div class="card-sub">
-                Maximum 12 clears
+                Unlimited weekly clears
             </div>
         </div>
 
@@ -749,11 +749,11 @@
 
             <div class="card-value"
                  id="characterRemaining">
-                12
+                ∞
             </div>
 
             <div class="card-sub">
-                Boss Crystal slots
+                No selection limit
             </div>
         </div>
 
@@ -786,18 +786,11 @@
 
             <div class="card-sub">
                 <span id="accountCrystalText">
-                    0 / 90 Boss Crystals
+                    0 Boss Crystals selected
                 </span>
             </div>
 
-            <div class="progress-wrap">
-                <div class="progress">
-                    <div
-                        class="progress-bar"
-                        id="accountProgress">
-                    </div>
-                </div>
-            </div>
+            
         </div>
 
     </section>
@@ -879,7 +872,7 @@
                 <div
                     class="card-sub"
                     id="weeklyAnnualSub">
-                    0 / 90 weekly crystals × 52 weeks
+                    0 selected weekly crystals × 52 weeks
                 </div>
 
             </div>
@@ -1083,7 +1076,7 @@
                 </div>
 
                 <div class="section-subtitle">
-                    Maximum 12 Boss Crystals per character
+                    Unlimited Boss Crystal selections
                     · Each boss can be cleared up to 2 times
                 </div>
 
@@ -1161,10 +1154,6 @@
 /* =========================================================
    SETTINGS
 ========================================================= */
-
-const MAX_BOSSES_PER_CHARACTER = 12;
-
-const MAX_ACCOUNT_CRYSTALS = 90;
 
 const MAX_CLEARS_PER_BOSS = 2;
 
@@ -2571,125 +2560,18 @@ function selectDifficulty(
     }
 
     /*
-        x1 -> x2 normally.
-
-        If character/account is full,
-        x1 becomes deselect.
+        Cycle x0 -> x1 -> x2 -> x0 without character
+        or account-wide selection limits.
     */
 
-    else if (
-        difficultyCount === 1
-    ) {
-
-        const characterCount =
-            getCharacterCrystalCount(
-                character
-            );
-
-
-        const accountCount =
-            getAccountCrystalCount();
-
-
-        const characterFull =
-            !isMonthlyBoss(boss) &&
-            characterCount >=
-                MAX_BOSSES_PER_CHARACTER;
-
-
-        const accountFull =
-            !isMonthlyBoss(boss) &&
-            accountCount >=
-            MAX_ACCOUNT_CRYSTALS;
-
-
-        if (
-            characterFull ||
-            accountFull
-        ) {
-
-            selections =
-                selections.filter(
-                    item =>
-                        item !== difficulty
-                );
-
-        }
-
-        else {
-
-            selections.push(
-                difficulty
-            );
-
-        }
-
-    }
-
-    /*
-        x0 -> x1
-    */
-
-    else {
-
-        const characterCount =
-            getCharacterCrystalCount(
-                character
-            );
-
-
-        const accountCount =
-            getAccountCrystalCount();
-
-
-        if (
-            !isMonthlyBoss(boss) &&
-            characterCount >=
-                MAX_BOSSES_PER_CHARACTER
-        ) {
-
-            showToast(
-                `Character limit reached: ${MAX_BOSSES_PER_CHARACTER} Boss Crystals.`
-            );
-
+    else if (difficultyCount === 1) {
+        selections.push(difficulty);
+    } else {
+        if (currentBossClears >= MAX_CLEARS_PER_BOSS) {
+            showToast("This boss can only be cleared 2 times.");
             return;
-
         }
-
-
-        if (
-            !isMonthlyBoss(boss) &&
-            accountCount >=
-            MAX_ACCOUNT_CRYSTALS
-        ) {
-
-            showToast(
-                `Account limit reached: ${MAX_ACCOUNT_CRYSTALS} Boss Crystals.`
-            );
-
-            return;
-
-        }
-
-
-        if (
-            currentBossClears >=
-            MAX_CLEARS_PER_BOSS
-        ) {
-
-            showToast(
-                "This boss can only be cleared 2 times."
-            );
-
-            return;
-
-        }
-
-
-        selections.push(
-            difficulty
-        );
-
+        selections.push(difficulty);
     }
 
 
@@ -2795,7 +2677,7 @@ function renderAccounts() {
                 </span>
 
                 <span class="account-tab-count">
-                    ${crystalCount}/${MAX_ACCOUNT_CRYSTALS}
+                    ${crystalCount} selected
                 </span>
 
             `;
@@ -2890,7 +2772,7 @@ function renderCharacters() {
                 </span>
 
                 <span class="character-tab-count">
-                    ${count}/${MAX_BOSSES_PER_CHARACTER}
+                    ${count} selected
                 </span>
 
             `;
@@ -2935,12 +2817,7 @@ function renderDashboard() {
         );
 
 
-    const characterRemaining =
-        Math.max(
-            0,
-            MAX_BOSSES_PER_CHARACTER -
-            characterCrystals
-        );
+    const characterRemaining = "∞";
 
 
     const characterTotal =
@@ -2988,23 +2865,7 @@ function renderDashboard() {
     document.getElementById(
         "accountCrystalText"
     ).textContent =
-        `${accountCrystals} / ${MAX_ACCOUNT_CRYSTALS} Boss Crystals`;
-
-
-    const percentage =
-        Math.min(
-            100,
-            (
-                accountCrystals /
-                MAX_ACCOUNT_CRYSTALS
-            ) * 100
-        );
-
-
-    document.getElementById(
-        "accountProgress"
-    ).style.width =
-        percentage + "%";
+        `${accountCrystals} Boss Crystals selected`;
 
 }
 
@@ -3071,7 +2932,7 @@ function renderMonthlyDashboard() {
     document.getElementById(
         "weeklyAnnualSub"
     ).textContent =
-        `${weeklyCrystals} / ${MAX_ACCOUNT_CRYSTALS} weekly crystals × 52 weeks`;
+        `${weeklyCrystals} selected weekly crystals × 52 weeks`;
 
 
     document.getElementById(
@@ -3219,18 +3080,6 @@ function renderBossList(
                 isMonthlyBoss(boss);
 
 
-            const characterLimitReached =
-                !isMonthly &&
-                characterCount >=
-                MAX_BOSSES_PER_CHARACTER;
-
-
-            const accountLimitReached =
-                !isMonthly &&
-                accountCount >=
-                MAX_ACCOUNT_CRYSTALS;
-
-
             let difficultyHtml = "";
 
 
@@ -3257,12 +3106,7 @@ function renderBossList(
 
                     const disabled =
                         count === 0 &&
-                        (
-                            characterLimitReached ||
-                            accountLimitReached ||
-                            bossClearCount >=
-                            MAX_CLEARS_PER_BOSS
-                        );
+                        bossClearCount >= MAX_CLEARS_PER_BOSS;
 
 
                     const inputId =
