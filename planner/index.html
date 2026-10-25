@@ -465,6 +465,26 @@ function isPlannerBossCleared(character, bossId) {
     return getBossSelections(character, bossId).length > 0;
 }
 
+function resetPlannerClearStatusesByType(type) {
+    if (!calculatorState || !Array.isArray(calculatorState.accounts)) return;
+
+    calculatorState.accounts.forEach(account => {
+        if (!Array.isArray(account.characters)) return;
+
+        account.characters.forEach(character => {
+            if (!plannerClearStatus[character.id]) {
+                plannerClearStatus[character.id] = {};
+            }
+
+            bossDefinitions.forEach(boss => {
+                if (type === null || boss.type === type) {
+                    plannerClearStatus[character.id][boss.id] = false;
+                }
+            });
+        });
+    });
+}
+
 function resetPlannerClearStatus() {
     const confirmed = window.confirm(
         "Reset all Planner Cleared / Not Cleared statuses? Statuses will return to their default based on Calculator selections. Calculator selections, accounts, characters, party sizes and notes will not be changed."
@@ -472,11 +492,11 @@ function resetPlannerClearStatus() {
 
     if (!confirmed) return;
 
-    // Clear only Planner status overrides; never touch Calculator selections.
-    plannerClearStatus = {};
+    // Explicitly mark every boss as Not Cleared, regardless of Calculator selections.
+    resetPlannerClearStatusesByType(null);
     savePlannerClearStatus();
     renderAll();
-    showToast("Planner clear statuses reset. Calculator selections were not changed.");
+    showToast("All Planner boss statuses reset to Not Cleared. Calculator selections were not changed.");
 }
 
 function togglePlannerBossClearStatus(character, bossId) {
@@ -1088,10 +1108,11 @@ function runAutomaticResets() {
     ) {
 
         /*
-           Keep weekly boss selections persistent across weekly resets.
-           The user removes a boss by unticking it in the Calculator.
-           Only update the period marker; do not delete selected bosses.
+           Keep Calculator boss selections persistent, but reset the Planner's
+           weekly Cleared / Not Cleared statuses to Not Cleared on Thursday.
         */
+        resetPlannerClearStatusesByType("weekly");
+        savePlannerClearStatus();
         resetState.weeklyPeriod =
             currentWeeklyPeriod;
     }
