@@ -81,6 +81,7 @@ header{margin-bottom:24px} header h1{margin:0 0 6px;font-size:30px} header p{mar
     <div class="toolbar">
         <div class="search"><input id="searchInput" type="text" placeholder="Search boss..." oninput="renderBosses()"></div>
         <button class="btn primary" type="button" onclick="syncFromCalculator()">↻ Sync from Calculator</button>
+        <button class="btn danger" type="button" onclick="resetPlannerClearStatus()">↺ Reset Clear Status</button>
     </div>
 
     <div class="reset-notice">
@@ -462,6 +463,20 @@ function isPlannerBossCleared(character, bossId) {
     }
     // Initially mirror existing selections until the user sets a separate Planner status.
     return getBossSelections(character, bossId).length > 0;
+}
+
+function resetPlannerClearStatus() {
+    const confirmed = window.confirm(
+        "Reset all Planner Cleared / Not Cleared statuses? Statuses will return to their default based on Calculator selections. Calculator selections, accounts, characters, party sizes and notes will not be changed."
+    );
+
+    if (!confirmed) return;
+
+    // Clear only Planner status overrides; never touch Calculator selections.
+    plannerClearStatus = {};
+    savePlannerClearStatus();
+    renderAll();
+    showToast("Planner clear statuses reset. Calculator selections were not changed.");
 }
 
 function togglePlannerBossClearStatus(character, bossId) {
