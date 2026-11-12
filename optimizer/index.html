@@ -1086,6 +1086,70 @@ const defaultBosses = [
 ];
 
 
+/* Latest proposed crystal prices, synced with the Calculator. */
+const afterBossPrices = {
+    "blackmage:H": 660,
+    "blackmage:EX": 5680,
+    "lotus:N": 18,
+    "lotus:H": 57,
+    "lotus:EX": 558.6,
+    "damien:N": 18.5,
+    "damien:H": 54,
+    "slime:N": 25.5,
+    "slime:C": 80,
+    "lucid:E": 29.8,
+    "lucid:N": 35.6,
+    "lucid:H": 68,
+    "will:E": 32.3,
+    "will:N": 41.1,
+    "will:H": 83.5,
+    "dusk:N": 44,
+    "dusk:C": 76,
+    "heretic:N": 77,
+    "heretic:H": 113,
+    "djunkel:N": 47.5,
+    "djunkel:H": 100,
+    "seren:N": 239,
+    "seren:H": 340,
+    "seren:EX": 1840,
+    "malicia:N": 275,
+    "malicia:EX": 3160,
+    "kalos:E": 305,
+    "kalos:N": 445.5,
+    "kalos:C": 1056,
+    "kalos:EX": 2565,
+    "adversary:E": 324.9,
+    "adversary:N": 503.5,
+    "adversary:H": 1260,
+    "adversary:EX": 2920,
+    "carling:E": 349.7,
+    "carling:N": 577.5,
+    "carling:H": 1232,
+    "carling:EX": 3040,
+    "radiant:N": 564.3,
+    "radiant:H": 2143.2,
+    "limbo:N": 900,
+    "limbo:H": 1930,
+    "baldrix:N": 1200,
+    "baldrix:H": 2376,
+    "jupiter:N": 1360,
+    "jupiter:H": 3000,
+    "bellona:E": 396,
+    "bellona:N": 824,
+    "bellona:H": 2200
+};
+
+/* Apply the latest price schedule to every matching boss difficulty. */
+for (const boss of defaultBosses) {
+    for (const difficulty of boss.difficulties) {
+        const updatedPrice = afterBossPrices[boss.id + ":" + difficulty.name];
+        if (updatedPrice !== undefined) {
+            difficulty.value = updatedPrice;
+        }
+    }
+}
+
+
 /* =========================================================
    STATE
 ========================================================= */
