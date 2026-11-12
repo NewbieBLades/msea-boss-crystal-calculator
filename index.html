@@ -593,6 +593,23 @@
         cursor: not-allowed;
     }
 
+    .difficulty-price {
+        display: inline-flex;
+        align-items: center;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+        opacity: 0.95;
+        white-space: nowrap;
+    }
+
+    .difficulty-option label {
+        flex-direction: column;
+        gap: 3px;
+        min-width: 54px;
+        padding: 6px 8px;
+    }
+
     .difficulty-count {
         display: inline-flex;
         align-items: center;
@@ -3355,8 +3372,21 @@ function renderBossList(
                         `difficulty-${character.id}-${boss.id}-${difficulty.name}`;
 
 
+                    const partySize =
+                        getPartySize(
+                            boss.id,
+                            character.id,
+                            difficulty.name
+                        );
+
+                    const latestCrystalPrice =
+                        afterBossPrices[boss.id + ":" + difficulty.name];
+
                     let labelContent =
-                        difficulty.name;
+                        `${difficulty.name}
+                            <span class="difficulty-price">
+                                ${formatMeso(latestCrystalPrice)}
+                            </span>`;
 
 
                     if (
@@ -3372,14 +3402,6 @@ function renderBossList(
                         `;
 
                     }
-
-
-                    const partySize =
-                        getPartySize(
-                            boss.id,
-                            character.id,
-                            difficulty.name
-                        );
 
 
                     difficultyHtml += `
