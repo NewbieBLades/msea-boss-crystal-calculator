@@ -2524,26 +2524,8 @@ function getAccountTotalWithPriceSet(useAfterPrices) {
 
 function getAccountTotal() {
 
-    const account =
-        getActiveAccount();
-
-
-    if (!account) {
-        return 0;
-    }
-
-
-    return account.characters.reduce(
-        (
-            total,
-            character
-        ) =>
-            total +
-            getCharacterTotal(
-                character
-            ),
-        0
-    );
+    // Account Total now reflects the proposed AFTER prices.
+    return getAccountTotalWithPriceSet(true);
 
 }
 
