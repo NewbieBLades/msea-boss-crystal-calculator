@@ -144,6 +144,67 @@
     }
 
     /* =========================
+       BEFORE / AFTER PRICE COMPARISON
+    ========================= */
+
+    .price-comparison-dashboard {
+        background: #171a22;
+        border: 1px solid #292e3a;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+
+    .price-comparison-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid #292e3a;
+    }
+
+    .price-comparison-title {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .price-comparison-subtitle {
+        color: #777f8d;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .price-comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .price-comparison-item {
+        background: #1d222d;
+        border: 1px solid #303746;
+        border-radius: 10px;
+        padding: 14px;
+        min-width: 0;
+    }
+
+    .price-comparison-label {
+        color: #9aa1ad;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .price-comparison-value {
+        font-size: 25px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .price-comparison-note {
+        color: #777f8d;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    /* =========================
        MONTHLY / ANNUAL DASHBOARD
     ========================= */
 
@@ -827,6 +888,40 @@
 
 
     <!-- =========================
+         BEFORE / AFTER PRICE COMPARISON
+    ========================= -->
+
+    <section class="price-comparison-dashboard">
+
+        <div class="price-comparison-header">
+            <div class="price-comparison-title">Account Total · Before / After</div>
+            <div class="price-comparison-subtitle">Estimated weekly crystal income using your selected crystals and party sizes</div>
+        </div>
+
+        <div class="price-comparison-grid">
+            <div class="price-comparison-item">
+                <div class="price-comparison-label">B = Before</div>
+                <div class="price-comparison-value" id="beforeAccountTotal">0</div>
+                <div class="price-comparison-note">Current crystal prices</div>
+            </div>
+
+            <div class="price-comparison-item">
+                <div class="price-comparison-label">A = After</div>
+                <div class="price-comparison-value" id="afterAccountTotal">0</div>
+                <div class="price-comparison-note">Proposed new crystal prices</div>
+            </div>
+
+            <div class="price-comparison-item">
+                <div class="price-comparison-label">Boss Crystals Selected</div>
+                <div class="price-comparison-value" id="priceComparisonCrystalCount">0</div>
+                <div class="price-comparison-note">Across this account</div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- =========================
          MONTHLY / ANNUAL DASHBOARD
     ========================= -->
 
@@ -1420,6 +1515,63 @@ const defaultBosses = [
         ]
     }
 ];
+
+
+
+
+// Proposed replacement crystal prices, in millions of mesos.
+// Used only by the Before / After comparison; existing calculator prices stay unchanged.
+const afterBossPrices = {
+    "blackmage:H": 660,
+    "blackmage:EX": 5680,
+    "lotus:N": 18,
+    "lotus:H": 57,
+    "lotus:EX": 558.6,
+    "damien:N": 18.5,
+    "damien:H": 54,
+    "slime:N": 25.5,
+    "slime:C": 80,
+    "lucid:E": 29.8,
+    "lucid:N": 35.6,
+    "lucid:H": 68,
+    "will:E": 32.3,
+    "will:N": 41.1,
+    "will:H": 83.5,
+    "dusk:N": 44,
+    "dusk:C": 76,
+    "heretic:N": 77,
+    "heretic:H": 113,
+    "djunkel:N": 47.5,
+    "djunkel:H": 100,
+    "seren:N": 239,
+    "seren:H": 340,
+    "seren:EX": 1840,
+    "malicia:N": 275,
+    "malicia:EX": 3160,
+    "kalos:E": 305,
+    "kalos:N": 445.5,
+    "kalos:C": 1056,
+    "kalos:EX": 2565,
+    "adversary:E": 324.9,
+    "adversary:N": 503.5,
+    "adversary:H": 1260,
+    "adversary:EX": 2920,
+    "carling:E": 349.7,
+    "carling:N": 577.5,
+    "carling:H": 1232,
+    "carling:EX": 3040,
+    "radiant:N": 564.3,
+    "radiant:H": 2143.2,
+    "limbo:N": 900,
+    "limbo:H": 1930,
+    "baldrix:N": 1200,
+    "baldrix:H": 2376,
+    "jupiter:N": 1360,
+    "jupiter:H": 3000,
+    "bellona:E": 396,
+    "bellona:N": 824,
+    "bellona:H": 2200
+};
 
 
 /* =========================================================
@@ -2327,6 +2479,49 @@ function getCharacterTotal(
 }
 
 
+function getAccountTotalWithPriceSet(useAfterPrices) {
+
+    const account = getActiveAccount();
+
+    if (!account) {
+        return 0;
+    }
+
+    return account.characters.reduce((accountSum, character) => {
+        if (!character || !character.selected) {
+            return accountSum;
+        }
+
+        let characterSum = 0;
+
+        Object.keys(character.selected).forEach(bossId => {
+            const boss = getBoss(bossId);
+
+            // Match the existing Account Total: weekly crystals only.
+            // Black Mage remains in the separate monthly income dashboard.
+            if (!boss || boss.type !== "Weekly") {
+                return;
+            }
+
+            getBossSelections(character, bossId).forEach(difficultyName => {
+                const difficulty = getDifficulty(bossId, difficultyName);
+                const afterPrice = afterBossPrices[bossId + ":" + difficultyName];
+                const price = useAfterPrices ? afterPrice : (difficulty ? difficulty.value : null);
+
+                if (price === null || price === undefined) {
+                    return;
+                }
+
+                const partySize = getPartySize(bossId, character.id, difficultyName);
+                characterSum += price / partySize;
+            });
+        });
+
+        return accountSum + characterSum;
+    }, 0);
+}
+
+
 function getAccountTotal() {
 
     const account =
@@ -2922,6 +3117,15 @@ function renderDashboard() {
         "accountCrystalText"
     ).textContent =
         `${accountCrystals} Boss Crystals selected`;
+
+    document.getElementById("beforeAccountTotal").textContent =
+        formatMeso(getAccountTotalWithPriceSet(false));
+
+    document.getElementById("afterAccountTotal").textContent =
+        formatMeso(getAccountTotalWithPriceSet(true));
+
+    document.getElementById("priceComparisonCrystalCount").textContent =
+        accountCrystals;
 
 }
 
