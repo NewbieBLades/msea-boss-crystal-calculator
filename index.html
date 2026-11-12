@@ -3472,6 +3472,9 @@ function renderBossList(
                             difficultyName
                         );
 
+                    const latestPrice =
+                        afterBossPrices[boss.id + ":" + difficultyName];
+
 
                     if (
                         difficulty &&
@@ -3485,14 +3488,20 @@ function renderBossList(
                                 difficultyName
                             );
 
+                        const displayPrice =
+                            latestPrice !== undefined &&
+                            latestPrice !== null
+                                ? latestPrice
+                                : difficulty.value;
+
 
                         selectedMeso +=
-                            difficulty.value /
+                            displayPrice /
                             partySize;
 
 
                         rawBossTotal +=
-                            difficulty.value;
+                            displayPrice;
 
                     }
 
